@@ -1,0 +1,29 @@
+{
+  "name": "universajs",
+  "version": "0.1.0",
+  "description": "cryptography tools for universa",
+  "main": "index.js",
+  "scripts": {
+    "test": "browserify test/*.js > build/tests.js && mocha-phantomjs -p ./node_modules/.bin/phantomjs test/runner.html",
+    "build": "./node_modules/webpack/bin/webpack.js && uglifyjs build/universajs.js > build/universajs.min.js"
+  },
+  "keywords": [
+    "crypt",
+    "frontend",
+    "client"
+  ],
+  "author": "",
+  "devDependencies": {
+    "mocha": "~3.2.0",
+    "should": "~11.2.0",
+    "uglify-js": "~2.8.7",
+    "browserify": "~14.1.0",
+    "simple-mock": "~0.7.0",
+    "mocha-phantomjs": "~4.1.0",
+    "phantomjs-prebuilt": "^2.1.14",
+    "webpack": "^2.2.0"
+  },
+  "dependencies": {
+    "node-forge": "^0.7.1"
+  }
+}
