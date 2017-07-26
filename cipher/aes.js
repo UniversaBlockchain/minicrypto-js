@@ -12,11 +12,11 @@ module.exports = AES;
  * @param {String} mode - cipher mode (ECB for ex.)
  */
 function AES(key, mode) {
-	if (!mode) mode = 'ECB';
-	var type = ['AES', mode].join('-');
+  if (!mode) mode = 'ECB';
+  var type = ['AES', mode].join('-');
 
-	this.cipher = cipher.createCipher(type, key);
-	this.decipher = cipher.createDecipher(type, key);
+  this.cipher = cipher.createCipher(type, key);
+  this.decipher = cipher.createDecipher(type, key);
 }
 
 /**
@@ -25,13 +25,13 @@ function AES(key, mode) {
  * @param {String} bytes - message in bytes to encrypt
  */
 AES.prototype.encrypt = function(bytes) {
-	var cipher = this.cipher;
+  var cipher = this.cipher;
 
-	cipher.start();
-	cipher.update(util.createBuffer(bytes));
-	cipher.finish();
+  cipher.start();
+  cipher.update(util.createBuffer(bytes));
+  cipher.finish();
 
-	return cipher.output.bytes();
+  return cipher.output.bytes();
 };
 
 /**
@@ -40,13 +40,13 @@ AES.prototype.encrypt = function(bytes) {
  * @param {String} encrypted - (in bytes) encrypted message to encrypt
  */
 AES.prototype.decrypt = function(encrypted) {
-	var decipher = this.decipher;
+  var decipher = this.decipher;
 
-	decipher.start();
-	decipher.update(util.createBuffer(encrypted));
-	var result = decipher.finish();
+  decipher.start();
+  decipher.update(util.createBuffer(encrypted));
+  var result = decipher.finish();
 
-	if (!result) return new Error('Decryption failed');
+  if (!result) return new Error('Decryption failed');
 
-	return decipher.output.bytes();
+  return decipher.output.bytes();
 };
