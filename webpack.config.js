@@ -1,6 +1,3 @@
-const path = require('path');
-const webpack = require('webpack');
-
 module.exports = [
   {
     entry: forgeModules([
@@ -20,9 +17,7 @@ module.exports = [
     }
   },
   {
-    entry: forgeModules([
-      'prime.worker'
-    ]),
+    entry: forgeModules(['prime.worker']),
     output: {
       filename: 'worker.js',
       path: __dirname + '/vendor',
