@@ -1,7 +1,7 @@
 module.exports = [{
   entry: ['./index.js'],
   output: {
-    filename: 'universajs.js',
+    filename: 'universa.js',
     path: __dirname + '/build'
   }
 }];
