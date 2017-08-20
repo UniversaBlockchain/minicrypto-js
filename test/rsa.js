@@ -106,6 +106,20 @@ describe('RSA', function() {
   });
 
   describe('Private key', function() {
+    it('should read from BOSS format', function() {
+      var privateKey = new PrivateKey('EXPONENTS', {
+        e: oaep.e,
+        p: oaep.p,
+        q: oaep.q
+      });
+
+      const packed = privateKey.pack('BOSS');
+
+      const unpacked = new PrivateKey('BOSS', packed);
+
+      should(unpacked.params.qInv).eql(privateKey.params.qInv);
+    });
+
     it('should restore key from exponents (e, p, q)', function() {
       var privateKey = new PrivateKey('EXPONENTS', {
         e: oaep.e,
