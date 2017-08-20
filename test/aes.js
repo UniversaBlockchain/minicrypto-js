@@ -1,6 +1,6 @@
 var should = require('should');
-var utils = require('../utils');
-var cipher = require('../cipher');
+var utils = require('../lib/utils');
+var cipher = require('../lib/cipher');
 
 var AES = cipher.AES;
 

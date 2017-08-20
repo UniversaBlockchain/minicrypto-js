@@ -1,6 +1,6 @@
-exports.hash = require('./hash');
-exports.pki = require('./pki');
-exports.utils = require('./utils');
-exports.cipher = require('./cipher');
+exports.hash = require('./lib/hash');
+exports.pki = require('./lib/pki');
+exports.utils = require('./lib/utils');
+exports.cipher = require('./lib/cipher');
 
-exports.Boss = require('./boss');
+exports.Boss = require('./lib/boss');

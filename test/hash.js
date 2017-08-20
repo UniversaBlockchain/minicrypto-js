@@ -1,5 +1,5 @@
 var should = require('should');
-var hash = require('../hash');
+var hash = require('../lib/hash');
 
 var SHA = hash.SHA;
 var HMAC = hash.HMAC;

@@ -1,6 +1,6 @@
 const should = require('should');
 
-const Boss = require('../boss/protocol');
+const Boss = require('../lib/boss/protocol');
 
 const vectors = [
   ['8', 7],
@@ -11,7 +11,7 @@ const vectors = [
   // TODO: [',Hello', bytes!('Hello'), 2, 4, 4, 1]
 ];
 
-describe('Protocol', function() {
+describe('BOSS Protocol', function() {
   var boss;
 
   beforeEach(function() {

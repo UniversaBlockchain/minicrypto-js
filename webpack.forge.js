@@ -12,7 +12,7 @@ module.exports = [
     ]),
     output: {
       filename: 'forge.js',
-      path: __dirname + '/vendor',
+      path: __dirname + '/lib/vendor',
       libraryTarget: 'umd'
     }
   },
@@ -20,7 +20,7 @@ module.exports = [
     entry: forgeModules(['prime.worker']),
     output: {
       filename: 'worker.js',
-      path: __dirname + '/vendor',
+      path: __dirname + '/lib/vendor',
       libraryTarget: 'umd'
     }
   }

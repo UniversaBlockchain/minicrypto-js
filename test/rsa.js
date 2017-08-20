@@ -1,15 +1,15 @@
 var should = require('should');
-var utils = require('../utils');
+var utils = require('../lib/utils');
 
-var rsa = require('../pki/rsa');
-var hash = require('../hash');
+var rsa = require('../lib/pki/rsa');
+var hash = require('../lib/hash');
 
 var SHA = hash.SHA;
 
 var bytesToHex = utils.bytesToHex;
 
-var PrivateKey = require('../pki/private_key');
-var PublicKey = require('../pki/public_key');
+var PrivateKey = require('../lib/pki/private_key');
+var PublicKey = require('../lib/pki/public_key');
 
 var vectors = require('./vectors');
 

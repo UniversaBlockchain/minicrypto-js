@@ -1,4 +1,4 @@
-var utils = require('../../utils');
+var utils = require('../../lib/utils');
 var helpers = require('../helpers');
 
 var hexToBytes = utils.hexToBytes;
