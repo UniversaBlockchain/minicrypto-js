@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "browserify test/*.js > build/tests.js && mocha-phantomjs -p ./node_modules/.bin/phantomjs test/runner.html",
-    "build": "./node_modules/webpack/bin/webpack.js --config webpack.forge.js && ./node_modules/webpack/bin/webpack.js --config webpack.universa.js && uglifyjs build/universa.js > build/universa.min.js"
+    "build": "./node_modules/webpack/bin/webpack.js --config webpack.forge.js && ./node_modules/webpack/bin/webpack.js --config webpack.universa.js && uglifyjs build/universa.js > build/universa.min.js && uglifyjs build/boss.js > build/boss.min.js"
   },
   "keywords": [
     "crypt",
@@ -14,18 +14,19 @@
   ],
   "author": "",
   "devDependencies": {
+    "webpack": "^2.2.0",
+    "uglify-js": "~2.8.7",
     "babel-core": "~6.26.0",
     "babel-loader": "~7.1.2",
     "babel-preset-es2015": "~6.24.1",
+    "babel-plugin-transform-es2015-modules-amd": "~0.1.0",
 
     "mocha": "~3.2.0",
     "should": "~11.2.0",
-    "uglify-js": "~2.8.7",
     "browserify": "~14.1.0",
     "simple-mock": "~0.7.0",
     "mocha-phantomjs": "~4.1.0",
-    "phantomjs-prebuilt": "^2.1.14",
-    "webpack": "^2.2.0"
+    "phantomjs-prebuilt": "^2.1.14"
   },
   "dependencies": {
     "node-forge": "^0.7.1"
