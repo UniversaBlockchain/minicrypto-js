@@ -44,7 +44,7 @@ describe('RSA', function() {
     it('should encrypt data with OAEP and MGF1', function() {
       // To make test repeatable
       var oaepOpts = { seed: oaep.seed };
-      var publicKey = new PublicKey(oaep);
+      var publicKey = new PublicKey('EXPONENTS', oaep);
 
       var encrypted = publicKey.encrypt(oaep.originalMessage, oaepOpts);
 
@@ -52,7 +52,7 @@ describe('RSA', function() {
     });
 
     it('should verify message PSS signature', function() {
-      var publicKey = new PublicKey(pss);
+      var publicKey = new PublicKey('EXPONENTS', pss);
       var pssOpts = { salt: pss.salt };
 
       var hash = new SHA('1');
@@ -67,7 +67,11 @@ describe('RSA', function() {
       var privateKey, publicKey;
 
       beforeEach(function() {
-        privateKey = new PrivateKey({ e: customSalt.e, p: customSalt.p, q: customSalt.q });
+        privateKey = new PrivateKey('EXPONENTS', {
+          e: customSalt.e,
+          p: customSalt.p,
+          q: customSalt.q
+        });
         publicKey = privateKey.publicKey;
       });
 
@@ -94,14 +98,16 @@ describe('RSA', function() {
         hash.put(customSalt.message);
         var hashed = hash.get('bytes');
 
-        should(publicKey.verify(hashed, privateKey.sign(hash))).eql(true);
+        var signature = privateKey.sign(hash);
+
+        should(publicKey.verify(hashed, signature)).eql(true);
       });
     });
   });
 
   describe('Private key', function() {
     it('should restore key from exponents (e, p, q)', function() {
-      var privateKey = new PrivateKey({
+      var privateKey = new PrivateKey('EXPONENTS', {
         e: oaep.e,
         p: oaep.p,
         q: oaep.q
@@ -122,7 +128,7 @@ describe('RSA', function() {
     it('should decrypt data with OAEP and MGF1', function() {
       // To make test repeatable
       var oaepOpts = { seed: oaep.seed };
-      var privateKey = new PrivateKey(oaep);
+      var privateKey = new PrivateKey('EXPONENTS', oaep);
 
       var decrypted = privateKey.decrypt(oaep.encryptedMessage, oaepOpts);
 
@@ -130,7 +136,7 @@ describe('RSA', function() {
     });
 
     it('should sign message with PSS', function() {
-      var privateKey = new PrivateKey(pss);
+      var privateKey = new PrivateKey('EXPONENTS', pss);
       var pssOpts = { salt: pss.salt };
 
       var hash = new SHA('1');
