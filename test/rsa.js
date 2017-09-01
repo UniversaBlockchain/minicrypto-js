@@ -3,6 +3,7 @@ var utils = require('../lib/utils');
 
 var rsa = require('../lib/pki/rsa');
 var hash = require('../lib/hash');
+var Boss = require('../lib/boss/protocol');
 
 var SHA = hash.SHA;
 
@@ -19,14 +20,13 @@ var customSalt = vectors.customSalt;
 
 describe('RSA', function() {
   describe('key creation', function() {
-    it.skip('should generate key pair', function(done) {
+    it('should generate key pair', function(done) {
       // FIXME: why keys generation and convertation to pem takes so long time?
       this.timeout(8000);
 
       var options = {
         bits: 2048,
-        e: 0x10001,
-        workerScript: '../vendor/worker.js'
+        e: 0x10001
       };
 
       rsa.createKeys(options, function(err, pair) {
@@ -37,6 +37,16 @@ describe('RSA', function() {
 
         done();
       });
+    });
+
+    it.skip('should read key from BOSS format', function() {
+      var base64Encoded = vectors.keys[0];
+      var bossEncoded = utils.decode64(base64Encoded);
+      var boss = new Boss();
+
+      console.log(typeof bossEncoded);
+
+      console.log(boss.unpack(bossEncoded.split('')));
     });
   });
 
