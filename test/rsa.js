@@ -39,14 +39,13 @@ describe('RSA', function() {
       });
     });
 
-    it.skip('should read key from BOSS format', function() {
-      var base64Encoded = vectors.keys[0];
+    it.only('should read key from BOSS format', function() {
+      var base64Encoded = vectors.keys[1];
       var bossEncoded = utils.decode64(base64Encoded);
       var boss = new Boss();
+      var unpacked = boss.unpack(utils.raw.encode(bossEncoded));
 
-      console.log(typeof bossEncoded);
-
-      console.log(boss.unpack(bossEncoded.split('')));
+      should(unpacked[0]).eql(0);
     });
   });
 
