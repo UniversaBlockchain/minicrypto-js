@@ -11,11 +11,13 @@ function rewriteWorker(err, stats) {
 
 	const quote = /'/g;
 	const newline = /\n/g;
+	const comment = /\/\/.+\n/g;
 	const workerPath = __dirname + '/lib/vendor/worker.js';
 
 	var data = fs.readFileSync(workerPath);
 	data = data.toString();
 	data = data.replace(quote, '"');
+	data = data.replace(comment, " ");
 	data = data.replace(newline, ' ');
 	data = 'module.exports = \'' + data + '\';';
 	fs.writeFile(workerPath, data, buildUniversa);
