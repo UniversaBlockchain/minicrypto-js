@@ -39,13 +39,12 @@ describe('RSA', function() {
       });
     });
 
-    it.only('should read key from BOSS format', function() {
+    it.only('should read/write key from/to BOSS format', function() {
       var base64Encoded = vectors.keys[1];
-      var bossEncoded = utils.decode64(base64Encoded);
-      var boss = new Boss();
-      var unpacked = boss.unpack(utils.raw.encode(bossEncoded));
+      var key = new PrivateKey('BOSS', base64Encoded);
+      var encoded = key.pack('BOSS');
 
-      should(unpacked[0]).eql(0);
+      should(key.params.n.toString(16)).eql('cc518b92cef4a1baf1fe3fd3a4419bb5a0a5fe381c7d4b365dd672343a911236474a2fdff759dac21b40af42e83ec8ff30e403ed339faca0ab3a15f72a22dc822184a4949179590cbd53098d443fed61209a47223c4c6212e1b0085824d4ffd7f2d4927533f89a98132d070a61b062873c22b7ae65411a1ea6a9d33d30c5bbe63b19e05fe7589ac50ba5b704ee6fe9338d09dd7e9efd071534646101d058e676c9b650381ff5a0cdb2f11c3167378a25493957cb3ac71770a43cd77bc605b41f11c437560c0a0271154c4782f9c6a731477260e7334a380b81b197c1af53608d9ea451b136afdf7ada9ebba46db0a92464c7283b48a2eb332a89cc70ec02b8c66adc1e2344365db7f7bae30fe793e36eeacc93663969aca23a863556b2b9c4ff690f9f87994fa246c514bec71c91d0df26436934da51a6d484667d5e8f46f3599a8a5f52287dfd019e919ef4650406a44657f59342426ad61d33668b217ffe5f333c1858ce4cbbdcbbb71d486bca83f4eefed82088ea13e8b82288b639446831f61f298e96ebf5281056ed51d5f3e8e25c341386c699f4954a3f33a82efaf88e7d791e311bfbbcc947865349af32ddad1a5addafb10ff7401549a1c53bb7777533e269ec94e73d6f5927662c403a05b7b0541b3af816e91da94bbab8b095fedbb003253deffcbafb4190057f523564646d3f16d9e43a3b8be29a2694942bc047');
     });
   });
 
