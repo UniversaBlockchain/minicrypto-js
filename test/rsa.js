@@ -7,7 +7,7 @@ var Boss = require('../lib/boss/protocol');
 
 var SHA = hash.SHA;
 
-var bytesToHex = utils.bytesToHex;
+const { bytesToHex, hexToBytes, raw } = utils;
 
 var PrivateKey = require('../lib/pki/private_key');
 var PublicKey = require('../lib/pki/public_key');
@@ -20,7 +20,7 @@ var customSalt = vectors.customSalt;
 
 describe('RSA', function() {
   describe('key creation', function() {
-    it('should generate key pair', function(done) {
+    it.skip('should generate key pair', function(done) {
       // FIXME: why keys generation and convertation to pem takes so long time?
       this.timeout(8000);
 
@@ -39,12 +39,11 @@ describe('RSA', function() {
       });
     });
 
-    it.only('should read/write key from/to BOSS format', function() {
-      var base64Encoded = vectors.keys[1];
+    it('should read/write key from/to BOSS format', function() {
+      var base64Encoded = vectors.keys[2];
       var key = new PrivateKey('BOSS', base64Encoded);
-      var encoded = key.pack('BOSS');
 
-      should(key.params.n.toString(16)).eql('cc518b92cef4a1baf1fe3fd3a4419bb5a0a5fe381c7d4b365dd672343a911236474a2fdff759dac21b40af42e83ec8ff30e403ed339faca0ab3a15f72a22dc822184a4949179590cbd53098d443fed61209a47223c4c6212e1b0085824d4ffd7f2d4927533f89a98132d070a61b062873c22b7ae65411a1ea6a9d33d30c5bbe63b19e05fe7589ac50ba5b704ee6fe9338d09dd7e9efd071534646101d058e676c9b650381ff5a0cdb2f11c3167378a25493957cb3ac71770a43cd77bc605b41f11c437560c0a0271154c4782f9c6a731477260e7334a380b81b197c1af53608d9ea451b136afdf7ada9ebba46db0a92464c7283b48a2eb332a89cc70ec02b8c66adc1e2344365db7f7bae30fe793e36eeacc93663969aca23a863556b2b9c4ff690f9f87994fa246c514bec71c91d0df26436934da51a6d484667d5e8f46f3599a8a5f52287dfd019e919ef4650406a44657f59342426ad61d33668b217ffe5f333c1858ce4cbbdcbbb71d486bca83f4eefed82088ea13e8b82288b639446831f61f298e96ebf5281056ed51d5f3e8e25c341386c699f4954a3f33a82efaf88e7d791e311bfbbcc947865349af32ddad1a5addafb10ff7401549a1c53bb7777533e269ec94e73d6f5927662c403a05b7b0541b3af816e91da94bbab8b095fedbb003253deffcbafb4190057f523564646d3f16d9e43a3b8be29a2694942bc047');
+      should(key.params.p.toString(16)).eql('c0e7ac8d230f90888a59f72670a5d5b414a30f5669056a5f9e2637a096f13bc6aa1e6a6b1e0809f8d3cc04b986cd8ea3132603a73bf78ea4baf57493266112f821b04daca3ca594fa74c89bc8cac12ca18070ad75851e88e749ea7c414a03afa77559f27a9e7b0ef80619df60156729540461db4fb8860f3274ce9b8139efd996618e155bae573a6f4db6c9ff48979bfb94d103c5fdbcfdae5ea6f3aa89e28ed1f6a6466f6b35c29e85b760c68e1703ea27b8761c4ea55aceeb8ce7edab0c142c2ddb9d4245e2bd6044d63be14c5a0ada04ff139c40925fad7c37a6cffdd21244855f1277e5c4526078e15fd29853709a91d65ffba4062c72e857707a106cbb7');
     });
   });
 
@@ -57,6 +56,15 @@ describe('RSA', function() {
       var encrypted = publicKey.encrypt(oaep.originalMessage, oaepOpts);
 
       should(bytesToHex(encrypted)).eql(bytesToHex(oaep.encryptedMessage));
+    });
+
+    it('should calculate fingerprint', function() {
+      const base64Encoded = vectors.keys[1];
+      const key = new PrivateKey('BOSS', base64Encoded);
+      const fp_full = '00BC204118648ED82A64B9A9FF6A9CB7BCD64CF5367E290E1C80C333A08107C1F82663'.toLowerCase();
+      const fp = key.publicKey.fingerprint();
+
+      should(bytesToHex(key.publicKey.fingerprint())).eql(fp_full);
     });
 
     it('should verify message PSS signature', function() {
@@ -122,10 +130,12 @@ describe('RSA', function() {
       });
 
       const packed = privateKey.pack('BOSS');
-
       const unpacked = new PrivateKey('BOSS', packed);
+      const packed2 = unpacked.pack('BOSS');
+      const unpacked2 = new PrivateKey('BOSS', packed2);
 
-      should(unpacked.params.qInv).eql(privateKey.params.qInv);
+      should(unpacked.params.qInv.toString(16)).eql(unpacked2.params.qInv.toString(16));
+      should(unpacked2.params.qInv.toString(16)).eql(privateKey.params.qInv.toString(16));
     });
 
     it('should restore key from exponents (e, p, q)', function() {
