@@ -29,14 +29,14 @@ describe('Hash functions', function() {
       it('should calculate hash for message "one"', function() {
         var msg = 'one';
 
-        should(sha256.get(msg)).eql(hashFor[msg]);
+        should(sha256.get(msg, 'hex')).eql(hashFor[msg]);
       });
 
       it('should calculate hash for message "onetwo" divided by parts', function() {
         sha256.put('one');
         sha256.put('two');
 
-        should(sha256.get()).eql(hashFor['onetwo']);
+        should(sha256.get('hex')).eql(hashFor['onetwo']);
       });
     });
 
@@ -49,14 +49,14 @@ describe('Hash functions', function() {
       it('should calculate hash for message "one"', function() {
         var msg = 'one';
 
-        should(sha512.get(msg)).eql(hashFor[msg]);
+        should(sha512.get(msg, 'hex')).eql(hashFor[msg]);
       });
 
       it('should calculate hash for message "onetwo" divided by parts', function() {
         sha512.put('one');
         sha512.put('two');
 
-        should(sha512.get()).eql(hashFor['onetwo']);
+        should(sha512.get('hex')).eql(hashFor['onetwo']);
       });
     });
   });
@@ -71,7 +71,7 @@ describe('Hash functions', function() {
       var sha256 = new SHA('256');
       var hmac = new HMAC(sha256, key);
 
-      should(hmac.get(data)).eql(hashFor[data]);
+      should(hmac.get(data, 'hex')).eql(hashFor[data]);
     });
   });
 });
