@@ -1,20 +1,18 @@
-var should = require('should');
-var utils = require('../lib/utils');
-var cipher = require('../lib/cipher');
+const should = require('should');
+const utils = require('../lib/utils');
+const cipher = require('../lib/cipher');
 
-var AES = cipher.AES;
+const { AES } = cipher;
+const { bytesToHex, hexToBytes } = utils;
 
-var bytesToHex = utils.bytesToHex;
-var hexToBytes = utils.hexToBytes;
-
-var key = hexToBytes('000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f');
-var message = hexToBytes('00112233445566778899aabbccddeeff');
-var encrypted = hexToBytes('8ea2b7ca516745bfeafc49904b4960899f3b7504926f8bd36e3118e903a4cd4a');
+const key = hexToBytes('000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f');
+const message = hexToBytes('00112233445566778899aabbccddeeff');
+const encrypted = hexToBytes('8ea2b7ca516745bfeafc49904b496089');
 
 describe('AES', function() {
   describe('AES 256', function() {
     it('should encrypt message by key', function() {
-      var cipher = new AES(key);
+      var cipher = new AES(utils.raw.encode(key));
 
       should(bytesToHex(cipher.encrypt(message))).eql(bytesToHex(encrypted));
     });
