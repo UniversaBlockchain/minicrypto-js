@@ -1,8 +1,9 @@
-var utils = require('../lib/utils');
+const utils = require('../lib/utils');
 
-var BigInteger = utils.BigInteger;
+const { raw, decode64, BigInteger } = utils;
 
 exports.i = i;
+exports.readKey64 = readKey64;
 
 /**
  * Returns big integer parsed from hex string
@@ -11,4 +12,8 @@ exports.i = i;
  */
 function i(hex) {
   return new BigInteger(hex, 16);
+}
+
+function readKey64(key64) {
+	return raw.encode(decode64(key64));
 }

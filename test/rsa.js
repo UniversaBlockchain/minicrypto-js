@@ -9,7 +9,9 @@ const PrivateKey = require('../lib/pki/private_key');
 
 const { SHA } = hash;
 
-const { bytesToHex, hexToBytes, raw } = utils;
+const { readKey64 } = require('./helpers');
+
+const { bytesToHex, hexToBytes, raw, decode64 } = utils;
 const { oaep, pss, customSalt } = vectors;
 
 describe('RSA', function() {
@@ -35,14 +37,14 @@ describe('RSA', function() {
 
     it('should read/write key from/to BOSS format', function() {
       const base64Encoded = vectors.keys[2];
-      const key = new PrivateKey('BOSS', base64Encoded);
+      const key = new PrivateKey('BOSS', readKey64(base64Encoded));
 
       should(key.params.p.toString(16)).eql('c0e7ac8d230f90888a59f72670a5d5b414a30f5669056a5f9e2637a096f13bc6aa1e6a6b1e0809f8d3cc04b986cd8ea3132603a73bf78ea4baf57493266112f821b04daca3ca594fa74c89bc8cac12ca18070ad75851e88e749ea7c414a03afa77559f27a9e7b0ef80619df60156729540461db4fb8860f3274ce9b8139efd996618e155bae573a6f4db6c9ff48979bfb94d103c5fdbcfdae5ea6f3aa89e28ed1f6a6466f6b35c29e85b760c68e1703ea27b8761c4ea55aceeb8ce7edab0c142c2ddb9d4245e2bd6044d63be14c5a0ada04ff139c40925fad7c37a6cffdd21244855f1277e5c4526078e15fd29853709a91d65ffba4062c72e857707a106cbb7');
     });
 
     it('should check equality of keys', function() {
-      var key1 = new PrivateKey('BOSS', vectors.keys[2]);
-      var key2 = new PrivateKey('BOSS', vectors.keys[3]);
+      var key1 = new PrivateKey('BOSS', readKey64(vectors.keys[2]));
+      var key2 = new PrivateKey('BOSS', readKey64(vectors.keys[3]));
 
       should(rsa.keysEqual(key1, key2)).eql(false);
       should(rsa.keysEqual(key1, key1)).eql(true);
@@ -62,7 +64,7 @@ describe('RSA', function() {
 
     it('should calculate fingerprint', function() {
       const base64Encoded = vectors.keys[1];
-      const key = new PrivateKey('BOSS', base64Encoded);
+      const key = new PrivateKey('BOSS', readKey64(base64Encoded));
       const fp_full = '00BC204118648ED82A64B9A9FF6A9CB7BCD64CF5367E290E1C80C333A08107C1F82663'.toLowerCase();
       const fp = key.publicKey.fingerprint();
 
