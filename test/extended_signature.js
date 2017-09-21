@@ -35,7 +35,7 @@ describe('Extended signature', function() {
     const es = verify(pubKey, signature, data);
 
     should(es).be.ok();
-    should(es.keyId).eql(id);
+    should(es.key).eql(id);
     should(keyId(key)).eql(keyId(pubKey));
   });
 });
