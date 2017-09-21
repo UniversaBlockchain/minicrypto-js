@@ -65,7 +65,7 @@ describe('RSA', function() {
     it('should calculate fingerprint', function() {
       const base64Encoded = vectors.keys[1];
       const key = new PrivateKey('BOSS', readKey64(base64Encoded));
-      const fp_full = '00BC204118648ED82A64B9A9FF6A9CB7BCD64CF5367E290E1C80C333A08107C1F82663'.toLowerCase();
+      const fp_full = '074118648ED82A64B9A9FF6A9CB7BCD64CF5367E290E1C80C333A08107C1F82663'.toLowerCase();
       const fp = key.publicKey.fingerprint();
 
       should(bytesToHex(key.publicKey.fingerprint())).eql(fp_full);

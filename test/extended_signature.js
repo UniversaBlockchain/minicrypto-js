@@ -14,7 +14,7 @@ const { readKey64 } = require('./helpers');
 const { SHA } = hash;
 
 const { bytesToHex, hexToBytes, textToHex, raw, decode64 } = utils;
-const { keyId, sign, verify } = extended;
+const { keyId, sign, verify, extractKeyId } = extended;
 const { customSalt, pss, oaep } = vectors;
 
 describe('Extended signature', function() {
@@ -22,7 +22,7 @@ describe('Extended signature', function() {
     const key = new PrivateKey('BOSS', readKey64(vectors.keys[1]));
     const id = keyId(key);
 
-    should(bytesToHex(id)).eql('00bc204118648ed82a64b9a9ff6a9cb7bcd64cf5367e290e1c80c333a08107c1f82663');
+    should(bytesToHex(id)).eql('074118648ed82a64b9a9ff6a9cb7bcd64cf5367e290e1c80c333a08107c1f82663');
   });
 
   it('should sign and verify data', function() {
@@ -36,6 +36,7 @@ describe('Extended signature', function() {
 
     should(es).be.ok();
     should(es.key).eql(id);
+    should(extractKeyId(signature)).eql(keyId(pubKey));
     should(keyId(key)).eql(keyId(pubKey));
   });
 });
