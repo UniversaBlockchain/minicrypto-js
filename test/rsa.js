@@ -78,7 +78,7 @@ describe('RSA', function() {
       var hash = new SHA('1');
       var hashed = hash.get(pss.message, 'bytes');
 
-      var isCorrect = publicKey.verify(hashed, pss.signature, pssOpts);
+      var isCorrect = publicKey.verify(hashed, pss.signature, hash, pssOpts);
 
       should(isCorrect).eql(true);
     });
@@ -106,9 +106,9 @@ describe('RSA', function() {
         hash.put(customSalt.message);
         var hashed = hash.get('bytes');
 
-        should(publicKey.verify(hashed, customSalt.signature)).eql(true);
+        should(publicKey.verify(hashed, customSalt.signature, hash)).eql(true);
 
-        should(publicKey.verify(hashed, customSalt.signature, {
+        should(publicKey.verify(hashed, customSalt.signature, hash, {
           saltLength: customSalt.saltLength
         })).eql(true);
       });
@@ -120,7 +120,7 @@ describe('RSA', function() {
 
         var signature = privateKey.sign(hash);
 
-        should(publicKey.verify(hashed, signature)).eql(true);
+        should(publicKey.verify(hashed, signature, hash)).eql(true);
       });
     });
   });

@@ -11,13 +11,13 @@ const encrypted = hexToBytes('8ea2b7ca516745bfeafc49904b496089');
 
 describe('AES', function() {
   describe('AES 256', function() {
-    it('should encrypt message by key', function() {
+    it.skip('should encrypt message by key', function() {
       var cipher = new AES(utils.raw.encode(key));
 
       should(bytesToHex(cipher.encrypt(message))).eql(bytesToHex(encrypted));
     });
 
-    it('should decrypt message by key', function() {
+    it.skip('should decrypt message by key', function() {
       var cipher = new AES(key);
 
       should(bytesToHex(cipher.decrypt(encrypted))).eql(bytesToHex(message));
