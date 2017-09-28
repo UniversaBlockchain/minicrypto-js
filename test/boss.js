@@ -1,6 +1,7 @@
 const should = require('should');
 
 const Boss = require('../lib/boss/protocol');
+const utils = require('../lib/utils');
 
 const vectors = [
   ['8', 7],
@@ -11,11 +12,21 @@ const vectors = [
   // TODO: [',Hello', bytes!('Hello'), 2, 4, 4, 1]
 ];
 
+const { hexToBytes, byteStringToBin } = utils;
+
 describe('BOSS Protocol', function() {
   var boss;
 
   beforeEach(function() {
     boss = new Boss();
+  });
+
+  it('should cache similar objects', function() {
+    const txt = { __type: 'text', value: "" };
+    const obj = { binary: byteStringToBin(hexToBytes('aa')), text: txt };
+    const unpacked = boss.load(boss.dump(obj));
+
+    should(obj.text).eql(unpacked.text);
   });
 
   it('should perform compatible encode', function() {
