@@ -1,10 +1,9 @@
 const fs = require('fs');
 const webpack = require('webpack');
 const forgeConfig = require('./webpack.forge');
-const workerConfig = require('./webpack.worker');
 const universaConfig = require('./webpack.universa');
 
-webpack([workerConfig, forgeConfig], rewriteWorker);
+webpack(forgeConfig, rewriteWorker);
 
 function rewriteWorker(err, stats) {
 	if (err) return console.log(err);
@@ -26,7 +25,5 @@ function rewriteWorker(err, stats) {
 function buildUniversa(err) {
 	if (err) return console.log(err);
 
-	webpack(universaConfig, err => {
-		if (err) console.log(err);
-	});
+	webpack(universaConfig, err => err && console.log(err));
 }

@@ -4,3 +4,4 @@ npm-debug.log
 .jshintrc
 .jscsrc
 vendor
+.DS_Store
