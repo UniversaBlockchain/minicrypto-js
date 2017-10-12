@@ -47,6 +47,12 @@ describe('BOSS Protocol', function() {
     round(-1.11);
   });
 
+  it('should properly encode rounded Dates', function() {
+    var seconds = 1507766400;
+    var d = new Date(seconds * 1000);
+    should(boss.load(boss.dump(d))).eql(d);
+  });
+
   it('should encode booleans', function() {
     round(true);
     round(false);
