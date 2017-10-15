@@ -26,6 +26,13 @@ Also, open page `test/runner.html` in your browser, to test in a real browser.
 
 ## Usage
 
+### Misc
+
+    // returns random bytestring for given length
+    var randomBytes = Universa.utils.randomBytes;
+    var key16bytes = randomBytes(16);
+
+
 ### Converters
 
     var hexToBytes = Universa.utils.hexToBytes;
