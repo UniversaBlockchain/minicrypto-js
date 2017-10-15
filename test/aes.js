@@ -12,7 +12,8 @@ const encrypted = hexToBytes('8ea2b7ca516745bfeafc49904b496089');
 describe('AES', function() {
   describe('AES 256', function() {
     it('should encrypt message by key', function() {
-      var cipher = new AES(key);
+      // var cipher = new AES(key);
+      const cipher = new AES(key);
 
       should(bytesToHex(cipher.encrypt(message))).eql(bytesToHex(encrypted));
     });

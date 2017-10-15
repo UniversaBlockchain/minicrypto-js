@@ -5,7 +5,6 @@ module.exports = [
       'sha512',
       'hmac',
       'pbkdf2',
-      'aes',
       'pki',
       'rsa',
       'forge'
