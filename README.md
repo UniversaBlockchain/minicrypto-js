@@ -165,8 +165,8 @@ OAEP encrypt/decrypt
     var data = '/* byte string */';
     var options = {
         seed: '/* byte string */', // optional, default none
-        mgf1Hash: new SHA(512), // optional, default SHA(1)
-        oaepHash: new SHA(512) // optional, default SHA(1)
+        mgf1Hash: new SHA(512), // optional, default SHA(256)
+        oaepHash: new SHA(512) // optional, default SHA(256)
     };
     var encrypted = publicKey.encrypt(data, options);
     var decrypted = privateKey.decrypt(encrypted, options);
@@ -181,8 +181,8 @@ PSS sign/verify
     var options = {
       salt: '/* byte string */', // optional
       saltLength: null, // optional, numeric
-      mgf1Hash: new SHA(512), // optional, default SHA(1)
-      pssHash: new SHA(512) // optional, default SHA(1)
+      mgf1Hash: new SHA(512), // optional, default SHA(256)
+      pssHash: new SHA(512) // optional, default SHA(256)
     };
 
     var message = 'abc123';
