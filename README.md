@@ -228,6 +228,29 @@ Encode/decode
     var encoded = boss.dump(data);
     var decoded = boss.load(encoded);
 
+Encode stream
+
+    const writer = new Boss.writer();
+
+    writer.write(0);
+    writer.write(1);
+    writer.write(2);
+    writer.write(3);
+
+    const dump = writer.get();
+
+    // bytesToHex(dump) === '00081018' - true
+
+Decode stream
+
+    const reader = new Boss.reader(hexToBytes('00081018'));
+
+    const arg1 = reader.read(); // 0
+    const arg2 = reader.read(); // 1
+    const arg3 = reader.read(); // 2
+    const arg4 = reader.read(); // 3
+    const arg5 = reader.read(); // undefined
+
 ### AES
 
 Encrypt/decrypt

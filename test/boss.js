@@ -12,7 +12,7 @@ const vectors = [
   // TODO: [',Hello', bytes!('Hello'), 2, 4, 4, 1]
 ];
 
-const { hexToBytes, byteStringToBin } = utils;
+const { hexToBytes, byteStringToBin, bytesToHex } = utils;
 
 describe('BOSS Protocol', function() {
   var boss;
@@ -84,6 +84,35 @@ describe('BOSS Protocol', function() {
     // take care of the comparison
     should(boss.load(boss.dump(now)).getTime())
       .equal(parseInt(now.getTime() / 1000) * 1000);
+  });
+
+  it('should encode in stream mode', function() {
+    const writer = new Boss.writer();
+
+    writer.write(0);
+    writer.write(1);
+    writer.write(2);
+    writer.write(3);
+
+    const dump = writer.get();
+
+    should(bytesToHex(dump)).eql('00081018');
+  });
+
+  it('should decode in stream mode', function() {
+    const reader = new Boss.reader(hexToBytes('00081018'));
+
+    const arg1 = reader.read();
+    const arg2 = reader.read();
+    const arg3 = reader.read();
+    const arg4 = reader.read();
+    const arg5 = reader.read();
+  
+    should(arg1).eql(0);
+    should(arg2).eql(1);
+    should(arg3).eql(2);
+    should(arg4).eql(3);
+    should(arg5).eql(undefined);
   });
 
   it('should cache data', function() {
