@@ -21,6 +21,18 @@ describe('BOSS Protocol', function() {
     boss = new Boss();
   });
 
+  it('should encode false', function() {
+    should(boss.load(boss.dump({a: false}))).eql({a: false});
+  });
+
+  it('should encode null', function() {
+    should(boss.load(boss.dump({ a: null }))).eql({ a: null });
+  });
+
+  it('should encode utf8 strings', function() {
+    should(boss.load(boss.dump('АБВГД'))).eql('АБВГД');
+  });
+
   it('should cache similar objects', function() {
     const txt = { __type: 'text', value: "" };
     const obj = { binary: byteStringToBin(hexToBytes('aa')), text: txt };
