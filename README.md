@@ -35,8 +35,15 @@ Also, open page `test/runner.html` in your browser, to test in a real browser.
 
 ### Converters
 
-    var hexToBytes = Universa.utils.hexToBytes;
+    // byte string <-> hex
     var bytesToHex = Universa.utils.bytesToHex;
+    var hexToBytes = Universa.utils.hexToBytes;
+
+    // byte string <-> Uint8Array
+    var bytesToArray = Universa.utils.bytesToArray;
+    var arrayToBytes = Universa.utils.arrayToBytes;
+
+    // byte string -> Buffer
     var bytesToBuffer = Universa.utils.bytesToBuffer;
 
 ### SHA
