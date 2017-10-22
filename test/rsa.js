@@ -183,6 +183,16 @@ describe('RSA', function() {
       should(bytesToHex(decrypted)).eql(bytesToHex(oaep.originalMessage));
     });
 
+    it('should decrypt key data', function() {
+      const text = utils.arrayToBytes(utils.decode64('aP2vtiA3oDNKFXRCsG6yV3e+S8rYyP3pV6Kfinl5dv/YNcEZx7FH8AHw5rOWdBWDSQGemp4A9OpasvFIkXJB/BTdVFlAabzIS2mpXsnx8y0hxK7V49+uGYL1SwtThK1ifenVzM7t6dBvQqhyqJ9OVhCXa4FPDvOd4DTn/+SSwyJZtDIex7c4nAV+7YXS1fhZVJ1pKOAh+qUPWhShFidOBaxckS2MeUUV+O3hidRPTtbY6kEG5i/0swLm04+Zu+rkOhgmZ71wGDXKMxdY+IlbQu6RLQvvVRwMWoivOli8UzKyzifJp9QlR6obHw63N2HdAhdjbPxVZuX2UKtDmFc2wLiAl83A6A4azjWlVXiHZjX1+FhZMd3Qn412cf4YtamUTzFLjJEtRihE0wZfG2sWCErNfWIYg8/a9EJHR6SiqP5Jz+sR+AE3VFqli9kG3nEZCJU+5eJTzRofGp7PvgN8vvO3owfVJk+dvdPXe4rrf97UCu+Fj81gnS29dsMZ53Y0yCWNKZ40tEXerbKMBEW/mO4nkloS5U47/xSy1FB5gTiM5crKIudQZLROu0yC1X0RfhQ/M4M7Ifz4GNs4RB2eLRCoX90wEOGE4BeJ4OJ9tcR37ofBd7jQiaYyedL20uFzQYQZ6cCYnZM19nBU9t9COGYDg1mhrhuWR9WMdLVvfQc='));
+      const pk = utils.arrayToBytes(utils.decode64('JgAcAQABxAAB5eaGe+7EifujmPC+dEj5zqGbmuT5pUGMqnqV0WK8sf4I+6OILEVQgmISMeHbU2frotdX5SjJ2qtZnH27JLKFtzK9T0uMozGAPHyLqlJ0HX7UF3lJhSiCpSki1Uu4J43wdl/sw8DgdDW31fRSaLnNQ3d/aukALzG8puEXdlT9o++W64E5Pb1QhNsQwakgzW7cCDBEKfryAIf5obgOWaj8hPO4AifxUT2Eyy6qjA9UgQcDeqPDc9OrL2SFNe5qXFVmFslPTT9UTjdtJ8vJIE8zyytI4rt+Zk09JnOsMIw0ptJ2fYoqMcgvblcTTB1k4tVwKDmQC1VSOaLRk7KWdGSLB8QAAcTWK3O9pYC869epQFNDtTFug7QapIYKzDNcGFBc2clyMfLa9T/szBh+qui7+YWsyK5k3MsC5xxiz0C/oJ+u9Qk9bh8ATRDSM4M162V19xhb/3RkMj1G+VpVak0k2Pvlyt5CbSj/1JgD2z69zpXnW24zo+3A/E3AjPQHSI2NPHm8oP0daTQgAKvSVET5GEmcEcPGChUG4SRULIXS27RHSkrKSs40r8G7fLIx6hkZjhdr4a754nG746fAb6GJyWf6h6WzVjStwnazgQHtPXY82SKDiCxjy4eectnzaeAtto52xdaXTaN33MS1v/wPL99WwA48lv/K+wmYyVo56Ok8bGM='));
+      const prk = new PrivateKey('BOSS', pk);
+      // if oaep hash is sha1 - it's ok
+      const decrypted = prk.decrypt(text, { oaepHash: new SHA(256), mgf1Hash: new SHA(1) });
+      
+      should(utils.encode64(utils.bytesToArray(decrypted))).eql('xQ05fry7sDV6qMgT6MM1i14AFcRFNeUmjuLu31w/rPE=');
+    });
+
     it('should sign message with PSS', function() {
       var privateKey = new PrivateKey('EXPONENTS', pss);
       var options = { 
