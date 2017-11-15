@@ -1,6 +1,6 @@
 const utils = require('../lib/utils');
 
-const { raw, decode64, BigInteger } = utils;
+const { raw, decode64, BigInteger, arrayToBytes } = utils;
 
 exports.i = i;
 exports.readKey64 = readKey64;
@@ -15,5 +15,5 @@ function i(hex) {
 }
 
 function readKey64(key64) {
-	return raw.encode(decode64(key64));
+	return arrayToBytes(decode64(key64));
 }
