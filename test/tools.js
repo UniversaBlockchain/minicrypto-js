@@ -5,7 +5,7 @@ const utils = require('../lib/utils');
 const { Buffer } = require('buffer');
 const SHA = hash.SHA;
 
-const { bytesToHex, hexToBytes, arrayToBytes, arrayToBuffer, bytesToArray, randomBytes, raw } = utils;
+const { bytesToHex, hexToBytes, arrayToBytes, arrayToBuffer, bytesToArray, randomBytes, raw, hashId } = utils;
 
 describe('Tools', function() {
   it('should convert large binaries', function() {
@@ -28,18 +28,9 @@ describe('Tools', function() {
   });  
 
   it.only('should calculate hashId', function() {
-    const gost = new SHA('GOST');
-    const sha3_256 = new SHA('3_256');
-    const sha512_256 = new SHA('512/256');
-
     const data = utils.decode64('gvyrDZKjMVPIhManWZaKNMQIgSb6jpUles+5LvB8EVwRlqk5BACZN1J9L59ZOz1a+cEOt0vjOYoww7M5EjyurHgVc3ht7ras4Iocej2FnoSeGlx1sWe/NdpfXZtDSCKLRlRmIS2bjUbURDk=');
     const result = utils.decode64('DdNQDJ5NBT8JKi1TEm+ZxTgFmW8Yh1YD0sWxqCqOjAw4vAzDDImHMJcpOeqijjRPr72mdXugR55Fyl8TCIjI7+FP+wsbf/eewiTHPW6B/kUTJ8JwgrR/BGUlaUwiHv7n');
 
-    var part1 = sha512_256.get(data);
-    var part2 = sha3_256.get(data);
-    var part3 = gost.get(data);
-    var hashId = part1 + part2 + part3;
-
-    should(hashId).eql(utils.arrayToBytes(result));
+    should(utils.arrayToBytes(hashId(data))).eql(utils.arrayToBytes(result));
   });
 });
