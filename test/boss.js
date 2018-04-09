@@ -14,7 +14,7 @@ const vectors = [
 
 const { hexToBytes, byteStringToBin, bytesToHex, bytesToArray, arrayToBytes } = utils;
 
-describe.only('BOSS Protocol', function() {
+describe('BOSS Protocol', function() {
   var boss;
 
   beforeEach(function() {
