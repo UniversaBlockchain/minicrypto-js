@@ -11,7 +11,7 @@ const { SHA } = hash;
 
 const { readKey64 } = require('./helpers');
 
-const { bytesToHex, hexToBytes, raw, decode64 } = utils;
+const { bytesToHex, hexToBytes, raw, decode64, v2 } = utils;
 const { oaep, pss, customSalt } = vectors;
 
 describe('RSA', function() {
@@ -99,6 +99,11 @@ describe('RSA', function() {
       });
 
       should(isCorrect).eql(true);
+    });
+
+    it.only('should calculate address', function() {
+      var publicKey = new PublicKey('EXPONENTS', oaep);
+      should(v2.base58.encode(publicKey.address())).eql("26Ah78vuENoN7gdWvRwZbq25tyX5YxNXSu8gyAEc33tGiBPUNsS");
     });
 
     describe('signature with custom salt', function() {
