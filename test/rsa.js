@@ -101,9 +101,9 @@ describe('RSA', function() {
       should(isCorrect).eql(true);
     });
 
-    it.only('should calculate address', function() {
+    it('should calculate address', function() {
       var publicKey = new PublicKey('EXPONENTS', oaep);
-      should(v2.base58.encode(publicKey.address())).eql("26Ah78vuENoN7gdWvRwZbq25tyX5YxNXSu8gyAEc33tGiBPUNsS");
+      should(v2.encode58(publicKey.address())).eql("26Ah78vuENoN7gdWvRwZbq25tyX5YxNXSu8gyAEc33tGiBPUNsS");
     });
 
     describe('signature with custom salt', function() {
