@@ -1,9 +1,13 @@
 const should = require('should');
 const utils = require('../lib/utils');
 const cipher = require('../lib/cipher');
+const pki = require('../lib/pki');
+const hash = require('../lib/hash');
 
-const { AES } = cipher;
-const { bytesToHex, hexToBytes } = utils;
+const { SHA } = hash;
+const { pbkdf2 } = pki;
+const { AES, AESCTRTransformer } = cipher;
+const { bytesToHex, hexToBytes, textToBytes, randomBytes, bytesToArray } = utils;
 
 const key = hexToBytes('000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f');
 const message = hexToBytes('00112233445566778899aabbccddeeff');
@@ -22,6 +26,28 @@ describe('AES', function() {
       var cipher = new AES(key);
 
       should(bytesToHex(cipher.decrypt(encrypted))).eql(bytesToHex(message));
+    });
+
+    it('should transform CTR', function() {
+      var iv = randomBytes(16);
+
+      var password = 'password';
+      var iterations = 4096;
+      var keyLength = 32;
+      var salt = textToBytes('salt');
+
+      var dk = pbkdf2(new SHA('256'), {
+        password: password,
+        salt: salt,
+        iterations: iterations,
+        keyLength: keyLength
+      });
+
+      var data = hexToBytes("abcd");
+
+      var encrypted = new AESCTRTransformer(dk, bytesToArray(iv)).transform(data);
+
+      should(1).eql(1);
     });
   });
 });

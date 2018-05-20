@@ -15,5 +15,5 @@ function i(hex) {
 }
 
 function readKey64(key64) {
-	return arrayToBytes(decode64(key64));
+	return decode64(key64);
 }

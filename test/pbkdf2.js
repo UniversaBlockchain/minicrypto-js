@@ -18,8 +18,8 @@ describe('PBKDF2', function() {
     var password = 'test';
     var iterations = 5000;
     var keyLength = 26;
-    var salt = raw.encode(decode64('KFuMDXmo'));
-    var standard = raw.encode(decode64('yPsu5qmQto99vDqAMWnldNuagfVl5OhPr6g='));
+    var salt = decode64('KFuMDXmo');
+    var standard = decode64('yPsu5qmQto99vDqAMWnldNuagfVl5OhPr6g=');
 
     var dk = pbkdf2(new SHA('512'), {
       password: password,

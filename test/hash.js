@@ -1,5 +1,8 @@
 var should = require('should');
 var hash = require('../lib/hash');
+const utils = require('../lib/utils');
+
+const { textToHex, textToBytes, hexToBytes, bytesToArray, encode64 } = utils;
 
 var SHA = hash.SHA;
 var HMAC = hash.HMAC;
@@ -14,7 +17,8 @@ var STANDARD = {
     'onetwo': '04aebe936d8eab8a145ce973d1101ac89ea8a2192ca43d3c986ba73ad3de1a58a6a5c95d85d86fc1900d24bad1334d56e550d1a23baf3f867f56fb64aaed0d59'
   },
   hmac: {
-    'my secret data': 'cc54950346e46a542b596afdbf32cb984c2566ebf9cfc702ebce0e257a12af57'
+    'my secret data': 'cc54950346e46a542b596afdbf32cb984c2566ebf9cfc702ebce0e257a12af57',
+    'a quick brown for his done something disgusting': 'la3Xl78Z3ktK2JLoDpPKthhqVilUX6+e6a0WultI9f8='
   }
 };
 
@@ -29,12 +33,12 @@ describe('Hash functions', function() {
       it('should calculate hash for message "one"', function() {
         var msg = 'one';
 
-        should(sha256.get(msg, 'hex')).eql(hashFor[msg]);
+        should(sha256.get(textToBytes(msg), 'hex')).eql(hashFor[msg]);
       });
 
       it('should calculate hash for message "onetwo" divided by parts', function() {
-        sha256.put('one');
-        sha256.put('two');
+        sha256.put(textToBytes('one'));
+        sha256.put(textToBytes('two'));
 
         should(sha256.get('hex')).eql(hashFor['onetwo']);
       });
@@ -49,12 +53,12 @@ describe('Hash functions', function() {
       it('should calculate hash for message "one"', function() {
         var msg = 'one';
 
-        should(sha512.get(msg, 'hex')).eql(hashFor[msg]);
+        should(sha512.get(textToBytes(msg), 'hex')).eql(hashFor[msg]);
       });
 
       it('should calculate hash for message "onetwo" divided by parts', function() {
-        sha512.put('one');
-        sha512.put('two');
+        sha512.put(textToBytes('one'));
+        sha512.put(textToBytes('two'));
 
         should(sha512.get('hex')).eql(hashFor['onetwo']);
       });
@@ -65,13 +69,13 @@ describe('Hash functions', function() {
     var hashFor = STANDARD.hmac;
 
     it('should calculate hash for message and key', function() {
-      var data = 'my secret data';
-      var key = 'my secret key';
+      var data = textToBytes('a quick brown for his done something disgusting');
+      var key = textToBytes('1234567890abcdef1234567890abcdef');
 
       var sha256 = new SHA('256');
       var hmac = new HMAC(sha256, key);
 
-      should(hmac.get(data, 'hex')).eql(hashFor[data]);
+      should(encode64(hmac.get(data))).eql('la3Xl78Z3ktK2JLoDpPKthhqVilUX6+e6a0WultI9f8=');
     });
   });
 });

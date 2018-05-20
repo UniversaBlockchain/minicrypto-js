@@ -26,7 +26,7 @@ describe('Extended signature', function() {
   });
 
   it('should sign and verify data', function() {
-    const data = bytesToArray(hexToBytes(textToHex('Hello world')));
+    const data = hexToBytes(textToHex('Hello world'));
     const key = new PrivateKey('BOSS', decode64(vectors.keys[3]));
     const id = keyId(key);
     const pubKey = key.publicKey;
