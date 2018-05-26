@@ -204,6 +204,11 @@ describe('BOSS Protocol', function() {
     should(boss.unpack(boss.pack(source))).eql(source);
   });
 
+  // it.only('should decode private data', function() {
+  //   console.log(boss.load(utils.decode64("JzN0b2tlbnMPK25pY2tzD2NhbnpodV90ZXNfOTNhQ21haW5fa2V5FztrZXlJbmZvexAsw7jCssKtIx4Aw4AAASNkYXRhw5UBJgAcAQABwrzCgQDDqQJPw6rDjsO2wqZZwrXCh8K2QFfCh8KgIFIaw6jCvELDnsOfUjHDo1saw45qw4Mew7woY8OlNsKbOwTChX8Xwrp/fSzDq8O+w6nDmMOlDMKUw5RqY8OXwqxaOwzCuwnCrl9IdVJ8w7ZOICtfwp3DisKSDsK5GcKpwo/DlkPCpsOZb3/CgsOKdMK7wozDm8OoRMKhwqPCksKdwo0Uw4rCl8OVwpohwo50fMKiZ8Orw7zClkcrPkLCgiNJaFPCuCnChcK8woEAwrkLYGbCriDDoMKXJcKzw5jCohjDsV44TWNpOk3DnzfDvWxVasKXPmE3UsKpJxbCh8Oqw4Z4w4HDqhZ2VF3DpysxdsO8cAXCtMKbw73DiQjDjsKTwo7DjMO3w4rCusOawqHDg8KPw45ZwrzCgWLCpcKhw67Dh0gxNhPCmMONw5vCu8OwTHoabhBTwpsHw7gKwq7Dn1nDosO2w5fChcKqD1bCl3BxDRzDhU0vwrfDvMKjwpTCqFdLw6TCl3jCqMKbS8K1W3N0b3JhZ2Vfa2V5F00zGAUAwrggXbsvSMOMIkk3CkEhwrbChWpFw6nDkQw2w5dJwr3Dl8O1IsOWwrhyRcKzH8KJQMOpw6pjcGFzc3dvcmRfa2V5F01bGAUQwrggAMOAECdduyoawq8Dw5bCpxQmKllPKxTDlRUiw77CgFrCvsK/XsKDYDIcwo8BLQFpZjID")))
+  //   should(1).eql(1);
+  // });
+
   function round(value) {
     should(value).eql(boss.load(boss.dump(value)));
   }

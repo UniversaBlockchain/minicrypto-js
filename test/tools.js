@@ -38,4 +38,8 @@ describe('Tools', function() {
   it('should calc b64 from array', function() {
     should(utils.v2.encode64([169, 159, 176, 211, 190, 63, 226, 212, 158, 113, 84, 67, 47, 113, 181, 139, 123, 163, 20, 86, 14, 204, 132, 124, 93, 136, 147, 174, 229, 108, 79, 251, 111, 46, 248, 228, 253, 185, 105, 62, 108, 97, 33, 186, 46, 54, 85, 253, 209, 26, 82, 171, 91, 209, 193, 157, 194, 167, 81, 97, 46, 105, 173, 247, 90, 255, 109, 228, 73, 244, 192, 22, 222, 171, 165, 148, 165, 103, 51, 225, 228, 24, 4])).eql("qZ+w074/4tSecVRDL3G1i3ujFFYOzIR8XYiTruVsT/tvLvjk/blpPmxhIbouNlX90RpSq1vRwZ3Cp1FhLmmt91r/beRJ9MAW3qullKVnM+HkGAQ=");
   });
+
+  it('should decode64', function() {
+    should(utils.v2.decode64("f7YrNmKlscCxpIwNw7jIIKrDtN1fkhsdsc7RDsZEb20").length).eql(32);
+  });
 });
