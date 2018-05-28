@@ -27,11 +27,10 @@ describe('Tools', function() {
     should(sample).eql(converted2);
   });
 
-  it.skip('should calculate hashId', function() {
+  it('should calculate hashId', function() {
     const data = utils.decode64('gvyrDZKjMVPIhManWZaKNMQIgSb6jpUles+5LvB8EVwRlqk5BACZN1J9L59ZOz1a+cEOt0vjOYoww7M5EjyurHgVc3ht7ras4Iocej2FnoSeGlx1sWe/NdpfXZtDSCKLRlRmIS2bjUbURDk=');
     const result = utils.decode64('DdNQDJ5NBT8JKi1TEm+ZxTgFmW8Yh1YD0sWxqCqOjAw4vAzDDImHMJcpOeqijjRPr72mdXugR55Fyl8TCIjI7+FP+wsbf/eewiTHPW6B/kUTJ8JwgrR/BGUlaUwiHv7n');
 
-    console.log(hashId(data), result);
     should(utils.arrayToBytes(hashId(data))).eql(utils.arrayToBytes(result));
   });
 

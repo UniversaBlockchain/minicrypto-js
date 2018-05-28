@@ -101,7 +101,7 @@ describe('RSA', function() {
       should(isCorrect).eql(true);
     });
 
-    it.skip('should calculate address', function() {
+    it('should calculate address', function() {
       var publicKey = new PublicKey('EXPONENTS', oaep);
 
 
@@ -123,7 +123,7 @@ describe('RSA', function() {
     //   should(encode64(shortAddress)).eql("ELhi4o6EspYRc7frob4CeXpuIL1SsheE6cP4NKLTJj2HNklq+A==")
     // });
 
-    it.only('should calculate short address', function() {
+    it('should calculate short address', function() {
       var privateEncoded = hexToBytes("26001c010001c40001f05da97d084313655c43e7caf582fd2dcb76eff3309ec49cc70ef7a2c82547e01b3c5a6d51ca48ae44bc05d1a089c2019865a44c49bbcd48c54ae59f21dba28f65fee44d1aa1389cfa9eca8a2e218f94c735b5bb1e3313afafcfd62657fb86bdd7bf3cbda7943509a9ce2c92534584424b0f8fe5fbadd944c378aa967d206128a6a1e259b597c286d67778ee3c548df8ea39aff4ec993a1858e2fc51d12698b674280664ddc0714b81613b97f1da4b9be8a2617be4faa720a5a183f2910862040b26e0292cc3368442210f1b6171bb0ccdd1e042d253afd8eabb79f6edfcf27dce28a09b7d81ffc161a64dcf42190aedac1cf50ec86bb390fd15ab33b4d4f44fc40001d9bd6a350d985789f574ed8c410e7cf1d79db784a494b33d98c440794797fa8ba76d5feb7c32897a221f87dc26414076d279333eed9e0d7c6c8fea801ec07f3ad69921a3f2e1ec6a0910fea6af48703fd98b92e6b6eaba23b3a619ab071ba4f80a89790e50619a921bf5f93193f54b059c78af097209ce050bd0eada0c6775a003315d8d4d3cccd0ee2740ad1a404ccd37d92992a2a717bcdbd46785813ab0f701be34753af658565c8f10550e91f13c1e1a1e167dcd7d37cd87189beb8baee375366346553b7951b35e1e2c80446bbeb2398163932dd288bdd44ba7f15a9fb05372e0340162ce3fa6ef324fd06b677990c9faf1e8dd7342a73ab2640695bf09");
       var priv = new PrivateKey('BOSS', privateEncoded);
       var pub = priv.publicKey;
@@ -215,17 +215,6 @@ describe('RSA', function() {
       var decrypted = privateKey.decrypt(oaep.encryptedMessage, oaepOpts);
 
       should(bytesToHex(decrypted)).eql(bytesToHex(oaep.originalMessage));
-    });
-
-    // may be broken
-    it.skip('should decrypt key data', function() {
-      const text = utils.arrayToBytes(utils.decode64('aP2vtiA3oDNKFXRCsG6yV3e+S8rYyP3pV6Kfinl5dv/YNcEZx7FH8AHw5rOWdBWDSQGemp4A9OpasvFIkXJB/BTdVFlAabzIS2mpXsnx8y0hxK7V49+uGYL1SwtThK1ifenVzM7t6dBvQqhyqJ9OVhCXa4FPDvOd4DTn/+SSwyJZtDIex7c4nAV+7YXS1fhZVJ1pKOAh+qUPWhShFidOBaxckS2MeUUV+O3hidRPTtbY6kEG5i/0swLm04+Zu+rkOhgmZ71wGDXKMxdY+IlbQu6RLQvvVRwMWoivOli8UzKyzifJp9QlR6obHw63N2HdAhdjbPxVZuX2UKtDmFc2wLiAl83A6A4azjWlVXiHZjX1+FhZMd3Qn412cf4YtamUTzFLjJEtRihE0wZfG2sWCErNfWIYg8/a9EJHR6SiqP5Jz+sR+AE3VFqli9kG3nEZCJU+5eJTzRofGp7PvgN8vvO3owfVJk+dvdPXe4rrf97UCu+Fj81gnS29dsMZ53Y0yCWNKZ40tEXerbKMBEW/mO4nkloS5U47/xSy1FB5gTiM5crKIudQZLROu0yC1X0RfhQ/M4M7Ifz4GNs4RB2eLRCoX90wEOGE4BeJ4OJ9tcR37ofBd7jQiaYyedL20uFzQYQZ6cCYnZM19nBU9t9COGYDg1mhrhuWR9WMdLVvfQc='));
-      const pk = utils.arrayToBytes(utils.decode64('JgAcAQABxAAB5eaGe+7EifujmPC+dEj5zqGbmuT5pUGMqnqV0WK8sf4I+6OILEVQgmISMeHbU2frotdX5SjJ2qtZnH27JLKFtzK9T0uMozGAPHyLqlJ0HX7UF3lJhSiCpSki1Uu4J43wdl/sw8DgdDW31fRSaLnNQ3d/aukALzG8puEXdlT9o++W64E5Pb1QhNsQwakgzW7cCDBEKfryAIf5obgOWaj8hPO4AifxUT2Eyy6qjA9UgQcDeqPDc9OrL2SFNe5qXFVmFslPTT9UTjdtJ8vJIE8zyytI4rt+Zk09JnOsMIw0ptJ2fYoqMcgvblcTTB1k4tVwKDmQC1VSOaLRk7KWdGSLB8QAAcTWK3O9pYC869epQFNDtTFug7QapIYKzDNcGFBc2clyMfLa9T/szBh+qui7+YWsyK5k3MsC5xxiz0C/oJ+u9Qk9bh8ATRDSM4M162V19xhb/3RkMj1G+VpVak0k2Pvlyt5CbSj/1JgD2z69zpXnW24zo+3A/E3AjPQHSI2NPHm8oP0daTQgAKvSVET5GEmcEcPGChUG4SRULIXS27RHSkrKSs40r8G7fLIx6hkZjhdr4a754nG746fAb6GJyWf6h6WzVjStwnazgQHtPXY82SKDiCxjy4eectnzaeAtto52xdaXTaN33MS1v/wPL99WwA48lv/K+wmYyVo56Ok8bGM='));
-      const prk = new PrivateKey('BOSS', pk);
-      // if oaep hash is sha1 - it's ok
-      const decrypted = prk.decrypt(text, { oaepHash: new SHA(256), mgf1Hash: new SHA(1) });
-
-      should(utils.encode64(utils.bytesToArray(decrypted))).eql('xQ05fry7sDV6qMgT6MM1i14AFcRFNeUmjuLu31w/rPE=');
     });
 
     it('should sign message with PSS', function() {
