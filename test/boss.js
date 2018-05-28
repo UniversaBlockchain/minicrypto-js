@@ -209,6 +209,11 @@ describe('BOSS Protocol', function() {
   //   should(1).eql(1);
   // });
 
+  it.only('should read item result', function() {
+    console.log(boss.load(utils.decode64("DzNyZXN1bHQPU2l0ZW1SZXN1bHRPS2NyZWF0ZWRBdHkMJT5WhStleHRyYQczX190eXBlU0l0ZW1SZXN1bHRLaXNUZXN0bmV0aStzdGF0ZUNBUFBST1ZFRENoYXZlQ29weWlTbG9ja2VkQnlJZAVLZXhwaXJlc0F0eRAgHTeRM2Vycm9ycwU=")));
+    should(1).eql(1);
+  });
+
   function round(value) {
     should(value).eql(boss.load(boss.dump(value)));
   }
