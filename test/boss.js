@@ -20,10 +20,21 @@ describe('BOSS Protocol', function() {
     boss = new Boss();
   });
 
-  it('should pack date', function() {
+  it('should cache equal byte arrays', function() {
+    var d = utils.v2.decode64("f7YrNmKlscCxpIwNw7jIIKrDtN1fkhsdsc7RDsZEb20");
+    var hash = { a: 1, b: d, c: d };
+
+    var decoded = boss.load(boss.dump(hash));
+
+    should(typeof decoded.c).eql('object');
+  });
+
+  it.skip('should pack date', function() {
     var d = new Date('2218 07 Mar 21:39');
 
     var encoded = boss.dump(d);
+    console.log(d);
+    console.log(boss.load(encoded));
 
     should(bytesToHex(arrayToBytes(encoded))).eql('79446b3e169d');
   });
