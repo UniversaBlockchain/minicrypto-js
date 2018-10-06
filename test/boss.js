@@ -20,6 +20,14 @@ describe('BOSS Protocol', function() {
     boss = new Boss();
   });
 
+  it('should pack doubles', function() {
+    var double = 3.75;
+
+    var encoded = boss.dump(double);
+
+    should(boss.load(encoded)).eql(3.75);
+  });
+
   it('should cache equal byte arrays', function() {
     var d = utils.v2.decode64("f7YrNmKlscCxpIwNw7jIIKrDtN1fkhsdsc7RDsZEb20");
     var hash = { a: 1, b: d, c: d };
