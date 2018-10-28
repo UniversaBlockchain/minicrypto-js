@@ -1,9 +1,9 @@
 const fs = require('fs');
 const webpack = require('webpack');
-const forgeConfig = require('./webpack.forge');
+// const forgeConfig = require('./webpack.forge');
 const universaConfig = require('./webpack.universa');
 
-webpack(forgeConfig, rewriteWorker);
+rewriteWorker();
 
 function rewriteWorker(err, stats) {
 	if (err) return console.log(err);

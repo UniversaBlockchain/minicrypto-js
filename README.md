@@ -111,8 +111,8 @@ Private key - import
 
     var privateKey1 = new PrivateKey('BOSS', bossEncodedKey);
     var privateKey2 = new PrivateKey('EXPONENTS', {
-      e: '/* byte string */', 
-      p: '/* byte string */', 
+      e: '/* byte string */',
+      p: '/* byte string */',
       q: '/* byte string */'
     });
 
@@ -124,13 +124,13 @@ Public key - import
 
     var publicKey1 = new PublicKey('BOSS', bossEncodedKey);
     var publicKey2 = privateKey2.publicKey;
-    var publicKey3 = new PublicKey('EXPONENTS', { 
-      n: '/* byte string */', 
-      e: '/* byte string */' 
+    var publicKey3 = new PublicKey('EXPONENTS', {
+      n: '/* byte string */',
+      e: '/* byte string */'
     });
 
 Public key - fingerprint
-    
+
     var publicKey1; // some PublicKey instance
 
     console.log(publicKey1.fingerprint()); // fingerprint
@@ -151,12 +151,12 @@ Pair - creation
     });
 
 Private(public) key - export
-    
+
     var PrivateKey = Universa.pki.privateKey;
     var bossEncodedKey = '/* byteString */';
 
     var privateKey1 = new PrivateKey('BOSS', bossEncodedKey);
-    
+
     var hashWithExponents = privateKey1.pack('EXPONENTS');
     var bossEncoded = privateKey1.pack('BOSS');
 
@@ -270,4 +270,12 @@ Encrypt/decrypt
     var encrypted = aes256.encrypt(message);
     var decrypted = aes256.decrypt(encrypted);
 
+### NOTES
 
+forge has broken method for encoding bytes, it should be replaced with:
+
+util.binary.raw.encode = function(bytes) {
+  return bytes.reduce(function (data, byte) {
+    return data + String.fromCharCode(byte);
+  }, '');
+};
