@@ -8,6 +8,14 @@ const SHA = hash.SHA;
 const { bytesToHex, hexToBytes, arrayToBytes, arrayToBuffer, bytesToArray, randomBytes, raw, hashId } = utils;
 
 describe('Tools', function() {
+  it('should calc crc32 for bin', function() {
+    const data = utils.decode64('gvyrDZKjMVPIhManWZaKNMQIgSb6jpUles+5LvB8EVwRlqk5BACZN1J9L59ZOz1a+cEOt0vjOYoww7M5EjyurHgVc3ht7ras4Iocej2FnoSeGlx1sWe/NdpfXZtDSCKLRlRmIS2bjUbURDk=');
+    const sample = randomBytes(1000);
+    const digest = utils.v2.crc32BIN(data);
+
+    should(bytesToHex(digest)).eql("b5eaa121");
+  });
+
   it('should convert large binaries', function() {
     const sample = randomBytes(1000000);
     var bigData = '';
