@@ -24,7 +24,7 @@ describe('BOSS Protocol', function() {
     boss = new Boss();
   });
 
-  it.only('should ignore functions', function() {
+  it('should ignore functions', function() {
     var hash = { a: 1, b: 2, c: function() {} };
 
     var decoded = boss.load(boss.dump(hash));
