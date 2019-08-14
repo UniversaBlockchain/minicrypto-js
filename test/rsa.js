@@ -11,7 +11,7 @@ const { SHA } = hash;
 
 const { readKey64 } = require('./helpers');
 
-const { bytesToHex, hexToBytes, raw, decode64, encode64, v2 } = utils;
+const { bytesToHex, hexToBytes, raw, decode64, encode64, isValidAddress, v2 } = utils;
 const { oaep, pss, customSalt } = vectors;
 
 describe('RSA', function() {
@@ -52,6 +52,19 @@ describe('RSA', function() {
   });
 
   describe('Public key', function() {
+    it('should verify address', function() {
+      var publicKey = new PublicKey('EXPONENTS', oaep);
+      var address = publicKey.address({ long: true });
+      var addressString = v2.base58.encode(address);
+
+      var addressShort = publicKey.address();
+      var addressShortString = v2.base58.encode(addressShort);
+
+      should(isValidAddress(addressString)).eql(true);
+      should(isValidAddress(addressShortString)).eql(true);
+      should(isValidAddress(addressShortString + "a")).eql(false);
+    });
+
     it('should encrypt data with OAEP and MGF1', function() {
       // To make test repeatable
       var oaepOpts = {
