@@ -7,7 +7,7 @@ const hash = require('../lib/hash');
 const { SHA } = hash;
 const { pbkdf2 } = pki;
 const { AES, AESCTRTransformer } = cipher;
-const { bytesToHex, hexToBytes, textToBytes, randomBytes, bytesToArray } = utils;
+const { byteStringToHex, hexToBytes, textToBytes, randomBytes, byteStringToArray } = utils;
 
 const key = hexToBytes('000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f');
 const message = hexToBytes('00112233445566778899aabbccddeeff');
@@ -19,13 +19,13 @@ describe('AES', function() {
       // var cipher = new AES(key);
       const cipher = new AES(key);
 
-      should(bytesToHex(cipher.encrypt(message))).eql(bytesToHex(encrypted));
+      should(byteStringToHex(cipher.encrypt(message))).eql(byteStringToHex(encrypted));
     });
 
     it('should decrypt message by key', function() {
       var cipher = new AES(key);
 
-      should(bytesToHex(cipher.decrypt(encrypted))).eql(bytesToHex(message));
+      should(byteStringToHex(cipher.decrypt(encrypted))).eql(byteStringToHex(message));
     });
 
     it('should transform CTR', function() {
@@ -45,7 +45,7 @@ describe('AES', function() {
 
       var data = hexToBytes("abcd");
 
-      var encrypted = new AESCTRTransformer(dk, bytesToArray(iv)).transform(data);
+      var encrypted = new AESCTRTransformer(dk, iv).transform(data);
 
       should(1).eql(1);
     });

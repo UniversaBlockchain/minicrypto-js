@@ -2,7 +2,7 @@ var utils = require('../../lib/utils');
 var helpers = require('../helpers');
 
 var hexToBytes = utils.hexToBytes;
-var bytesToHex = utils.bytesToHex;
+var bytesToHex = utils.byteStringToHex;
 var BigInteger = utils.BigInteger;
 
 var i = helpers.i;

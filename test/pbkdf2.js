@@ -5,7 +5,7 @@ var utils = require('../lib/utils');
 
 var bytesToHex = utils.bytesToHex;
 var hexToBytes = utils.hexToBytes;
-var textToHex = utils.textToHex;
+var textToHex = utils.bytes.textToHex;
 var decode64 = utils.decode64;
 var raw = utils.raw;
 

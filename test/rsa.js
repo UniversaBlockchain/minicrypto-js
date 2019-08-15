@@ -11,7 +11,16 @@ const { SHA } = hash;
 
 const { readKey64 } = require('./helpers');
 
-const { bytesToHex, hexToBytes, raw, decode64, encode64, isValidAddress, v2 } = utils;
+const {
+  bytesToHex,
+  hexToBytes,
+  raw,
+  decode64,
+  encode64,
+  decode58,
+  encode58,
+  v2
+} = utils;
 const { oaep, pss, customSalt } = vectors;
 
 describe('RSA', function() {
@@ -55,14 +64,14 @@ describe('RSA', function() {
     it('should verify address', function() {
       var publicKey = new PublicKey('EXPONENTS', oaep);
       var address = publicKey.address({ long: true });
-      var addressString = v2.base58.encode(address);
+      var addressString = encode58(address);
 
       var addressShort = publicKey.address();
-      var addressShortString = v2.base58.encode(addressShort);
+      var addressShortString = encode58(addressShort);
 
-      should(isValidAddress(addressString)).eql(true);
-      should(isValidAddress(addressShortString)).eql(true);
-      should(isValidAddress(addressShortString + "a")).eql(false);
+      should(PublicKey.isValidAddress(addressString)).eql(true);
+      should(PublicKey.isValidAddress(addressShortString)).eql(true);
+      should(PublicKey.isValidAddress(addressShortString + "a")).eql(false);
     });
 
     it('should encrypt data with OAEP and MGF1', function() {
@@ -120,9 +129,8 @@ describe('RSA', function() {
 
       const pubK = new PublicKey('BOSS', decode64("HggcAQABxAEBAKPW/V0ov09rGWAMoBSWuRHzf2yzA29WgLRzJvZutClo9xfo8KaOryl1NxtvOBJ9xsdH0fMXyV/1LBWa9U5v7vBO49m7oneIQt0GIJ35mWcZPp9WjZVzMogy9xvRoDSTMrfWuApJRWnD0Z5bYDxI9kObKA17Vrv8gr0YD7kK9r2J9tJDcV7pPthHWzLDgLVQHX/l86zK+MGDFypX8OWo5murr7ESTzqA42VHprwdwhJ2zrwqdFMbVozwC4OpWkCEEgQNZUDYYx1fAUR4RnoCB/51RkoRmKkLjjJpV+ZIXg+SqU9hUJPtJ08JnaHcz66lbA3utcolnck4NT1MtVeZKAs="));
       const addr = "ZFPU5QyNJPA3LsyLwJU4UiFMfxZ7BUoxbF5SMdRMdNGhXUWnar";
-      console.log(utils.encode64(pubK.fingerprint()));
 
-      should(v2.encode58(pubK.address())).eql(addr);
+      should(encode58(pubK.address())).eql(addr);
       // should(v2.encode58(publicKey.address())).eql("26Ah78vuENoN7gdWvRwZbq25tyX5YxNXSu8gyAEc33tGiBPUNsS");
     });
 
@@ -142,7 +150,7 @@ describe('RSA', function() {
       var pub = priv.publicKey;
       var shortAddress = pub.address();
 
-      should(utils.v2.encode58(shortAddress)).eql("26RzRJDLqze3P5Z1AzpnucF75RLi1oa6jqBaDh8MJ3XmTaUoF8R")
+      should(encode58(shortAddress)).eql("26RzRJDLqze3P5Z1AzpnucF75RLi1oa6jqBaDh8MJ3XmTaUoF8R")
     });
 
     // 26RzRJDLqze3P5Z1AzpnucF75RLi1oa6jqBaDh8MJ3XmTaUoF8R
