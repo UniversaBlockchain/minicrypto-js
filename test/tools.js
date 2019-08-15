@@ -22,7 +22,7 @@ describe('Tools', function() {
   it('should calc crc32 for bin', function() {
     const data = utils.decode64('gvyrDZKjMVPIhManWZaKNMQIgSb6jpUles+5LvB8EVwRlqk5BACZN1J9L59ZOz1a+cEOt0vjOYoww7M5EjyurHgVc3ht7ras4Iocej2FnoSeGlx1sWe/NdpfXZtDSCKLRlRmIS2bjUbURDk=');
     const sample = randomBytes(1000);
-    const digest = crc32.bytes(data);
+    const digest = crc32(data);
 
 
     should(bytesToHex(digest)).eql("b5eaa121");
