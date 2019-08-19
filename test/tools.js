@@ -32,9 +32,6 @@ describe('Tools', function() {
     const sample = randomByteString(100000);
     var bigData = '';
 
-    // console.log(sample);
-    // console.log(byteStringToArray(arrayToByteString(sample)));
-
     const converted = byteStringToArray(arrayToByteString(byteStringToArray(sample)));
 
     should(encode64(byteStringToArray(sample))).eql(encode64(converted));
