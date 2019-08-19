@@ -3,7 +3,7 @@
 Cryptographic tools for running in browser.
 
 Supports:
- * [SHA1, SHA256, SHA512](#sha)
+ * [SHA family](#sha)
  * [HMAC](#hmac)
  * [PBKDF2](#pbkdf2)
  * [RSA OAEP/PSS](#oaep-pss)
@@ -11,271 +11,359 @@ Supports:
  * [BOSS](#boss)
 
 ## Installation
+```bash
+npm install
+npm run build
+```
 
-    npm install
-    npm run build
-
-In folder `build` there will be `universa.js` and `universa.min.js`.
+In folder `build` there will be `universa.js` and `boss.js`.
 To enable RSA keys generation, you will need provide path to `vendor/worker.js`
 
 ## Running tests
-
-    npm run test
-
-Also, open page `test/runner.html` in your browser, to test in a real browser.
+```bash
+mocha
+```
 
 ## Usage
 
+### Universa Capsule tools
+
+Sign capsule
+
+```js
+const { Capsule } = Universa;
+
+const newCapsuleBin = Capsule.sign(capsuleBin, privateKey); // Uint8Array
+```
+
+Extract signatures
+
+```js
+const { Capsule } = Universa;
+
+const signatures = Capsule.getSignatures(capsuleBin); // Array[Uint8Array]
+```
+
+Extract signature keys
+
+```js
+const { Capsule } = Universa;
+
+const publicKeys = Capsule.getSignatureKeys(capsuleBin); // Array[PublicKey]
+```
+
 ### Misc
 
-    // returns random bytestring for given length
-    var randomBytes = Universa.utils.randomBytes;
-    var key16bytes = randomBytes(16);
+Random byte array for given length
 
+```js
+const { randomBytes } = Universa.utils;
+const bytes16 = randomBytes(16); // Uint8Array
+```
+
+HashId for binary data
+
+```js
+const { hashId } = Universa.utils;
+const id = hashId(decode64("abc")); // Uint8Array
+```
+
+CRC32
+
+```js
+const { crc32 } = Universa.utils;
+const digest = crc32(decode64("abc")); // Uint8Array
+```
 
 ### Converters
 
-    // byte string <-> hex
-    var bytesToHex = Universa.utils.bytesToHex;
-    var hexToBytes = Universa.utils.hexToBytes;
+Convert byte array to hex string and back
 
-    // byte string <-> Uint8Array
-    var bytesToArray = Universa.utils.bytesToArray;
-    var arrayToBytes = Universa.utils.arrayToBytes;
+```js
+    const { bytesToHex, hexToBytes } = Universa.utils;
+    const hexString = bytesToHex(uint8arr);  // String
+    const bytesArray = hexToBytes(hexString); // Uint8Array
+```
 
-    // byte string -> Buffer
-    var bytesToBuffer = Universa.utils.bytesToBuffer;
+Convert plain text to bytes
+
+```js
+  const { textToBytes } = Universa.utils;
+  textToBytes("one two three") // Uint8Array
+```
+
+Convert bytes to base64 and back
+
+```js
+const { encode64, decode64 } = Universa.utils;
+const bytes = decode64("abc"); // Uint8Array
+const base64str = encode64(bytes); // String
+```
+
+Convert bytes to base58 and back
+
+```js
+const { encode58, decode58 } = Universa.utils;
+const bytes = decode58("abc"); // Uint8Array
+const base58str = encode58(bytes); // String
+```
 
 ### SHA
 
 Supports SHA256, SHA512, SHA1.
 
-Get instant hash value
+Get instant hash value for given byte array
 
-    var SHA = Universa.hash.SHA;
-    var sha256 = new SHA(256);
+```js
+const { SHA } = Universa.hash;
+const sha256 = new SHA(256);
 
-    var resultBytes = sha256.get('somevalue');
+const resultBytes = sha256.get(textToBytes('somevalue')); // Uint8Array
+```
 
 Get hash value for large data
 
-    var SHA = Universa.hash.SHA;
-    var sha512 = new SHA(512);
+```js
+const { SHA } = Universa.hash;
+const sha512 = new SHA(512);
 
-    sha512.put('chunk1');
-    sha512.put('chunk2');
+sha512.put(dataPart1); // dataPart1 is Uint8Array
+sha512.put(dataPart2);
+// .....
+sha512.put(dataPartFinal);
 
-    var resultBytes = sha512.get();
+const resultBytes = sha512.get(); // Uint8Array
+```
 
 Get hash value in HEX
 
-    var SHA = Universa.hash.SHA;
-
-    var sha256 = new SHA(256);
-    var resultBytes = sha256.get('somevalue', 'hex');
+```js
+const { SHA } = Universa.hash;
+const sha256 = new SHA(256);
+const hexResult = sha256.get(textToBytes("one two three"), 'hex'); // String
+```
 
 ### HMAC
 
-Supports SHA256, SHA512, SHA1.
+```js
+const { SHA, HMAC } = Universa.hash;
+const data = textToBytes('a quick brown for his done something disgusting');
+const key = textToBytes('1234567890abcdef1234567890abcdef');
 
-Example
-
-    var SHA = Universa.hash.SHA;
-    var HMAC = Universa.hash.HMAC;
-    var key = 'my secret key';
-
-    var hmac = new HMAC(new SHA(256), key);
-    var resultBytes = hmac.get('my secret data');
+const sha256 = new SHA('256');
+const hmac = new HMAC(sha256, key);
+const result = hmac.get(data) // Uint8Array
+```
 
 ### PBKDF2
 
-Example
+```js
+const { hexToBytes } = Universa.utils;
+const { pbkdf2 } = Universa.pki;
+const { SHA } = Universa.hash;
 
-    var hexToBytes = Universa.utils.hexToBytes;
-    var pbkdf2 = Universa.pki.pbkdf2;
-    var SHA = Universa.hash.SHA;
-
-    var derivedKey = pbkdf2(new SHA('256'), {
-      iterations: 1,
-      keyLength: 20
-      password: 'password',
-      salt: hexToBytes('abc123'),
-    });
+const derivedKey = pbkdf2(new SHA('256'), {
+  iterations: 1, // number of iterations
+  keyLength: 20  // bytes length
+  password: 'password',
+  salt: hexToBytes('abc123'),
+}); // Uint8Array
+```
 
 ### RSA Pair, keys helpers
 
-Private key - import
+Private key unpack
 
-    var PrivateKey = Universa.pki.privateKey;
-    var bossEncodedKey = '/* byte string */';
+```js
+const { PrivateKey } = Universa.pki;
+const { decode64, BigInteger } = Universa.utils;
 
-    var privateKey1 = new PrivateKey('BOSS', bossEncodedKey);
-    var privateKey2 = new PrivateKey('EXPONENTS', {
-      e: '/* byte string */',
-      p: '/* byte string */',
-      q: '/* byte string */'
-    });
+const bossEncodedKey = decode64(keyPacked64);
 
-Public key - import
+const privateKey1 = new PrivateKey('BOSS', bossEncodedKey);
+const privateKey2 = new PrivateKey('EXPONENTS', {
+  e: new BigInteger(eHex, 16),
+  p: new BigInteger(pHex, 16),
+  q: new BigInteger(qHex, 16)
+});
+```
 
-    var PublicKey = Universa.pki.publicKey;
-    var bossEncodedKey = '/* byte string */';
-    var privateKey2 = new PrivateKey('BOSS', privateEncoded);
+Public key unpack
 
-    var publicKey1 = new PublicKey('BOSS', bossEncodedKey);
-    var publicKey2 = privateKey2.publicKey;
-    var publicKey3 = new PublicKey('EXPONENTS', {
-      n: '/* byte string */',
-      e: '/* byte string */'
-    });
+```js
+const { PublicKey, PrivateKey } = Universa.pki;
+const { decode64, BigInteger } = Universa.utils;
 
-Public key - fingerprint
+const bossEncodedKey = decode64(keyPacked64);
+const privateKey2 = new PrivateKey('BOSS', privateEncoded);
 
-    var publicKey1; // some PublicKey instance
+const publicKey1 = new PublicKey('BOSS', bossEncodedKey);
+const publicKey2 = privateKey2.publicKey;
+const publicKey3 = new PublicKey('EXPONENTS', {
+  n: new BigInteger(nHex, 16),
+  e: new BigInteger(eHex, 16),
+});
+```
 
-    console.log(publicKey1.fingerprint()); // fingerprint
+Public key fingerprint
 
+```js
+publicKey.fingerprint(); // fingerprint (Uint8Array)
+```
 
-Pair - creation
+Generate private key
 
-    var PrivateKey = Universa.pki.privateKey;
-    var PublicKey = Universa.pki.publicKey;
+```js
+const { PrivateKey, PublicKey } = Universa.pki;
+const { createKeys } = Universa.pki.rsa;
 
-    var createKeys = Universa.pki.rsa.createKeys;
+const options = { bits: 2048, e: 0x10001 };
 
-    var options = { bits: 2048, e: 0x10001 };
-
-    createKeys(options, (err, pair) => {
-      console.log(pair.publicKey instanceof PublicKey); // true
-      console.log(pair.privateKey instanceof PrivateKey); // true
-    });
+createKeys(options, (err, pair) => {
+  console.log(pair.publicKey instanceof PublicKey); // true
+  console.log(pair.privateKey instanceof PrivateKey); // true
+});
+```
 
 Private(public) key - export
 
-    var PrivateKey = Universa.pki.privateKey;
-    var bossEncodedKey = '/* byteString */';
+```js
+const { PrivateKey } = Universa.pki;
+const bossEncodedKey = decode64(keyPacked64);
 
-    var privateKey1 = new PrivateKey('BOSS', bossEncodedKey);
+const priv = new PrivateKey('BOSS', bossEncodedKey);
 
-    var hashWithExponents = privateKey1.pack('EXPONENTS');
-    var bossEncoded = privateKey1.pack('BOSS');
+const hashWithExponents = priv.pack('EXPONENTS'); // hash map with exponents
+const bossEncoded = priv.pack('BOSS'); // Uint8Array
+```
 
 ### RSA OAEP/PSS
 
 
 OAEP encrypt/decrypt
 
-    var privateKey; // some PrivateKey instance
-    var publicKey = privateKey.publicKey;
+```js
+const privateKey; // some PrivateKey instance
+const publicKey = privateKey.publicKey;
 
-    // encrypt data
-    var data = '/* byte string */';
-    var options = {
-        seed: '/* byte string */', // optional, default none
-        mgf1Hash: new SHA(512), // optional, default SHA(256)
-        oaepHash: new SHA(512) // optional, default SHA(256)
-    };
-    var encrypted = publicKey.encrypt(data, options);
-    var decrypted = privateKey.decrypt(encrypted, options);
+// encrypt data
+const data = decode64("abc123");
+const options = {
+  seed: decode64("abcabc"), // optional, default none
+  mgf1Hash: new SHA(512), // optional, default SHA(256)
+  oaepHash: new SHA(512) // optional, default SHA(256)
+};
+const encrypted = publicKey.encrypt(data, options);
+const decrypted = privateKey.decrypt(encrypted, options);
 
-    console.log(data === decrypted); // true
+encode64(data) === encode64(decrypted); // true
+```
 
 PSS sign/verify
 
-    var privateKey; // some PrivateKey instance
-    var publicKey = privateKey.publicKey;
+```js
+const privateKey; // some PrivateKey instance
+const publicKey = privateKey.publicKey;
 
-    var options = {
-      salt: '/* byte string */', // optional
-      saltLength: null, // optional, numeric
-      mgf1Hash: new SHA(512), // optional, default SHA(256)
-      pssHash: new SHA(512) // optional, default SHA(256)
-    };
+const options = {
+  salt: decode64("abcabc"), // optional
+  saltLength: null, // optional, numeric
+  mgf1Hash: new SHA(512), // optional, default SHA(256)
+  pssHash: new SHA(512) // optional, default SHA(256)
+};
 
-    var message = 'abc123';
+const message = 'abc123';
 
-    var signature = privateKey.sign(message, options);
-    var isCorrect = publicKey.verify(message, signature, options);
-    console.log(isCorrect); // true
+const signature = privateKey.sign(message, options);
+const isCorrect = publicKey.verify(message, signature, options);
+console.log(isCorrect); // true
+```
 
 ### Extended signature
 
 Sign/verify
 
-    var ExtendedSignature = Universa.pki.extendedSignature;
-    var data = '/* byte string */';
-    var privateKey; // some PrivateKey instance
-    var publicKey = privateKey.publicKey;
+```js
+const { ExtendedSignature } = Universa.pki;
+const data = decode64("abcde12345");
+const privateKey; // some PrivateKey instance
+const publicKey = privateKey.publicKey;
 
-    var signature = ExtendedSignature.sign(key, data);
-    var es = ExtendedSignature.verify(publicKey, signature, data);
+const signature = ExtendedSignature.sign(key, data);
+const es = ExtendedSignature.verify(publicKey, signature, data);
 
-    var isCorrect = !!es;
-    console.log(es.created_at); // signature created at
-    console.log(es.key); // fingerprint
-    console.log(ExtendedSignature.extractKeyId(signature)); // fingerprint
-    console.log(ExtendedSignature.keyId(publicKey)); // fingerprint
+const isCorrect = !!es;
+console.log(es.created_at); // Date - signature created at
+console.log(es.key); // Uint8Array - PublicKey fingerprint
+console.log(ExtendedSignature.extractPublicKey(signature)); // PublicKey instance
+```
 
 ### BOSS
 
 Encode/decode
 
-    var bytesToBuffer = Universa.utils.bytesToBuffer;
-    var Boss = Universa.boss;
-    var boss = new Boss();
+```js
+const { Boss } = Universa;
+const boss = new Boss();
 
-    // IMPORTANT: you should wrap byte string into buffer, before passing it to boss formatter
-    var data = {
-        a: bytesToBuffer('/* some byte string */')
-        b: new Date(),
-        c: [1, 2, 'test'],
-        d: { a: 1 }
-    };
+const data = {
+  a: decode64("abc")
+  b: new Date(),
+  c: [1, 2, 'test'],
+  d: { a: 1 }
+};
 
-    var encoded = boss.dump(data);
-    var decoded = boss.load(encoded);
+const encoded = boss.dump(data); // Uint8Array
+const decoded = boss.load(encoded); // original data
+```
 
 Encode stream
 
-    const writer = new Boss.writer();
+```js
+const writer = new Boss.writer();
 
-    writer.write(0);
-    writer.write(1);
-    writer.write(2);
-    writer.write(3);
+writer.write(0);
+writer.write(1);
+writer.write(2);
+writer.write(3);
 
-    const dump = writer.get();
-
-    // bytesToHex(dump) === '00081018' - true
+const dump = writer.get(); // Uint8Array
+```
 
 Decode stream
 
-    const reader = new Boss.reader(hexToBytes('00081018'));
+```js
+const reader = new Boss.reader(hexToBytes('00081018'));
 
-    const arg1 = reader.read(); // 0
-    const arg2 = reader.read(); // 1
-    const arg3 = reader.read(); // 2
-    const arg4 = reader.read(); // 3
-    const arg5 = reader.read(); // undefined
+const arg1 = reader.read(); // 0
+const arg2 = reader.read(); // 1
+const arg3 = reader.read(); // 2
+const arg4 = reader.read(); // 3
+const arg5 = reader.read(); // undefined
+```
 
 ### AES
 
 Encrypt/decrypt
 
-    var AES = Universa.cipher.AES;
-    var key = '/* 16 byte string */'; // 16 bytes for aes128, 32 bytes for aes256
-    var message = 'some text';
+```js
+const { AES } = Universa.cipher;
+const key = decode64("abc"); // 16 bytes for aes128, 32 bytes for aes256
+const message = textToBytes('some text');
 
-    var aes256 = new AES(key);
-    var encrypted = aes256.encrypt(message);
-    var decrypted = aes256.decrypt(encrypted);
+const aes256 = new AES(key);
+const encrypted = aes256.encrypt(message);   // Uint8Array
+const decrypted = aes256.decrypt(encrypted); // Uint8Array
+```
 
 ### NOTES
 
-forge has broken method for encoding bytes, it should be replaced with:
+node-forge has broken method for encoding bytes, it should be replaced with:
 
+```js
 util.binary.raw.encode = function(bytes) {
   return bytes.reduce(function (data, byte) {
     return data + String.fromCharCode(byte);
   }, '');
 };
+```

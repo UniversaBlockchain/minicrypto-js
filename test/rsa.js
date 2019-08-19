@@ -26,7 +26,7 @@ const { oaep, pss, customSalt } = vectors;
 describe('RSA', function() {
   describe('key creation', function() {
     it.skip('should generate key pair', function(done) {
-      // FIXME: why keys generation and convertation to pem takes so long time?
+      // FIXME: why keys generation and convertation to pem takes so much time?
       this.timeout(8000);
 
       const options = {
@@ -131,18 +131,7 @@ describe('RSA', function() {
       const addr = "ZFPU5QyNJPA3LsyLwJU4UiFMfxZ7BUoxbF5SMdRMdNGhXUWnar";
 
       should(encode58(pubK.address())).eql(addr);
-      // should(v2.encode58(publicKey.address())).eql("26Ah78vuENoN7gdWvRwZbq25tyX5YxNXSu8gyAEc33tGiBPUNsS");
     });
-
-    // it.only('should calculate short address', function() {
-    //   var privateEncoded = decode64("JgAcAQABvIEAxIA1enr/js+6wCO5AfidA7cxOAGF6un36HGCAlv8WiUwkZV8kUsN4KdCmEcjfDr6WBdnxfftD8uv3LbT3LzTo4rpMv0EkBVfC3s/HnK/kLrPyrnt3cycZdbF6P939DMFAyiUGmD1HFFlIfPCtGVszlIU4aRvPNLRfuSno52Iqe28gQCoPVqU6HYVl6RPbMxM0MwQr6mUNOOEh4TvxHdTMw6O1Qv+wTPu0bHocV6CcLx132FEKoVfcLrTj/bkjNiTpwSzkIlQIWhokljvhSD9ILniAkOgtbKGgDuQ2ikrcPHSSe+uRJXGlBkyxDVKR5i+6ZVQunJk4vdhfwRLOk2KYgEyIQ==");
-    //   var priv = new PrivateKey('BOSS', privateEncoded);
-    //   var pub = priv.publicKey;
-    //   var shortAddress = pub.address();
-    //   console.log(encode64(pub.address()));
-
-    //   should(encode64(shortAddress)).eql("ELhi4o6EspYRc7frob4CeXpuIL1SsheE6cP4NKLTJj2HNklq+A==")
-    // });
 
     it('should calculate short address', function() {
       var privateEncoded = hexToBytes("26001c010001c40001f05da97d084313655c43e7caf582fd2dcb76eff3309ec49cc70ef7a2c82547e01b3c5a6d51ca48ae44bc05d1a089c2019865a44c49bbcd48c54ae59f21dba28f65fee44d1aa1389cfa9eca8a2e218f94c735b5bb1e3313afafcfd62657fb86bdd7bf3cbda7943509a9ce2c92534584424b0f8fe5fbadd944c378aa967d206128a6a1e259b597c286d67778ee3c548df8ea39aff4ec993a1858e2fc51d12698b674280664ddc0714b81613b97f1da4b9be8a2617be4faa720a5a183f2910862040b26e0292cc3368442210f1b6171bb0ccdd1e042d253afd8eabb79f6edfcf27dce28a09b7d81ffc161a64dcf42190aedac1cf50ec86bb390fd15ab33b4d4f44fc40001d9bd6a350d985789f574ed8c410e7cf1d79db784a494b33d98c440794797fa8ba76d5feb7c32897a221f87dc26414076d279333eed9e0d7c6c8fea801ec07f3ad69921a3f2e1ec6a0910fea6af48703fd98b92e6b6eaba23b3a619ab071ba4f80a89790e50619a921bf5f93193f54b059c78af097209ce050bd0eada0c6775a003315d8d4d3cccd0ee2740ad1a404ccd37d92992a2a717bcdbd46785813ab0f701be34753af658565c8f10550e91f13c1e1a1e167dcd7d37cd87189beb8baee375366346553b7951b35e1e2c80446bbeb2398163932dd288bdd44ba7f15a9fb05372e0340162ce3fa6ef324fd06b677990c9faf1e8dd7342a73ab2640695bf09");
@@ -152,8 +141,6 @@ describe('RSA', function() {
 
       should(encode58(shortAddress)).eql("26RzRJDLqze3P5Z1AzpnucF75RLi1oa6jqBaDh8MJ3XmTaUoF8R")
     });
-
-    // 26RzRJDLqze3P5Z1AzpnucF75RLi1oa6jqBaDh8MJ3XmTaUoF8R
 
     describe('signature with custom salt', function() {
       var privateKey, publicKey;
