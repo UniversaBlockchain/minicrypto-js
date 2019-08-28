@@ -1,10 +1,10 @@
 {
-  "name": "universajs",
+  "name": "ubc-minicrypto",
   "version": "0.1.0",
-  "description": "cryptography tools for universa",
+  "description": "Minimalistic Javascript library required to perform basic operations with Universa smart contracts and other objects.",
   "main": "index.js",
   "scripts": {
-    "test": "browserify test/*.js > build/tests.js && mocha-phantomjs -p ./node_modules/.bin/phantomjs test/runner.html",
+    "test": "mocha",
     "build": "node ./build.js"
   },
   "keywords": [
@@ -12,7 +12,13 @@
     "frontend",
     "client"
   ],
-  "author": "",
+  "author": "Universa Blockchain Team",
+  "license": "(BSD-3-Clause OR GPL-2.0)",
+  "bugs": "https://github.com/UniversaBlockchain/minicrypto-js/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/UniversaBlockchain/minicrypto-js"
+  },
   "devDependencies": {
     "babel-core": "~6.26.0",
     "babel-loader": "~7.1.2",
