@@ -1,6 +1,6 @@
 ## universa-js/universajs
 
-Cryptographic tools for running in browser.
+Minimalistic Javascript library required to perform basic operations with Universa smart contracts and other objects.
 
 Supports:
  * [SHA family](#sha)
