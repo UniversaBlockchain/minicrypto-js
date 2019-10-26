@@ -28,19 +28,10 @@ function build(config) {
 }
 
 build(forgeConfig)
-  .then(() => build(universaConfig))
   .then(rewriteWorker)
+  .then(() => build(universaConfig))
   .then(
     () => console.log("Done without errors."),
     (err) => console.log(`Done with errors: ${err}`)
   );
-
-// new Promise(buildForge)
-//   .then(buildUniversa)
-//   .then(rewriteWorker)
-//   .then(
-//     () => console.log("Done without errors."),
-//     (err) => console.log(`Done with errors: ${err}`)
-//   );
-
 
