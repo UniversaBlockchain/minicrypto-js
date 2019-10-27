@@ -211,6 +211,15 @@ Public key fingerprint
 publicKey.fingerprint(); // fingerprint (Uint8Array)
 ```
 
+Public key address
+
+```js
+publicKey.address();               // short address (Uint8Array)
+publicKey.shortAddress();          // short address (Uint8Array)
+publicKey.address({ long: true }); // long address (Uint8Array)
+publicKey.longAddress();           // long address (Uint8Array)
+```
+
 Generate private key
 
 ```js

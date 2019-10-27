@@ -57,7 +57,7 @@ describe('BOSS Protocol', function() {
     should(typeof decoded.c).eql('object');
   });
 
-  it.skip('should pack date', function() {
+  it('should pack date', function() {
     var d = new Date('2218 07 Mar 21:39');
 
     var encoded = boss.dump(d);
