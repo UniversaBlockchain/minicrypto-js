@@ -110,12 +110,14 @@ const base58str = encode58(bytes); // String
 
 ### SHA
 
-Supports SHA256, SHA512, SHA1.
+Supports SHA256, SHA512, SHA1, SHA3(256, 384, 512)
 
 Get instant hash value for given byte array
 
 ```js
 const { SHA } = Universa.hash;
+
+// sha3 identifiers: "3_256", "3_384", "3_512"
 const sha256 = new SHA(256);
 
 const resultBytes = sha256.get(textToBytes('somevalue')); // Uint8Array
@@ -244,6 +246,87 @@ const priv = new PrivateKey('BOSS', bossEncodedKey);
 
 const hashWithExponents = priv.pack('EXPONENTS'); // hash map with exponents
 const bossEncoded = priv.pack('BOSS'); // Uint8Array
+```
+
+### KEY INFO
+
+Contains information about Key and helper to match keys compatibility
+
+Supported algorithms: RSAPublic, RSAPrivate, AES256
+Supported PRF: HMAC_SHA1, HMAC_SHA256, HMAC_SHA512
+
+```js
+const { KeyInfo} = Universa.pki;
+const keyInfo = new KeyInfo({
+  algorithm: KeyInfo.Algorithm.AES256,
+  tag: decode64("abc"), // Uint8Array
+  keyLength: 32,        // Int
+  prf: KeyInfo.PRF.HMAC_SHA256,
+  rounds: 16000,        // number of iterations
+  salt: decode64("bcd") // Uint8Array
+});
+
+```
+
+Pack to BOSS
+
+```js
+const packed = keyInfo.pack(); // Uint8Array
+```
+
+Read from BOSS
+
+```js
+// bossEncoded is Uint8Array
+const keyInfo = KeyInfo.unpack(bossEncoded); // KeyInfo
+```
+
+Check that this key can decrypt other key
+
+```js
+const canDecrypt = keyInfo.matchType(otherKeyInfo); // boolean
+```
+
+Derived key from password
+
+```js
+const derivedKey = keyInfo.derivePassword("somepassword"); // Uint8Array
+```
+
+### SYMMETRIC KEY
+
+Symmetric key: main interface to the symmetric cipher.
+This implementation uses AES256 in CTR mode with IV to encrypt / decrypt.
+
+```js
+// Creates random key (AES256, CTR)
+const symmetricKey = new SymmetricKey();
+
+// Creates key by derived key (Uint8Array) and it's info (KeyInfo)
+const symmetricKey2 = new SymmetricKey({
+  keyBytes: derivedKey,
+  keyInfo: keyInfo
+});
+
+// Creates key by password (String) and number of rounds (Int). Salt is optional
+// Uint8Array, null by default
+const symmetricKey3 = SymmetricKey.fromPassword(password, rounds, salt);
+```
+
+Encrypt / decrypt data with AES256 in CRT mode with IV
+
+```js
+// data is Uint8Array
+const encrypted = symmetricKey.encrypt(data); // Uint8Array
+const decrypted = symmetricKey.decrypt(encrypted); // Uint8Array
+```
+
+Encrypt / decrypt data with EtA using Sha256-based HMAC
+
+```js
+// data is Uint8Array
+const encrypted = symmetricKey.etaEncrypt(data); // Uint8Array
+const decrypted = symmetricKey.etaDecrypt(encrypted); // Uint8Array
 ```
 
 ### RSA OAEP/PSS
