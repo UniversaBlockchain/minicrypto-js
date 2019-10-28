@@ -188,6 +188,12 @@ const privateKey2 = new PrivateKey('EXPONENTS', {
   p: new BigInteger(pHex, 16),
   q: new BigInteger(qHex, 16)
 });
+
+// Read password-protected key
+const privateKey3 = new PrivateKey('BOSS', {
+  bin: bossEncodedKey,
+  password: "somepassword"
+})
 ```
 
 Public key unpack
@@ -248,11 +254,18 @@ const hashWithExponents = priv.pack('EXPONENTS'); // hash map with exponents
 const bossEncoded = priv.pack('BOSS'); // Uint8Array
 ```
 
+Password-protected Private key export
+
+```js
+const bossEncoded = privateKey.pack("BOSS", "somepassword");
+```
+
 ### KEY INFO
 
 Contains information about Key and helper to match keys compatibility
 
 Supported algorithms: RSAPublic, RSAPrivate, AES256
+
 Supported PRF: HMAC_SHA1, HMAC_SHA256, HMAC_SHA512
 
 ```js
