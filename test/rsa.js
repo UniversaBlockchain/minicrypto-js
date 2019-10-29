@@ -14,6 +14,7 @@ const { readKey64 } = require('./helpers');
 const {
   bytesToHex,
   hexToBytes,
+  textToHex,
   raw,
   decode64,
   encode64,
@@ -195,10 +196,34 @@ describe('RSA', function() {
         })).eql(true);
       });
 
-       it('signature check with default params should work for signature created with default params', function() {
+      it('signature check with default params should work for signature created with default params', function() {
         var signature = privateKey.sign(customSalt.message, { pssHash: new SHA(1) });
 
         should(publicKey.verify(customSalt.message, signature, { pssHash: new SHA(1) })).eql(true);
+      });
+
+      it('should pss sign with sha3', function() {
+        var signature = privateKey.sign(customSalt.message, { pssHash: new SHA("3_384") });
+
+        should(publicKey.verify(customSalt.message, signature, { pssHash: new SHA("3_384") })).eql(true);
+      });
+
+      it('should pss 384', function(){
+        var keyB = decode64("JgAcAQABvIDoaVg0PVAe9jcbthAtqajcFUNDI+hi4YVJbOGPSCmXBPLGhAYjDNNVJ2mvSxSED7Aa3nVu/M0NqmRrzOQZuXk7EBAjkDeP5xKJKes5O2okwvjU1Tysg2/xe5vkSKpsLVBMaZ38W2Vgq5gvyfhl87T9fJCaNVUw4ZvhiDvPJoGO9byA2nbKMXmYM/qM/p5tLI91NX0TofBCXgCHrccDHnOwN0ftx2qR3tE/0U4AFY4FTig2BBm4Loq8r0TSuF79gjJHKcmY0fAKmE4VBCSBOXDqbClJ4ywOK7BbJ53xX/MfVEI26cFVZySPXWoYu05+fzEta9tcViOY7ouqgys9f8biTT8");
+        var msg = hexToBytes("85e965a0");
+
+        var priv = new PrivateKey('BOSS', keyB);
+        var signature;
+        // signature = priv.sign(msg, {
+        //   pssHash: new SHA("3_384"),
+        //   mgf1Hash: new SHA("1")
+        // });
+        signature = decode64("N4F/jKomkjHJQJELFddbQaeqITmIQv6rrIdZojE5XVdLuz+batkPzhFIz4vS6KMjRpn7RkMSXzhnVWOqHntl3TjTkOzYNO8C4pYNB+gwWCC0VxGdF/orgwHMT9waOrobNolaOyJi50lRX0ubsrqhbZ5VWtaWuaG8IO/F7G99KvnVUctZcA9v1ZtHEbS4Gj7baXXi0zxennTz/UOA2WtO8HLNIpRCGE7Euw/PMFHcosslc5CAM8hfMenZ3P/DFSvNcEdkN6wMKKPavoKmt3ERWiYdpT4a0ounUf0xY26wgecJTsbzaieWtnhdP5RqVTYHIoP/fvTfoJz2b8pCHNnELg");
+
+        should(priv.publicKey.verify(msg, signature, {
+          pssHash: new SHA("3_384"),
+          mgf1Hash: new SHA("1")
+        })).eql(true);
       });
     });
   });

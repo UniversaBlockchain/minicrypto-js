@@ -2,7 +2,7 @@ var should = require('should');
 var hash = require('../lib/hash');
 const utils = require('../lib/utils');
 
-const { textToHex, textToBytes, hexToBytes, bytesToArray, encode64, decode64 } = utils;
+const { textToHex, textToBytes, hexToBytes, bytesToHex, bytesToArray, encode64, decode64 } = utils;
 
 var SHA = hash.SHA;
 var HMAC = hash.HMAC;
@@ -61,6 +61,24 @@ describe('Hash functions', function() {
         sha512.put(textToBytes('two'));
 
         should(sha512.get('hex')).eql(hashFor['onetwo']);
+      });
+    });
+
+    describe('SHA3 384', function() {
+      it("should get hash with 384", function() {
+        // const vector = "abc";
+        // const hash = new SHA("256");
+
+        // const digest = bytesToHex(hash.get(vector));
+
+        // should(digest).eql("ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad");
+
+        const vector = "abc";
+        const hash = new SHA("3_384");
+
+        const digest = bytesToHex(hash.get(vector));
+
+        should(digest).eql("ec01498288516fc926459f58e2c6ad8df9b473cb0fc08c2596da7cf0e49be4b298d88cea927ac7f539f1edf228376d25");
       });
     });
   });
