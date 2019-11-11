@@ -60,6 +60,21 @@ describe('RSA', function() {
       should(encode64(key2.publicKey.fingerprint())).eql(encode64(key.publicKey.fingerprint()));
     });
 
+    it('should pack with password and iterations', function() {
+      this.timeout(8000);
+
+      const base64Encoded = vectors.keys[2];
+      const key = new PrivateKey('BOSS', readKey64(base64Encoded));
+      const keyPacked = key.pack("BOSS", { password: "qwerty", rounds: 1000 });
+
+      const key2 = new PrivateKey("BOSS", {
+        bin: keyPacked,
+        password: "qwerty"
+      });
+
+      should(encode64(key2.publicKey.fingerprint())).eql(encode64(key.publicKey.fingerprint()));
+    });
+
     it('should read v2 keys', function() {
       const keyBin = decode64("HhisGAUQuCAAuPpkMr8wf6f/jCb2p1+5xDwCU25f/m3Q7dh3R31OUfD+WvAtDga1aifgufNudMwZREU6yiqADUIEBsELX6kFEHn0hd5zsniIoGchIhMWeaQ+F2EzB7wkK742QoY4mlbJpCsNzc8ehr/MsD19a8Im0YdJ4t1gudvQE7h+tRrImh+CLIN4FpHtvT0ZNroDKnNCnimOPbfe0jFip3cnC6bGdEvvpkLVJwWs1OQa6kkPBrdCMI3NrTlk21qxMu/ySukeRhCGsSp+KprNWinUWrVqfKmWkrKdLLePlyY+HB6sQkIBmZ7PbVd3nejRiTGeswOR+ZTHOvE4t5afVq+dfmWFsNlEGCQvKmwUqxPIw+kw5IcUdZrat0DvsJ2rDS6LwlnaNBLoEd7EgaPcI3lvjwuQ8XjCBQ05YrHwegTkLv6djqwfooS6ip4wCMmwPG1t294hP5BXcJ/i1uv2pkNdEQMacPbXjiPw0d5v0S02/VJv9oJ3NWLqtMhxgjFAhuKyzyz/0gqpQllW9zJrYQop3oNv1l6v0+FMo5ITfqB+NvuX5LjSYXimKLnj7BqwO4lVfOTaTehHaNGuBW4JqC5F3eRx1YWFmIM6VHlsXJ9KzmK9nSA1mDJe1v3GNq7bd8GDGsF89ROB2M44p8yN9tJnXIGn/pxB+7/2sB9suUcxgykkTePnnpIoo1AdoWppTG/qNtXDi0amhy3XwOg0kDQg60JNW4mo5did7Z6vkTPufi9yFcW+H3s9JB1IssbETopHDJ80Vl+xYAozLvEKxbectXw");
       const password = "81bf60af-703c-4c28-8fc7-878860089df5";

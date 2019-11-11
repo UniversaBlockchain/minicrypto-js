@@ -30,9 +30,9 @@ describe('Extended signature', function() {
     const key = new PrivateKey('BOSS', decode64(vectors.keys[3]));
     const id = keyId(key);
     const pubKey = key.publicKey;
-    const signature = sign(key, data);
+    const signature = key.signExtended(data);
 
-    const es = verify(pubKey, signature, data);
+    const es = pubKey.verifyExtended(signature, data);
 
     should(es).be.ok();
     should(es.key).eql(id);

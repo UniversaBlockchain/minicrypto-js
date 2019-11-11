@@ -257,7 +257,14 @@ const bossEncoded = priv.pack('BOSS'); // Uint8Array
 Password-protected Private key export
 
 ```js
+// default pbkdf2 rounds = 160000
 const bossEncoded = privateKey.pack("BOSS", "somepassword");
+
+// use custom pbkdf2 rounds
+const bossEncodedFast = privateKey.pack("BOSS", {
+  password: "somepassword",
+  rounds: 16000
+});
 ```
 
 ### KEY INFO
@@ -394,8 +401,8 @@ const data = decode64("abcde12345");
 const privateKey; // some PrivateKey instance
 const publicKey = privateKey.publicKey;
 
-const signature = ExtendedSignature.sign(key, data);
-const es = ExtendedSignature.verify(publicKey, signature, data);
+const signature = privateKey.signExtended(data);
+const es = publicKey.verifyExtended(signature, data);
 
 const isCorrect = !!es;
 console.log(es.created_at); // Date - signature created at
