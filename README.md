@@ -11,6 +11,32 @@ Supports:
  * [BOSS](#boss)
 
 ## Installation
+
+### Node.js
+
+For usage in an existing Node.js project, add it to your dependencies:
+
+```
+$ npm install universa-minicrypto
+```
+
+or with yarn:
+
+```
+$ yarn add universa-minicrypto
+```
+
+
+And use it with the following line wherever you need it:
+
+```javascript
+const Universa = require('universa-minicrypto');
+```
+
+### Web
+
+In root folder of package run
+
 ```bash
 npm install
 npm run build
@@ -19,9 +45,11 @@ npm run build
 In folder `build` there will be `universa.js` and `boss.js`.
 To enable RSA keys generation, you will need provide path to `vendor/worker.js`
 
-## Running tests
-```bash
-mocha
+Simply copy `build/universa.js` to wherever you keep your vendor scripts and include
+it as a script:
+
+```html
+<script src="path/to/universa.js"></script>
 ```
 
 ## Usage
@@ -232,7 +260,7 @@ Generate private key
 
 ```js
 const { PrivateKey, PublicKey } = Universa.pki;
-const { createKeys } = Universa.pki.rsa;
+const { createKeys } = Universa.pki.rsa;
 
 const options = { bits: 2048, e: 0x10001 };
 
@@ -245,7 +273,7 @@ createKeys(options, (err, pair) => {
 Private(public) key - export
 
 ```js
-const { PrivateKey } = Universa.pki;
+const { PrivateKey } = Universa.pki;
 const bossEncodedKey = decode64(keyPacked64);
 
 const priv = new PrivateKey('BOSS', bossEncodedKey);
@@ -415,7 +443,7 @@ console.log(ExtendedSignature.extractPublicKey(signature)); // PublicKey instanc
 Encode/decode
 
 ```js
-const { Boss } = Universa;
+const { Boss } = Universa;
 const boss = new Boss();
 
 const data = {
@@ -466,6 +494,23 @@ const message = textToBytes('some text');
 const aes256 = new AES(key);
 const encrypted = aes256.encrypt(message);   // Uint8Array
 const decrypted = aes256.decrypt(encrypted); // Uint8Array
+```
+
+## Create bundle
+
+Run in package root folder
+
+```bash
+npm install
+npm run build
+```
+
+In folder `build` there will be `universa.js` and `boss.js`.
+To enable RSA keys generation, you will need provide path to `vendor/worker.js`
+
+## Running tests
+```bash
+mocha
 ```
 
 ### NOTES
