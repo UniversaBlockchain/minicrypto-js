@@ -347,5 +347,21 @@ describe('RSA', function() {
 
       should(bytesToHex(pss.message)).eql(bytesToHex(decrypted2));
     });
+
+    it('should pack key as is', function() {
+      const keyBytes = decode64("/bbMv7MMsbsWSi4Abujd/1nije6QADJeuqxAKyCg+gY=");
+      const symmetricKey = new SymmetricKey({ keyBytes });
+
+      const encrypted = symmetricKey.encrypt(pss.message);
+      const decrypted = symmetricKey.decrypt(encrypted);
+
+      should(bytesToHex(pss.message)).eql(bytesToHex(decrypted));
+
+      const encrypted2 = symmetricKey.etaEncrypt(pss.message);
+      const decrypted2 = symmetricKey.etaDecrypt(encrypted2);
+
+      should(bytesToHex(pss.message)).eql(bytesToHex(decrypted2));
+      should(encode64(symmetricKey.pack())).eql(encode64(keyBytes));
+    });
   });
 });

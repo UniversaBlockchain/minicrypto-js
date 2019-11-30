@@ -358,9 +358,25 @@ const symmetricKey2 = new SymmetricKey({
   keyInfo: keyInfo
 });
 
+// Creates key by derived key (Uint8Array)
+const symmetricKey2 = new SymmetricKey({
+  keyBytes: derivedKey
+});
+
 // Creates key by password (String) and number of rounds (Int). Salt is optional
 // Uint8Array, null by default
 const symmetricKey3 = SymmetricKey.fromPassword(password, rounds, salt);
+```
+
+Pack symmetric key (get derived key bytes)
+
+```js
+const { SymmetricKey } = Universa.pki;
+
+// Creates random key (AES256, CTR)
+const symmetricKey = new SymmetricKey();
+
+const derivedKey = symmetricKey.pack(); // Uint8Array
 ```
 
 Encrypt / decrypt data with AES256 in CRT mode with IV
