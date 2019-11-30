@@ -6,6 +6,7 @@ const should = require('should');
 const vectors = require('./vectors');
 const PublicKey = require('../lib/pki/public_key');
 const PrivateKey = require('../lib/pki/private_key');
+const SymmetricKey = require('../lib/pki/symmetric_key');
 
 const { SHA } = hash;
 
@@ -329,6 +330,22 @@ describe('RSA', function() {
       var isCorrect = privateKey.publicKey.verify(pss.message, signature, { salt: pss.salt });
 
       should(isCorrect).eql(true);
+    });
+  });
+
+  describe('Symmetric key', function() {
+    it('should create random symmetric key', function() {
+      const symmetricKey = new SymmetricKey();
+
+      const encrypted = symmetricKey.encrypt(pss.message);
+      const decrypted = symmetricKey.decrypt(encrypted);
+
+      should(bytesToHex(pss.message)).eql(bytesToHex(decrypted));
+
+      const encrypted2 = symmetricKey.etaEncrypt(pss.message);
+      const decrypted2 = symmetricKey.etaDecrypt(encrypted2);
+
+      should(bytesToHex(pss.message)).eql(bytesToHex(decrypted2));
     });
   });
 });
