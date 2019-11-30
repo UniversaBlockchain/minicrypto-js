@@ -347,6 +347,8 @@ Symmetric key: main interface to the symmetric cipher.
 This implementation uses AES256 in CTR mode with IV to encrypt / decrypt.
 
 ```js
+const { SymmetricKey } = Universa.pki;
+
 // Creates random key (AES256, CTR)
 const symmetricKey = new SymmetricKey();
 
