@@ -28,7 +28,7 @@ describe('Tools', function() {
     should(bytesToHex(digest)).eql("b5eaa121");
   });
 
-  it.skip('should convert large binaries', function() {
+  it('should convert large binaries', function() {
     const sample = randomByteString(100000);
     var bigData = '';
 

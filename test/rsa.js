@@ -27,7 +27,7 @@ const { oaep, pss, customSalt } = vectors;
 
 describe('RSA', function() {
   describe('key creation', function() {
-    it.skip('should generate key pair', function(done) {
+    it('should generate key pair', function(done) {
       // FIXME: why keys generation and convertation to pem takes so much time?
       this.timeout(8000);
 
