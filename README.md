@@ -528,7 +528,7 @@ To enable RSA keys generation, you will need provide path to `vendor/worker.js`
 
 ## Running tests
 ```bash
-mocha
+npm test
 ```
 
 ### NOTES

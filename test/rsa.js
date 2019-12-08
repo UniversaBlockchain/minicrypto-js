@@ -1,12 +1,12 @@
-const rsa = require('../lib/pki/rsa');
-const hash = require('../lib/hash');
-const Boss = require('../lib/boss/protocol');
-const utils = require('../lib/utils');
+const rsa = require('../src/pki/rsa');
+const hash = require('../src/hash');
+const Boss = require('../src/boss/protocol');
+const utils = require('../src/utils');
 const should = require('should');
 const vectors = require('./vectors');
-const PublicKey = require('../lib/pki/public_key');
-const PrivateKey = require('../lib/pki/private_key');
-const SymmetricKey = require('../lib/pki/symmetric_key');
+const PublicKey = require('../src/pki/public_key');
+const PrivateKey = require('../src/pki/private_key');
+const SymmetricKey = require('../src/pki/symmetric_key');
 
 const { SHA } = hash;
 
@@ -29,7 +29,7 @@ describe('RSA', function() {
   describe('key creation', function() {
     it('should generate key pair', function(done) {
       // FIXME: why keys generation and convertation to pem takes so much time?
-      this.timeout(8000);
+      this.timeout(10000);
 
       const options = {
         bits: 2048,

@@ -1,4 +1,4 @@
-const utils = require('../lib/utils');
+const utils = require('../src/utils');
 
 const { raw, decode64, BigInteger, arrayToBytes } = utils;
 

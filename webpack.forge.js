@@ -29,7 +29,7 @@ module.exports = [
     entry: forgeModules(['prime.worker']),
     output: {
       filename: 'worker.js',
-      path: __dirname + '/lib/vendor',
+      path: __dirname + '/src/vendor',
       libraryTarget: 'umd'
     }
   }

@@ -1,7 +1,7 @@
 var should = require('should');
-var pki = require('../lib/pki');
-var hash = require('../lib/hash');
-var utils = require('../lib/utils');
+var pki = require('../src/pki');
+var hash = require('../src/hash');
+var utils = require('../src/utils');
 
 var bytesToHex = utils.bytesToHex;
 var hexToBytes = utils.hexToBytes;

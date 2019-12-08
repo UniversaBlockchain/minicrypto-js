@@ -1,7 +1,7 @@
 const should = require('should');
 
-const Boss = require('../lib/boss/protocol');
-const utils = require('../lib/utils');
+const Boss = require('../src/boss/protocol');
+const utils = require('../src/utils');
 
 Object.prototype.equals = function () {
 

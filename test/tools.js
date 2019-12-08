@@ -1,7 +1,7 @@
 const should = require('should');
-const pki = require('../lib/pki');
-const hash = require('../lib/hash');
-const utils = require('../lib/utils');
+const pki = require('../src/pki');
+const hash = require('../src/hash');
+const utils = require('../src/utils');
 const { Buffer } = require('buffer');
 const SHA = hash.SHA;
 
@@ -29,6 +29,7 @@ describe('Tools', function() {
   });
 
   it('should convert large binaries', function() {
+    this.timeout(5000);
     const sample = randomByteString(100000);
     var bigData = '';
 

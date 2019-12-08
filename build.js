@@ -8,7 +8,7 @@ function rewriteWorker() {
   	const quote = /'/g;
   	const newline = /\n/g;
   	const comment = /\/\/.+\n/g;
-  	const workerPath = __dirname + '/lib/vendor/worker.js';
+  	const workerPath = __dirname + '/src/vendor/worker.js';
 
   	var data = fs.readFileSync(workerPath);
   	data = data.toString();
@@ -23,7 +23,7 @@ function rewriteWorker() {
 
 function build(config) {
   return new Promise((resolve, reject) => {
-	 webpack(config, err => err ? reject(err) : resolve());
+	  webpack(config, err => err ? reject(err) : resolve());
   });
 }
 

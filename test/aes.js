@@ -1,8 +1,8 @@
 const should = require('should');
-const utils = require('../lib/utils');
-const cipher = require('../lib/cipher');
-const pki = require('../lib/pki');
-const hash = require('../lib/hash');
+const utils = require('../src/utils');
+const cipher = require('../src/cipher');
+const pki = require('../src/pki');
+const hash = require('../src/hash');
 
 const { SHA } = hash;
 const { pbkdf2 } = pki;

@@ -1,13 +1,13 @@
 const should = require('should');
 
-const rsa = require('../lib/pki/rsa');
-const hash = require('../lib/hash');
-const utils = require('../lib/utils');
-const Boss = require('../lib/boss/protocol');
+const rsa = require('../src/pki/rsa');
+const hash = require('../src/hash');
+const utils = require('../src/utils');
+const Boss = require('../src/boss/protocol');
 
-const PrivateKey = require('../lib/pki/private_key');
-const PublicKey = require('../lib/pki/public_key');
-const extended = require('../lib/pki/extended_signature');
+const PrivateKey = require('../src/pki/private_key');
+const PublicKey = require('../src/pki/public_key');
+const extended = require('../src/pki/extended_signature');
 const vectors = require('./vectors');
 const { readKey64 } = require('./helpers');
 

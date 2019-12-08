@@ -3,48 +3,18 @@ module.exports = [
     entry: ['./index.js'],
     output: {
       filename: 'universa.js',
-      path: __dirname + '/build',
+      path: __dirname + '/dist',
       library: 'Universa',
       libraryTarget: 'umd'
-    },
-    module: {
-      rules: [
-        {
-          test: /\.js$/,
-          exclude: /(node_modules|bower_components)/,
-          use: {
-            loader: 'babel-loader',
-            options: {
-              presets: ['es2015']
-            }
-          }
-        }
-      ]
     }
   },
   {
-    entry: ['./lib/boss/protocol.js'],
+    entry: ['./src/boss/protocol.js'],
     output: {
       filename: 'boss.js',
-      path: __dirname + '/build',
-
+      path: __dirname + '/dist',
       library: 'Boss',
       libraryTarget: 'umd'
-    },
-    module: {
-      rules: [
-        {
-          test: /\.js$/,
-          exclude: /(node_modules|bower_components)/,
-          use: {
-            loader: 'babel-loader',
-            options: {
-              presets: ['es2015'],
-              plugins: ['transform-es2015-modules-amd']
-            }
-          }
-        }
-      ]
     }
   }
 ];

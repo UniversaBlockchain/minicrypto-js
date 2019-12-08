@@ -1,6 +1,6 @@
 var should = require('should');
-var hash = require('../lib/hash');
-const utils = require('../lib/utils');
+var hash = require('../src/hash');
+const utils = require('../src/utils');
 
 const { textToHex, textToBytes, hexToBytes, bytesToHex, bytesToArray, encode64, decode64 } = utils;
 
@@ -66,13 +66,6 @@ describe('Hash functions', function() {
 
     describe('SHA3 384', function() {
       it("should get hash with 384", function() {
-        // const vector = "abc";
-        // const hash = new SHA("256");
-
-        // const digest = bytesToHex(hash.get(vector));
-
-        // should(digest).eql("ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad");
-
         const vector = "abc";
         const hash = new SHA("3_384");
 
@@ -103,9 +96,6 @@ describe('Hash functions', function() {
       var sha256 = new SHA('256');
       var hmac = new HMAC(sha256, key);
 
-      // var arr = [];
-
-      // for (var b in data) { arr.push(data[b]); }
       var arr = data;
 
       should(encode64(hmac.get(arr))).eql('6wTwsUjFpsm9ccQd3LOIpEpevalwhO8fbHOX9rffdEg=');

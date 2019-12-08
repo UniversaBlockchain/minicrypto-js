@@ -1,6 +1,6 @@
-exports.hash = require('./lib/hash');
-exports.pki = require('./lib/pki');
-exports.utils = require('./lib/utils');
-exports.cipher = require('./lib/cipher');
-exports.Boss = require('./lib/boss/protocol');
-exports.Capsule = require('./lib/universa/Capsule');
+exports.hash = require('./src/hash');
+exports.pki = require('./src/pki');
+exports.utils = require('./src/utils');
+exports.cipher = require('./src/cipher');
+exports.Boss = require('./src/boss/protocol');
+exports.Capsule = require('./src/universa/Capsule');
