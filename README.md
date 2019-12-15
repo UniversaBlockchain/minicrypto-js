@@ -42,7 +42,7 @@ npm install
 npm run build
 ```
 
-In folder `dist` there will be `universa.min.js` and `boss.min.js`.
+In folder `dist` there will be `universa.min.js` and `boss.min.js`. Also there will be \*.LICENSE files.
 
 Simply copy `dist/universa.min.js` to wherever you keep your vendor scripts and include
 it as a script:
@@ -522,7 +522,7 @@ npm install
 npm run build
 ```
 
-In folder `dist` there will be `universa.min.js` and `boss.min.js`.
+In folder `dist` there will be `universa.min.js` and `boss.min.js`. Also there will be \*.LICENSE files.
 
 ## Running tests
 ```bash
