@@ -1,31 +1,27 @@
-const rsa = require('../src/pki/rsa');
-const hash = require('../src/hash');
-const Boss = require('../src/boss/protocol');
-const utils = require('../src/utils');
-const should = require('should');
-const vectors = require('./vectors');
-const PublicKey = require('../src/pki/public_key');
-const PrivateKey = require('../src/pki/private_key');
-const SymmetricKey = require('../src/pki/symmetric_key');
-
-const { SHA } = hash;
-
-const { readKey64 } = require('./helpers');
-
-const {
-  bytesToHex,
-  hexToBytes,
-  textToHex,
-  raw,
-  decode64,
-  encode64,
-  decode58,
-  encode58,
-  v2
-} = utils;
-const { oaep, pss, customSalt } = vectors;
+var Universa = Universa || require('../index');
+var chai = chai || require('chai');
+var expect = chai.expect;
 
 describe('RSA', function() {
+  const {
+    decode64,
+    encode64,
+    encode58,
+    bytesToHex: hex,
+    hexToBytes
+  } = Universa.utils;
+
+  const { rsa, PrivateKey, PublicKey, SymmetricKey } = Universa.pki;
+  const { SHA } = Universa.hash;
+
+  Universa.seed = Universa.seed || {};
+  const seedKeys = Universa.seed.keys || require('./seed/keys');
+  const seedOAEP = Universa.seed.oaep || require('./seed/oaep');
+  const seedPSS = Universa.seed.pss || require('./seed/pss');
+  const seedCustomSalt = Universa.seed.customSalt || require('./seed/custom_salt');
+
+  const fp = (key) => encode64(key.publicKey.fingerprint());
+
   describe('key creation', function() {
     it('should generate key pair', function(done) {
       // FIXME: why keys generation and convertation to pem takes so much time?
@@ -37,10 +33,9 @@ describe('RSA', function() {
       };
 
       rsa.createKeys(options, function(err, pair) {
-        should.not.exist(err);
-
-        should(pair.publicKey).be.instanceof(PublicKey);
-        should(pair.privateKey).be.instanceof(PrivateKey);
+        expect(err).to.be.null;
+        expect(pair.publicKey).to.be.an.instanceof(PublicKey);
+        expect(pair.privateKey).to.be.an.instanceof(PrivateKey);
 
         done();
       });
@@ -49,8 +44,8 @@ describe('RSA', function() {
     it('should pack with password', function() {
       this.timeout(8000);
 
-      const base64Encoded = vectors.keys[2];
-      const key = new PrivateKey('BOSS', readKey64(base64Encoded));
+      const base64Encoded = seedKeys[2];
+      const key = new PrivateKey('BOSS', decode64(base64Encoded));
       const keyPacked = key.pack("BOSS", "qwerty");
 
       const key2 = new PrivateKey("BOSS", {
@@ -58,14 +53,14 @@ describe('RSA', function() {
         password: "qwerty"
       });
 
-      should(encode64(key2.publicKey.fingerprint())).eql(encode64(key.publicKey.fingerprint()));
+      expect(fp(key2)).to.equal(fp(key));
     });
 
     it('should pack with password and iterations', function() {
       this.timeout(8000);
 
-      const base64Encoded = vectors.keys[2];
-      const key = new PrivateKey('BOSS', readKey64(base64Encoded));
+      const base64Encoded = seedKeys[2];
+      const key = new PrivateKey('BOSS', decode64(base64Encoded));
       const keyPacked = key.pack("BOSS", { password: "qwerty", rounds: 1000 });
 
       const key2 = new PrivateKey("BOSS", {
@@ -73,7 +68,7 @@ describe('RSA', function() {
         password: "qwerty"
       });
 
-      should(encode64(key2.publicKey.fingerprint())).eql(encode64(key.publicKey.fingerprint()));
+      expect(fp(key2)).to.equal(fp(key));
     });
 
     it('should read v2 keys', function() {
@@ -84,72 +79,73 @@ describe('RSA', function() {
         bin: keyBin,
         password: password
       });
+
+      expect(fp(key2)).to.equal("B5l9sd9iOGaGVJk+3dTD//7a+heSx600CP04k8uSPTlk");
     });
 
     it('should read/write key from/to BOSS format', function() {
-      const base64Encoded = vectors.keys[2];
-      const key = new PrivateKey('BOSS', readKey64(base64Encoded));
+      const base64Encoded = seedKeys[2];
+      const key = new PrivateKey('BOSS', decode64(base64Encoded));
 
-      should(key.params.p.toString(16)).eql('c0e7ac8d230f90888a59f72670a5d5b414a30f5669056a5f9e2637a096f13bc6aa1e6a6b1e0809f8d3cc04b986cd8ea3132603a73bf78ea4baf57493266112f821b04daca3ca594fa74c89bc8cac12ca18070ad75851e88e749ea7c414a03afa77559f27a9e7b0ef80619df60156729540461db4fb8860f3274ce9b8139efd996618e155bae573a6f4db6c9ff48979bfb94d103c5fdbcfdae5ea6f3aa89e28ed1f6a6466f6b35c29e85b760c68e1703ea27b8761c4ea55aceeb8ce7edab0c142c2ddb9d4245e2bd6044d63be14c5a0ada04ff139c40925fad7c37a6cffdd21244855f1277e5c4526078e15fd29853709a91d65ffba4062c72e857707a106cbb7');
+      expect(key.params.p.toString(16)).to.equal('c0e7ac8d230f90888a59f72670a5d5b414a30f5669056a5f9e2637a096f13bc6aa1e6a6b1e0809f8d3cc04b986cd8ea3132603a73bf78ea4baf57493266112f821b04daca3ca594fa74c89bc8cac12ca18070ad75851e88e749ea7c414a03afa77559f27a9e7b0ef80619df60156729540461db4fb8860f3274ce9b8139efd996618e155bae573a6f4db6c9ff48979bfb94d103c5fdbcfdae5ea6f3aa89e28ed1f6a6466f6b35c29e85b760c68e1703ea27b8761c4ea55aceeb8ce7edab0c142c2ddb9d4245e2bd6044d63be14c5a0ada04ff139c40925fad7c37a6cffdd21244855f1277e5c4526078e15fd29853709a91d65ffba4062c72e857707a106cbb7');
     });
 
     it('should check equality of keys', function() {
-      var key1 = new PrivateKey('BOSS', readKey64(vectors.keys[2]));
-      var key2 = new PrivateKey('BOSS', readKey64(vectors.keys[3]));
+      var key1 = new PrivateKey('BOSS', decode64(seedKeys[2]));
+      var key2 = new PrivateKey('BOSS', decode64(seedKeys[3]));
 
-      should(rsa.keysEqual(key1, key2)).eql(false);
-      should(rsa.keysEqual(key1, key1)).eql(true);
+      expect(rsa.keysEqual(key1, key2)).to.be.false;
+      expect(rsa.keysEqual(key1, key1)).to.be.true;
     });
   });
 
   describe('Public key', function() {
     it('should verify address', function() {
-      var publicKey = new PublicKey('EXPONENTS', oaep);
-      var address = publicKey.address({ long: true });
-      var addressString = encode58(address);
+      const publicKey = new PublicKey('EXPONENTS', seedOAEP);
+      const address = publicKey.address({ long: true });
+      const addressString = encode58(address);
 
-      var addressShort = publicKey.address();
-      var addressShortString = encode58(addressShort);
+      const addressShort = publicKey.address();
+      const addressShortString = encode58(addressShort);
 
-      should(PublicKey.isValidAddress(addressString)).eql(true);
-      should(PublicKey.isValidAddress(addressShortString)).eql(true);
-      should(PublicKey.isValidAddress(addressShortString + "a")).eql(false);
+      expect(PublicKey.isValidAddress(addressString)).to.be.true;
+      expect(PublicKey.isValidAddress(addressShortString)).to.be.true;
+      expect(PublicKey.isValidAddress(addressShortString + "a")).to.be.false;
     });
 
     it('should encrypt data with OAEP and MGF1', function() {
       // To make test repeatable
       var oaepOpts = {
-        seed: oaep.seed,
+        seed: seedOAEP.seed,
         pssHash: new SHA(1),
         mgf1Hash: new SHA(1)
       };
-      var publicKey = new PublicKey('EXPONENTS', oaep);
+      var publicKey = new PublicKey('EXPONENTS', seedOAEP);
+      var encrypted = publicKey.encrypt(seedOAEP.originalMessage, oaepOpts);
 
-      var encrypted = publicKey.encrypt(oaep.originalMessage, oaepOpts);
-
-      should(bytesToHex(encrypted)).eql(bytesToHex(oaep.encryptedMessage));
+      expect(hex(encrypted)).to.equal(hex(seedOAEP.encryptedMessage));
     });
 
     it('should calculate fingerprint', function() {
-      const base64Encoded = vectors.keys[1];
-      const key = new PrivateKey('BOSS', readKey64(base64Encoded));
+      const base64Encoded = seedKeys[1];
+      const key = new PrivateKey('BOSS', decode64(base64Encoded));
       const fp_full = '074118648ED82A64B9A9FF6A9CB7BCD64CF5367E290E1C80C333A08107C1F82663'.toLowerCase();
       const fp = key.publicKey.fingerprint();
 
-      should(bytesToHex(key.publicKey.fingerprint())).eql(fp_full);
+      expect(hex(key.publicKey.fingerprint())).to.equal(fp_full);
     });
 
     it('should verify message PSS signature', function() {
-      var publicKey = new PublicKey('EXPONENTS', pss);
+      var publicKey = new PublicKey('EXPONENTS', seedPSS);
       var pssOpts = {
-        salt: pss.salt,
+        salt: seedPSS.salt,
         pssHash: new SHA(1),
         mgf1Hash: new SHA(1)
       };
 
-      var isCorrect = publicKey.verify(pss.message, pss.signature, pssOpts);
+      var isCorrect = publicKey.verify(seedPSS.message, seedPSS.signature, pssOpts);
 
-      should(isCorrect).eql(true);
+      expect(isCorrect).to.be.true;
     });
 
     it('should verify real message', function() {
@@ -162,26 +158,24 @@ describe('RSA', function() {
         mgf1Hash: new SHA(1)
       });
 
-      should(isCorrect).eql(true);
+      expect(isCorrect).to.be.true;
     });
 
     it('should calculate address', function() {
-      var publicKey = new PublicKey('EXPONENTS', oaep);
-
-
+      const publicKey = new PublicKey('EXPONENTS', seedOAEP);
       const pubK = new PublicKey('BOSS', decode64("HggcAQABxAEBAKPW/V0ov09rGWAMoBSWuRHzf2yzA29WgLRzJvZutClo9xfo8KaOryl1NxtvOBJ9xsdH0fMXyV/1LBWa9U5v7vBO49m7oneIQt0GIJ35mWcZPp9WjZVzMogy9xvRoDSTMrfWuApJRWnD0Z5bYDxI9kObKA17Vrv8gr0YD7kK9r2J9tJDcV7pPthHWzLDgLVQHX/l86zK+MGDFypX8OWo5murr7ESTzqA42VHprwdwhJ2zrwqdFMbVozwC4OpWkCEEgQNZUDYYx1fAUR4RnoCB/51RkoRmKkLjjJpV+ZIXg+SqU9hUJPtJ08JnaHcz66lbA3utcolnck4NT1MtVeZKAs="));
       const addr = "ZFPU5QyNJPA3LsyLwJU4UiFMfxZ7BUoxbF5SMdRMdNGhXUWnar";
 
-      should(encode58(pubK.address())).eql(addr);
+      expect(encode58(pubK.address())).to.equal(addr);
     });
 
     it('should calculate short address', function() {
-      var privateEncoded = hexToBytes("26001c010001c40001f05da97d084313655c43e7caf582fd2dcb76eff3309ec49cc70ef7a2c82547e01b3c5a6d51ca48ae44bc05d1a089c2019865a44c49bbcd48c54ae59f21dba28f65fee44d1aa1389cfa9eca8a2e218f94c735b5bb1e3313afafcfd62657fb86bdd7bf3cbda7943509a9ce2c92534584424b0f8fe5fbadd944c378aa967d206128a6a1e259b597c286d67778ee3c548df8ea39aff4ec993a1858e2fc51d12698b674280664ddc0714b81613b97f1da4b9be8a2617be4faa720a5a183f2910862040b26e0292cc3368442210f1b6171bb0ccdd1e042d253afd8eabb79f6edfcf27dce28a09b7d81ffc161a64dcf42190aedac1cf50ec86bb390fd15ab33b4d4f44fc40001d9bd6a350d985789f574ed8c410e7cf1d79db784a494b33d98c440794797fa8ba76d5feb7c32897a221f87dc26414076d279333eed9e0d7c6c8fea801ec07f3ad69921a3f2e1ec6a0910fea6af48703fd98b92e6b6eaba23b3a619ab071ba4f80a89790e50619a921bf5f93193f54b059c78af097209ce050bd0eada0c6775a003315d8d4d3cccd0ee2740ad1a404ccd37d92992a2a717bcdbd46785813ab0f701be34753af658565c8f10550e91f13c1e1a1e167dcd7d37cd87189beb8baee375366346553b7951b35e1e2c80446bbeb2398163932dd288bdd44ba7f15a9fb05372e0340162ce3fa6ef324fd06b677990c9faf1e8dd7342a73ab2640695bf09");
-      var priv = new PrivateKey('BOSS', privateEncoded);
-      var pub = priv.publicKey;
-      var shortAddress = pub.address();
+      const privateEncoded = hexToBytes("26001c010001c40001f05da97d084313655c43e7caf582fd2dcb76eff3309ec49cc70ef7a2c82547e01b3c5a6d51ca48ae44bc05d1a089c2019865a44c49bbcd48c54ae59f21dba28f65fee44d1aa1389cfa9eca8a2e218f94c735b5bb1e3313afafcfd62657fb86bdd7bf3cbda7943509a9ce2c92534584424b0f8fe5fbadd944c378aa967d206128a6a1e259b597c286d67778ee3c548df8ea39aff4ec993a1858e2fc51d12698b674280664ddc0714b81613b97f1da4b9be8a2617be4faa720a5a183f2910862040b26e0292cc3368442210f1b6171bb0ccdd1e042d253afd8eabb79f6edfcf27dce28a09b7d81ffc161a64dcf42190aedac1cf50ec86bb390fd15ab33b4d4f44fc40001d9bd6a350d985789f574ed8c410e7cf1d79db784a494b33d98c440794797fa8ba76d5feb7c32897a221f87dc26414076d279333eed9e0d7c6c8fea801ec07f3ad69921a3f2e1ec6a0910fea6af48703fd98b92e6b6eaba23b3a619ab071ba4f80a89790e50619a921bf5f93193f54b059c78af097209ce050bd0eada0c6775a003315d8d4d3cccd0ee2740ad1a404ccd37d92992a2a717bcdbd46785813ab0f701be34753af658565c8f10550e91f13c1e1a1e167dcd7d37cd87189beb8baee375366346553b7951b35e1e2c80446bbeb2398163932dd288bdd44ba7f15a9fb05372e0340162ce3fa6ef324fd06b677990c9faf1e8dd7342a73ab2640695bf09");
+      const priv = new PrivateKey('BOSS', privateEncoded);
+      const pub = priv.publicKey;
+      const shortAddress = pub.address();
 
-      should(encode58(shortAddress)).eql("26RzRJDLqze3P5Z1AzpnucF75RLi1oa6jqBaDh8MJ3XmTaUoF8R")
+      expect(encode58(shortAddress)).to.equal("26RzRJDLqze3P5Z1AzpnucF75RLi1oa6jqBaDh8MJ3XmTaUoF8R")
     });
 
     describe('signature with custom salt', function() {
@@ -189,9 +183,9 @@ describe('RSA', function() {
 
       beforeEach(function() {
         privateKey = new PrivateKey('EXPONENTS', {
-          e: customSalt.e,
-          p: customSalt.p,
-          q: customSalt.q
+          e: seedCustomSalt.e,
+          p: seedCustomSalt.p,
+          q: seedCustomSalt.q
         });
         publicKey = privateKey.publicKey;
       });
@@ -199,29 +193,29 @@ describe('RSA', function() {
       it('should restore keys by exponents with correct modulus', function() {
         var params = publicKey.params;
 
-        should(params.n.toString(16)).eql(customSalt.n.toString(16));
+        expect(params.n.toString(16)).to.equal(seedCustomSalt.n.toString(16));
       });
 
       it('should use maximum salt length for signatures by default (490)', function() {
-        should(publicKey.verify(customSalt.message, customSalt.signature, { pssHash: new SHA(1), mgf1Hash: new SHA(1) })).eql(true);
+        expect(publicKey.verify(seedCustomSalt.message, seedCustomSalt.signature, { pssHash: new SHA(1), mgf1Hash: new SHA(1) })).to.equal(true);
 
-        should(publicKey.verify(customSalt.message, customSalt.signature, {
+        expect(publicKey.verify(seedCustomSalt.message, seedCustomSalt.signature, {
           pssHash: new SHA(1),
           mgf1Hash: new SHA(1),
-          saltLength: customSalt.saltLength
-        })).eql(true);
+          saltLength: seedCustomSalt.saltLength
+        })).to.equal(true);
       });
 
-      it('signature check with default params should work for signature created with default params', function() {
-        var signature = privateKey.sign(customSalt.message, { pssHash: new SHA(1) });
+      it('signature check with default params expect work for signature created with default params', function() {
+        var signature = privateKey.sign(seedCustomSalt.message, { pssHash: new SHA(1) });
 
-        should(publicKey.verify(customSalt.message, signature, { pssHash: new SHA(1) })).eql(true);
+        expect(publicKey.verify(seedCustomSalt.message, signature, { pssHash: new SHA(1) })).to.equal(true);
       });
 
       it('should pss sign with sha3', function() {
-        var signature = privateKey.sign(customSalt.message, { pssHash: new SHA("3_384") });
+        var signature = privateKey.sign(seedCustomSalt.message, { pssHash: new SHA("3_384") });
 
-        should(publicKey.verify(customSalt.message, signature, { pssHash: new SHA("3_384") })).eql(true);
+        expect(publicKey.verify(seedCustomSalt.message, signature, { pssHash: new SHA("3_384") })).to.equal(true);
       });
 
       it('should pss 384', function(){
@@ -236,10 +230,10 @@ describe('RSA', function() {
         // });
         signature = decode64("N4F/jKomkjHJQJELFddbQaeqITmIQv6rrIdZojE5XVdLuz+batkPzhFIz4vS6KMjRpn7RkMSXzhnVWOqHntl3TjTkOzYNO8C4pYNB+gwWCC0VxGdF/orgwHMT9waOrobNolaOyJi50lRX0ubsrqhbZ5VWtaWuaG8IO/F7G99KvnVUctZcA9v1ZtHEbS4Gj7baXXi0zxennTz/UOA2WtO8HLNIpRCGE7Euw/PMFHcosslc5CAM8hfMenZ3P/DFSvNcEdkN6wMKKPavoKmt3ERWiYdpT4a0ounUf0xY26wgecJTsbzaieWtnhdP5RqVTYHIoP/fvTfoJz2b8pCHNnELg");
 
-        should(priv.publicKey.verify(msg, signature, {
+        expect(priv.publicKey.verify(msg, signature, {
           pssHash: new SHA("3_384"),
           mgf1Hash: new SHA("1")
-        })).eql(true);
+        })).to.equal(true);
       });
     });
   });
@@ -247,9 +241,9 @@ describe('RSA', function() {
   describe('Private key', function() {
     it('should read from BOSS format', function() {
       var privateKey = new PrivateKey('EXPONENTS', {
-        e: oaep.e,
-        p: oaep.p,
-        q: oaep.q
+        e: seedOAEP.e,
+        p: seedOAEP.p,
+        q: seedOAEP.q
       });
 
       const packed = privateKey.pack('BOSS');
@@ -258,41 +252,41 @@ describe('RSA', function() {
       const packed2 = unpacked.pack('BOSS');
       const unpacked2 = new PrivateKey('BOSS', packed2);
 
-      should(unpacked.params.qInv.toString(16)).eql(unpacked2.params.qInv.toString(16));
-      should(unpacked2.params.qInv.toString(16)).eql(privateKey.params.qInv.toString(16));
+      expect(unpacked.params.qInv.toString(16)).to.equal(unpacked2.params.qInv.toString(16));
+      expect(unpacked2.params.qInv.toString(16)).to.equal(privateKey.params.qInv.toString(16));
     });
 
     it('should restore key from exponents (e, p, q)', function() {
       var privateKey = new PrivateKey('EXPONENTS', {
-        e: oaep.e,
-        p: oaep.p,
-        q: oaep.q
+        e: seedOAEP.e,
+        p: seedOAEP.p,
+        q: seedOAEP.q
       });
 
       var params = privateKey.params;
 
-      should(params.n.toString(16)).eql(oaep.n.toString(16));
-      should(params.e.toString(16)).eql(oaep.e.toString(16));
-      should(params.d.toString(16)).eql(oaep.d.toString(16));
-      should(params.p.toString(16)).eql(oaep.p.toString(16));
-      should(params.q.toString(16)).eql(oaep.q.toString(16));
-      should(params.dP.toString(16)).eql(oaep.dP.toString(16));
-      should(params.dQ.toString(16)).eql(oaep.dQ.toString(16));
-      should(params.qInv.toString(16)).eql(oaep.qInv.toString(16));
+      expect(params.n.toString(16)).to.equal(seedOAEP.n.toString(16));
+      expect(params.e.toString(16)).to.equal(seedOAEP.e.toString(16));
+      expect(params.d.toString(16)).to.equal(seedOAEP.d.toString(16));
+      expect(params.p.toString(16)).to.equal(seedOAEP.p.toString(16));
+      expect(params.q.toString(16)).to.equal(seedOAEP.q.toString(16));
+      expect(params.dP.toString(16)).to.equal(seedOAEP.dP.toString(16));
+      expect(params.dQ.toString(16)).to.equal(seedOAEP.dQ.toString(16));
+      expect(params.qInv.toString(16)).to.equal(seedOAEP.qInv.toString(16));
     });
 
     it('should decrypt data with OAEP and MGF1', function() {
       // To make test repeatable
-      var oaepOpts = { seed: oaep.seed, oaepHash: new SHA(1) };
-      var privateKey = new PrivateKey('EXPONENTS', oaep);
+      var oaepOpts = { seed: seedOAEP.seed, oaepHash: new SHA(1) };
+      var privateKey = new PrivateKey('EXPONENTS', seedOAEP);
 
-      var decrypted = privateKey.decrypt(oaep.encryptedMessage, oaepOpts);
+      var decrypted = privateKey.decrypt(seedOAEP.encryptedMessage, oaepOpts);
 
-      should(bytesToHex(decrypted)).eql(bytesToHex(oaep.originalMessage));
+      expect(hex(decrypted)).to.equal(hex(seedOAEP.originalMessage));
     });
 
     it('should encrypt with sha3 pss', function() {
-      var privateKey = new PrivateKey('EXPONENTS', oaep);
+      var privateKey = new PrivateKey('EXPONENTS', seedOAEP);
       var publicKey = privateKey.publicKey;
 
       var oaepOpts = {
@@ -301,35 +295,35 @@ describe('RSA', function() {
         mgf1Hash: new SHA(1)
       };
 
-      var encrypted = publicKey.encrypt(oaep.originalMessage, oaepOpts);
+      var encrypted = publicKey.encrypt(seedOAEP.originalMessage, oaepOpts);
       var decrypted = privateKey.decrypt(encrypted, oaepOpts);
 
-      should(encode64(oaep.originalMessage)).eql(encode64(decrypted));
+      expect(encode64(seedOAEP.originalMessage)).to.equal(encode64(decrypted));
     });
 
     it('should sign message with PSS', function() {
-      var privateKey = new PrivateKey('EXPONENTS', pss);
+      var privateKey = new PrivateKey('EXPONENTS', seedPSS);
       var options = {
-        salt: pss.salt,
+        salt: seedPSS.salt,
         pssHash: new SHA(1),
         mgf1Hash: new SHA(1)
       };
 
-      var signature = privateKey.sign(pss.message, options);
+      var signature = privateKey.sign(seedPSS.message, options);
 
-      should(bytesToHex(signature)).eql(bytesToHex(pss.signature));
+      expect(hex(signature)).to.equal(hex(seedPSS.signature));
     });
 
     it('should sign message with PSS without params', function() {
-      var privateKey = new PrivateKey('EXPONENTS', pss);
+      var privateKey = new PrivateKey('EXPONENTS', seedPSS);
 
-      var signature = privateKey.sign(pss.message, { salt: pss.salt });
+      var signature = privateKey.sign(seedPSS.message, { salt: seedPSS.salt });
 
-      should(bytesToHex(signature)).eql('39703c8bfbf6a54db3242769c03af7cedc4237e210aafd7802fcd34f68d9a7c57e766b59b8940196ca5ee6fbb549f5c8eb224a7e4280253b8f425c91014e05c08dacb830b4a753199b070caac0908368efa2134ec32670f48f8166e07564b5c3aa06a871772252b502f384ca96a4ae916805c255146b4b71ff7e74642f00b356');
+      expect(hex(signature)).to.equal('39703c8bfbf6a54db3242769c03af7cedc4237e210aafd7802fcd34f68d9a7c57e766b59b8940196ca5ee6fbb549f5c8eb224a7e4280253b8f425c91014e05c08dacb830b4a753199b070caac0908368efa2134ec32670f48f8166e07564b5c3aa06a871772252b502f384ca96a4ae916805c255146b4b71ff7e74642f00b356');
 
-      var isCorrect = privateKey.publicKey.verify(pss.message, signature, { salt: pss.salt });
+      var isCorrect = privateKey.publicKey.verify(seedPSS.message, signature, { salt: seedPSS.salt });
 
-      should(isCorrect).eql(true);
+      expect(isCorrect).to.equal(true);
     });
   });
 
@@ -337,31 +331,31 @@ describe('RSA', function() {
     it('should create random symmetric key', function() {
       const symmetricKey = new SymmetricKey();
 
-      const encrypted = symmetricKey.encrypt(pss.message);
+      const encrypted = symmetricKey.encrypt(seedPSS.message);
       const decrypted = symmetricKey.decrypt(encrypted);
 
-      should(bytesToHex(pss.message)).eql(bytesToHex(decrypted));
+      expect(hex(seedPSS.message)).to.equal(hex(decrypted));
 
-      const encrypted2 = symmetricKey.etaEncrypt(pss.message);
+      const encrypted2 = symmetricKey.etaEncrypt(seedPSS.message);
       const decrypted2 = symmetricKey.etaDecrypt(encrypted2);
 
-      should(bytesToHex(pss.message)).eql(bytesToHex(decrypted2));
+      expect(hex(seedPSS.message)).to.equal(hex(decrypted2));
     });
 
     it('should pack key as is', function() {
       const keyBytes = decode64("/bbMv7MMsbsWSi4Abujd/1nije6QADJeuqxAKyCg+gY=");
       const symmetricKey = new SymmetricKey({ keyBytes });
 
-      const encrypted = symmetricKey.encrypt(pss.message);
+      const encrypted = symmetricKey.encrypt(seedPSS.message);
       const decrypted = symmetricKey.decrypt(encrypted);
 
-      should(bytesToHex(pss.message)).eql(bytesToHex(decrypted));
+      expect(hex(seedPSS.message)).to.equal(hex(decrypted));
 
-      const encrypted2 = symmetricKey.etaEncrypt(pss.message);
+      const encrypted2 = symmetricKey.etaEncrypt(seedPSS.message);
       const decrypted2 = symmetricKey.etaDecrypt(encrypted2);
 
-      should(bytesToHex(pss.message)).eql(bytesToHex(decrypted2));
-      should(encode64(symmetricKey.pack())).eql(encode64(keyBytes));
+      expect(hex(seedPSS.message)).to.equal(hex(decrypted2));
+      expect(encode64(symmetricKey.pack())).to.equal(encode64(keyBytes));
     });
   });
 });

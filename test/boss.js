@@ -1,88 +1,78 @@
-const should = require('should');
-
-const Boss = require('../src/boss/protocol');
-const utils = require('../src/utils');
-
-Object.prototype.equals = function () {
-
-};
-
-const vectors = [
-  ['8', 7],
-  ['\xb8F', 70],
-  ['\xc8p\x11\x01', 70000],
-  ['.\x00\x08\n8:', [0, 1, -1, 7, -7]],
-  ['+Hello', 'Hello']
-];
-
-const {
-  hexToBytes,
-  bytesToHex,
-
-  arrayToByteString,
-  byteStringToArray,
-
-  decode64
-} = utils;
+var Universa = Universa || require('../index');
+var chai = chai || require('chai');
+var expect = chai.expect;
 
 describe('BOSS Protocol', function() {
   var boss;
+
+  const { Boss } = Universa;
+
+  const vectors = [
+    ['8', 7],
+    ['\xb8F', 70],
+    ['\xc8p\x11\x01', 70000],
+    ['.\x00\x08\n8:', [0, 1, -1, 7, -7]],
+    ['+Hello', 'Hello']
+  ];
+
+  const {
+    hexToBytes,
+    bytesToHex: hex,
+    arrayToByteString,
+    byteStringToArray,
+    decode64
+  } = Universa.utils;
 
   beforeEach(function() {
     boss = new Boss();
   });
 
   it('should ignore functions', function() {
-    var hash = { a: 1, b: 2, c: function() {} };
+    const hash = { a: 1, b: 2, c: function() {} };
+    const decoded = boss.load(boss.dump(hash));
 
-    var decoded = boss.load(boss.dump(hash));
-
-    should(typeof decoded.c).eql('undefined');
+    expect("undefined").to.equal(typeof decoded.c);
   });
 
   it('should pack doubles', function() {
-    var double = 3.75;
+    const double = 3.75;
+    const encoded = boss.dump(double);
 
-    var encoded = boss.dump(double);
-
-    should(boss.load(encoded)).eql(3.75);
+    expect(boss.load(encoded)).to.equal(3.75);
   });
 
   it('should cache equal byte arrays', function() {
-    var d = decode64("f7YrNmKlscCxpIwNw7jIIKrDtN1fkhsdsc7RDsZEb20");
-    var hash = { a: 1, b: d, c: d };
+    const d = decode64("f7YrNmKlscCxpIwNw7jIIKrDtN1fkhsdsc7RDsZEb20");
+    const hash = { a: 1, b: d, c: d };
+    const decoded = boss.load(boss.dump(hash));
 
-    var decoded = boss.load(boss.dump(hash));
-
-    should(typeof decoded.c).eql('object');
+    expect("object").to.equal(typeof decoded.c);
   });
 
   it('should pack date', function() {
-    var d = new Date('2218 07 Mar 21:39');
+    const d = new Date('2218 07 Mar 21:39');
+    const encoded = boss.dump(d);
 
-    var encoded = boss.dump(d);
-
-    should(bytesToHex(arrayToByteString(encoded))).eql('79446b3e169d');
+    expect(hex(encoded)).to.equal("79446b3e169d");
   });
 
   it('should read date', function() {
-    var encoded = '79446b3e169d';
-    var encoded1 = hexToBytes(encoded);
-    var decoded = boss.load(encoded1);
+    const encoded = hexToBytes('79446b3e169d');
+    const decoded = boss.load(encoded);
 
-    should(decoded.getTime()).eql(7831795140000);
+    expect(decoded.getTime()).to.equal(7831795140000);
   });
 
   it('should encode false', function() {
-    should(boss.load(boss.dump({a: false}))).eql({a: false});
+    expect(boss.load(boss.dump({ a: false }))).to.deep.equal({ a: false });
   });
 
   it('should encode null', function() {
-    should(boss.load(boss.dump({ a: null }))).eql({ a: null });
+    expect(boss.load(boss.dump({ a: null }))).to.deep.equal({ a: null });
   });
 
   it('should encode utf8 strings', function() {
-    should(boss.load(boss.dump('АБВГД'))).eql('АБВГД');
+    expect(boss.load(boss.dump('АБВГД'))).to.equal('АБВГД');
   });
 
   it('should cache similar objects', function() {
@@ -90,15 +80,19 @@ describe('BOSS Protocol', function() {
     const obj = { binary: hexToBytes('aa'), text: txt };
     const unpacked = boss.load(boss.dump(obj));
 
-    should(obj.text).eql(unpacked.text);
+    expect(obj.text).to.deep.equal(unpacked.text);
   });
 
+  // FIXME: need to deprecate byte strings
   it('should perform compatible encode', function() {
-    for (const [a, b] of vectors) should(arrayToByteString(boss.dump(b))).equal(a);
+    for (const [a, b] of vectors)
+      expect(arrayToByteString(boss.dump(b))).to.equal(a);
   });
 
+  // FIXME: need to deprecate byte strings
   it('should perform compatible decode', function() {
-    for (const [a, b] of vectors) should(boss.load(byteStringToArray(a))).eql(b);
+    for (const [a, b] of vectors)
+      expect(hex(boss.load(byteStringToArray(a)))).to.equal(hex(b));
   });
 
   it('should properly encode positive and negative floats', function() {
@@ -112,9 +106,10 @@ describe('BOSS Protocol', function() {
   });
 
   it('should properly encode rounded Dates', function() {
-    var seconds = 1507766400;
-    var d = new Date(seconds * 1000);
-    should(boss.load(boss.dump(d))).eql(d);
+    const seconds = 1507766400;
+    const d = new Date(seconds * 1000);
+
+    expect(boss.load(boss.dump(d)).getTime()).to.equal(d.getTime());
   });
 
   it('should encode booleans', function() {
@@ -134,7 +129,7 @@ describe('BOSS Protocol', function() {
 
     // Time is rounded to seconds on serialization, so we need
     // take care of the comparison
-    should(boss.load(boss.dump(now)).getTime())
+    expect(boss.load(boss.dump(now)).getTime()).to
       .equal(parseInt(now.getTime() / 1000) * 1000);
   });
 
@@ -148,7 +143,7 @@ describe('BOSS Protocol', function() {
 
     const dump = writer.get();
 
-    should(bytesToHex(dump)).eql('00081018');
+    expect(hex(dump)).to.equal('00081018');
   });
 
   it('should decode in stream mode', function() {
@@ -160,11 +155,11 @@ describe('BOSS Protocol', function() {
     const arg4 = reader.read();
     const arg5 = reader.read();
 
-    should(arg1).eql(0);
-    should(arg2).eql(1);
-    should(arg3).eql(2);
-    should(arg4).eql(3);
-    should(arg5).eql(undefined);
+    expect(arg1).to.equal(0);
+    expect(arg2).to.equal(1);
+    expect(arg3).to.equal(2);
+    expect(arg4).to.equal(3);
+    expect(arg5).to.equal(undefined);
   });
 
   it('should cache data', function() {
@@ -175,17 +170,17 @@ describe('BOSS Protocol', function() {
     const t = boss.load(boss.dump(data));
     const [b, c, d, e, f, g] = t;
 
-    should(a).eql(b);
-    should(b).equal(c);
+    expect(a).to.deep.equal(b);
+    expect(b).to.equal(c);
 
-    should(ca).eql(d);
-    should(ca).eql(e);
-    should(d).equal(e);
+    expect(ca).to.deep.equal(d);
+    expect(ca).to.deep.equal(e);
+    expect(d).to.equal(e);
 
-    should(f).equal('oops');
+    expect(f).to.equal('oops');
 
-    should(g).equal(f);
-    should(Object.isFrozen(g)).equal(true);
+    expect(g).to.equal(f);
+    expect(Object.isFrozen(g)).to.equal(true);
   });
 
   it('should properly encode very big intergers', function() {
@@ -205,9 +200,9 @@ describe('BOSS Protocol', function() {
 
     const result = boss.loadAll(boss.dump(...data));
 
-    should(data).eql(result);
-    should(result[0]).eql(result[2]);
-    should(result[1]).eql(result[3]);
+    expect(data).to.deep.equal(result);
+    expect(result[0]).to.deep.equal(result[2]);
+    expect(result[1]).to.deep.equal(result[3]);
   });
 
   it('should properly encode multilevel structures', function() {
@@ -228,10 +223,10 @@ describe('BOSS Protocol', function() {
   it('has shortcuts', function() {
     const source = ['foo', 'bar', { 'hello': 'world' }];
 
-    should(boss.unpack(boss.pack(source))).eql(source);
+    expect(boss.unpack(boss.pack(source))).to.deep.equal(source);
   });
 
   function round(value) {
-    should(value).eql(boss.load(boss.dump(value)));
+    expect(value).to.deep.equal(boss.load(boss.dump(value)));
   }
 });

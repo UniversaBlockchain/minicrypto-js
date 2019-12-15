@@ -21,17 +21,13 @@
     "url": "https://github.com/UniversaBlockchain/minicrypto-js"
   },
   "devDependencies": {
-    "babel-core": "^6.26.3",
-    "babel-loader": "^8.0.6",
-    "babel-plugin-transform-es2015-modules-amd": "*",
-    "babel-preset-es2015": "*",
-    "browserify": "^16.5.0",
+    "chai": "^4.2.0",
     "mocha": "^6.2.2",
     "nyc": "^14.1.1",
-    "should": "^13.2.3",
-    "simple-mock": "^0.8.0",
-    "uglify-js": "^3.6.0",
-    "webpack": "^4.39.3"
+    "terser-webpack-plugin": "^2.3.0",
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.10",
+    "webpack-merge": "^4.2.2"
   },
   "dependencies": {
     "buffer": "^5.4.2",

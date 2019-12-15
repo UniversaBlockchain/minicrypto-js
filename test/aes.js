@@ -1,53 +1,59 @@
-const should = require('should');
-const utils = require('../src/utils');
-const cipher = require('../src/cipher');
-const pki = require('../src/pki');
-const hash = require('../src/hash');
-
-const { SHA } = hash;
-const { pbkdf2 } = pki;
-const { AES, AESCTRTransformer } = cipher;
-const { bytesToHex, hexToBytes, textToBytes, randomBytes, byteStringToArray } = utils;
-
-const key = hexToBytes('000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f');
-const message = hexToBytes('00112233445566778899aabbccddeeff');
-const encrypted = hexToBytes('8ea2b7ca516745bfeafc49904b496089');
+var Universa = Universa || require('../index');
+var chai = chai || require('chai');
+var expect = chai.expect;
 
 describe('AES', function() {
+  const { SHA } = Universa.hash;
+  const { pbkdf2 } = Universa.pki;
+  const { AES, AESCTRTransformer } = Universa.cipher;
+  const {
+    bytesToHex: hex,
+    hexToBytes,
+    textToBytes,
+    randomBytes,
+    byteStringToArray
+  } = Universa.utils;
+
+  const key = hexToBytes('000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f');
+  const message = hexToBytes('00112233445566778899aabbccddeeff');
+  const encrypted = hexToBytes('8ea2b7ca516745bfeafc49904b496089');
+
   describe('AES 256', function() {
-    it('should encrypt message by key', function() {
-      // var cipher = new AES(key);
+    it('should encrypt data with key', function() {
       const cipher = new AES(key);
 
-      should(bytesToHex(cipher.encrypt(message))).eql(bytesToHex(encrypted));
+      expect(hex(cipher.encrypt(message))).to.equal(hex(encrypted));
     });
 
-    it('should decrypt message by key', function() {
-      var cipher = new AES(key);
+    it('should decrypt data with key', function() {
+      const cipher = new AES(key);
 
-      should(bytesToHex(cipher.decrypt(encrypted))).eql(bytesToHex(message));
+      expect(hex(cipher.decrypt(encrypted))).to.equal(hex(message));
     });
 
-    it('should transform CTR', function() {
-      var iv = randomBytes(16);
+    it('should transform data in CTR mode', function() {
+      const iv = randomBytes(16);
 
-      var password = 'password';
-      var iterations = 4096;
-      var keyLength = 32;
-      var salt = textToBytes('salt');
+      const password = 'password';
+      const iterations = 4096;
+      const keyLength = 32;
+      const salt = textToBytes('salt');
 
-      var dk = pbkdf2(new SHA('256'), {
+      const dk = pbkdf2(new SHA('256'), {
         password: password,
         salt: salt,
         iterations: iterations,
         keyLength: keyLength
       });
 
-      var data = hexToBytes("abcd");
+      const data = hexToBytes("abcd");
+      const transformer = new AESCTRTransformer(dk, iv);
+      const transformed = transformer.transform(data);
 
-      var encrypted = new AESCTRTransformer(dk, iv).transform(data);
+      const transformer2 = new AESCTRTransformer(dk, iv);
+      const restored = transformer2.transform(transformed);
 
-      should(1).eql(1);
+      expect(hex(data)).to.equal(hex(restored));
     });
   });
 });

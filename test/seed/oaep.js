@@ -1,13 +1,8 @@
-var utils = require('../../src/utils');
-var helpers = require('../helpers');
+var Universa = Universa || require('../../index');
+var { hexToBytes, bytesToHex, BigInteger } = Universa.utils;
+var i = (hex) => new BigInteger(hex, 16);
 
-var hexToBytes = utils.hexToBytes;
-var bytesToHex = utils.byteStringToHex;
-var BigInteger = utils.BigInteger;
-
-var i = helpers.i;
-
-var spec = {
+var oaepSeed = {
   n: i('bbf82f090682ce9c2338ac2b9da871f7368d07eed41043a440d6b6f07454f51fb8dfbaaf035c02ab61ea48ceeb6fcd4876ed520d60e1ec4619719d8a5b8b807fafb8e0a3dfc737723ee6b4b7d93a2584ee6a649d060953748834b2454598394ee0aab12d7b61a51f527a9a41f6c1687fe2537298ca2a8f5946f8e5fd091dbdcb'),
   e: i('11'),
   p: i('eecfae81b1b9b3c908810b10a1b5600199eb9f44aef4fda493b81a9e3d84f632124ef0236e5d1e3b7e28fae7aa040a2d5b252176459d1f397541ba2a58fb6599'),
@@ -27,21 +22,22 @@ var spec = {
   EM: hexToBytes('eb7a19ace9e3006350e329504b45e2ca82310b26dcd87d5c68f1eea8f55267c31b2e8bb4251f84d7e0b2c04626f5aff93edcfb25c9c2b3ff8ae10e839a2ddb4cdcfe4ff47728b4a1b7c1362baad29ab48d2869d5024121435811591be392f982fb3e87d095aeb40448db972f3ac14f7bc275195281ce32d2f1b76d4d353e2d')
 };
 
-spec.m = calcM();
-spec.d = calcD();
-
-module.exports = spec;
+oaepSeed.m = calcM();
+oaepSeed.d = calcD();
 
 function calcM() {
-  var p = spec.p;
-  var q = spec.q;
+  const { p, q } = oaepSeed;
 
   return p.subtract(BigInteger.ONE).multiply(q.subtract(BigInteger.ONE));
 }
 
 function calcD() {
-  var e = spec.e;
-  var m = spec.m;
+  const { e, m } = oaepSeed;
 
   return e.modInverse(m);
 }
+
+if (typeof window !== "undefined") {
+  Universa.seed = Universa.seed || {};
+  Universa.seed.oaep = oaepSeed;
+} else module.exports = oaepSeed;

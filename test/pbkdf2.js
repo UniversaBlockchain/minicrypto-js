@@ -1,19 +1,12 @@
-var should = require('should');
-var pki = require('../src/pki');
-var hash = require('../src/hash');
-var utils = require('../src/utils');
-
-var bytesToHex = utils.bytesToHex;
-var hexToBytes = utils.hexToBytes;
-var textToHex = utils.bytes.textToHex;
-var decode64 = utils.decode64;
-var raw = utils.raw;
-
-var pbkdf2 = pki.pbkdf2;
-
-var SHA = hash.SHA;
+var Universa = Universa || require('../index');
+var chai = chai || require('chai');
+var expect = chai.expect;
 
 describe('PBKDF2', function() {
+  const { pbkdf2 } = Universa.pki;
+  const { SHA } = Universa.hash;
+  const { decode64, textToHex, hexToBytes, bytesToHex: hex } = Universa.utils;
+
   it('should get derived key with SHA512', function() {
     var password = 'test';
     var iterations = 5000;
@@ -28,7 +21,7 @@ describe('PBKDF2', function() {
       keyLength: keyLength
     });
 
-    should(bytesToHex(dk)).eql(bytesToHex(standard));
+    expect(hex(dk)).to.equal(hex(standard));
   });
 
   it('should get derived key with SHA1', function() {
@@ -46,7 +39,7 @@ describe('PBKDF2', function() {
       keyLength: keyLength
     });
 
-    should(bytesToHex(dk)).eql(standard);
+    expect(hex(dk)).to.equal(standard);
   });
 
   it('should get derived key with SHA256 and 1 iterations', function() {
@@ -62,7 +55,7 @@ describe('PBKDF2', function() {
       keyLength: keyLength
     });
 
-    should(bytesToHex(dk)).eql(standard);
+    expect(hex(dk)).to.equal(standard);
   });
 
   it('should get derived key with SHA256 and 2 iterations', function() {
@@ -79,7 +72,7 @@ describe('PBKDF2', function() {
       keyLength: keyLength
     });
 
-    should(bytesToHex(dk)).eql(standard);
+    expect(hex(dk)).to.equal(standard);
   });
 
   it('should get derived key with SHA256 and 4096 iterations', function() {
@@ -95,7 +88,7 @@ describe('PBKDF2', function() {
       keyLength: keyLength
     });
 
-    should(bytesToHex(dk)).eql(standard);
+    expect(hex(dk)).to.equal(standard);
   });
 
   it('should calculate key async, if callback provided', function(done) {
@@ -113,9 +106,8 @@ describe('PBKDF2', function() {
     };
 
     pbkdf2(new SHA('256'), options, function(err, key) {
-      should.not.exist(err);
-
-      should(bytesToHex(key)).eql(standard);
+      expect(err).to.be.null;
+      expect(hex(key)).to.equal(standard);
 
       done();
     });

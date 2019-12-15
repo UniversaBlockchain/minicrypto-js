@@ -1,4 +1,4 @@
-module.exports = [
+var keysSeed = [
 	"JgAcAQABxAAB2ZLz9pA2qlUys9oomId1YF8u8n8T98ekEv8gYAyBQfnHnhqc\n" +
     "iPcTe4AoZb+r4h1sBgwhZ39pXXNOZDBOMd+e2UHIHYAZvi6R7lNnOm0waLCH\n" +
     "H7rNXJLCzPHpp7vhAhwVao9pu5U3Maw6dwAVvb4XBoQs2YyMjpSApQJOPizG\n" +
@@ -51,3 +51,8 @@ module.exports = [
     "9PydN2XsqHGWb7G9Rs4H0HgXndP9/fHjyiPLa/15BuiluRay4VJnmhFR0Tjr\n" +
     "EL+nURLBubWit2VY/I0GxfDMdlwz3qi00lLW7ss="
 ];
+
+if (typeof window !== "undefined") {
+  Universa.seed = Universa.seed || {};
+  Universa.seed.keys = keysSeed;
+} else module.exports = keysSeed;

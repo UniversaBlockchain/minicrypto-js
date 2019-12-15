@@ -523,8 +523,7 @@ npm install
 npm run build
 ```
 
-In folder `build` there will be `universa.js` and `boss.js`.
-To enable RSA keys generation, you will need provide path to `vendor/worker.js`
+In folder `dist` there will be `universa.min.js` and `boss.min.js`.
 
 ## Running tests
 ```bash

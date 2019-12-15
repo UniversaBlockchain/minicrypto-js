@@ -1,29 +1,35 @@
-var should = require('should');
-var hash = require('../src/hash');
-const utils = require('../src/utils');
+var Universa = Universa || require('../index');
+var chai = chai || require('chai');
+var expect = chai.expect;
 
-const { textToHex, textToBytes, hexToBytes, bytesToHex, bytesToArray, encode64, decode64 } = utils;
+describe('Hash', function() {
+  const {
+    textToHex,
+    textToBytes,
+    hexToBytes,
+    bytesToHex,
+    encode64,
+    decode64
+  } = Universa.utils;
 
-var SHA = hash.SHA;
-var HMAC = hash.HMAC;
+  const { SHA, HMAC } = Universa.hash;
 
-var STANDARD = {
-  sha256: {
-    'one': '7692c3ad3540bb803c020b3aee66cd8887123234ea0c6e7143c0add73ff431ed',
-    'onetwo': '25b6746d5172ed6352966a013d93ac846e1110d5a25e8f183b5931f4688842a1'
-  },
-  sha512: {
-    'one': '05f70341078acf6a06d423d21720f9643d5f953626d88a02636dc3a9e79582aeb0c820857fd3f8dc502aa8360d2c8fa97a985fda5b629b809cad18ffb62d3899',
-    'onetwo': '04aebe936d8eab8a145ce973d1101ac89ea8a2192ca43d3c986ba73ad3de1a58a6a5c95d85d86fc1900d24bad1334d56e550d1a23baf3f867f56fb64aaed0d59'
-  },
-  hmac: {
-    'my secret data': 'cc54950346e46a542b596afdbf32cb984c2566ebf9cfc702ebce0e257a12af57',
-    'a quick brown for his done something disgusting': 'la3Xl78Z3ktK2JLoDpPKthhqVilUX6+e6a0WultI9f8='
-  }
-};
+  const STANDARD = {
+    sha256: {
+      'one': '7692c3ad3540bb803c020b3aee66cd8887123234ea0c6e7143c0add73ff431ed',
+      'onetwo': '25b6746d5172ed6352966a013d93ac846e1110d5a25e8f183b5931f4688842a1'
+    },
+    sha512: {
+      'one': '05f70341078acf6a06d423d21720f9643d5f953626d88a02636dc3a9e79582aeb0c820857fd3f8dc502aa8360d2c8fa97a985fda5b629b809cad18ffb62d3899',
+      'onetwo': '04aebe936d8eab8a145ce973d1101ac89ea8a2192ca43d3c986ba73ad3de1a58a6a5c95d85d86fc1900d24bad1334d56e550d1a23baf3f867f56fb64aaed0d59'
+    },
+    hmac: {
+      'my secret data': 'cc54950346e46a542b596afdbf32cb984c2566ebf9cfc702ebce0e257a12af57',
+      'a quick brown for his done something disgusting': 'la3Xl78Z3ktK2JLoDpPKthhqVilUX6+e6a0WultI9f8='
+    }
+  };
 
-describe('Hash functions', function() {
-  describe('SHA family', function() {
+  describe('SHA', function() {
     describe('SHA256', function() {
       var hashFor = STANDARD.sha256;
       var sha256;
@@ -33,14 +39,14 @@ describe('Hash functions', function() {
       it('should calculate hash for message "one"', function() {
         var msg = 'one';
 
-        should(sha256.get(textToBytes(msg), 'hex')).eql(hashFor[msg]);
+        expect(sha256.get(textToBytes(msg), 'hex')).to.equal(hashFor[msg]);
       });
 
       it('should calculate hash for message "onetwo" divided by parts', function() {
         sha256.put(textToBytes('one'));
         sha256.put(textToBytes('two'));
 
-        should(sha256.get('hex')).eql(hashFor['onetwo']);
+        expect(sha256.get('hex')).to.equal(hashFor['onetwo']);
       });
     });
 
@@ -53,25 +59,25 @@ describe('Hash functions', function() {
       it('should calculate hash for message "one"', function() {
         var msg = 'one';
 
-        should(sha512.get(textToBytes(msg), 'hex')).eql(hashFor[msg]);
+        expect(sha512.get(textToBytes(msg), 'hex')).to.equal(hashFor[msg]);
       });
 
       it('should calculate hash for message "onetwo" divided by parts', function() {
         sha512.put(textToBytes('one'));
         sha512.put(textToBytes('two'));
 
-        should(sha512.get('hex')).eql(hashFor['onetwo']);
+        expect(sha512.get('hex')).to.equal(hashFor['onetwo']);
       });
     });
 
-    describe('SHA3 384', function() {
-      it("should get hash with 384", function() {
+    describe('SHA 3 (384)', function() {
+      it("should get hash with SHA384", function() {
         const vector = "abc";
         const hash = new SHA("3_384");
 
         const digest = bytesToHex(hash.get(vector));
 
-        should(digest).eql("ec01498288516fc926459f58e2c6ad8df9b473cb0fc08c2596da7cf0e49be4b298d88cea927ac7f539f1edf228376d25");
+        expect(digest).to.equal("ec01498288516fc926459f58e2c6ad8df9b473cb0fc08c2596da7cf0e49be4b298d88cea927ac7f539f1edf228376d25");
       });
     });
   });
@@ -86,7 +92,7 @@ describe('Hash functions', function() {
       var sha256 = new SHA('256');
       var hmac = new HMAC(sha256, key);
 
-      should(encode64(hmac.get(data))).eql('la3Xl78Z3ktK2JLoDpPKthhqVilUX6+e6a0WultI9f8=');
+      expect(encode64(hmac.get(data))).to.equal('la3Xl78Z3ktK2JLoDpPKthhqVilUX6+e6a0WultI9f8=');
     });
 
     it('should calculate hash for larg data', function() {
@@ -98,7 +104,7 @@ describe('Hash functions', function() {
 
       var arr = data;
 
-      should(encode64(hmac.get(arr))).eql('6wTwsUjFpsm9ccQd3LOIpEpevalwhO8fbHOX9rffdEg=');
+      expect(encode64(hmac.get(arr))).to.equal('6wTwsUjFpsm9ccQd3LOIpEpevalwhO8fbHOX9rffdEg=');
     });
   });
 });
