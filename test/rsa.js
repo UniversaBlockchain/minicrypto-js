@@ -11,7 +11,10 @@ describe('RSA', function() {
     hexToBytes
   } = Universa.utils;
 
-  const { rsa, PrivateKey, PublicKey, SymmetricKey } = Universa.pki;
+  const {
+    rsa, PrivateKey, PublicKey,
+    SymmetricKey, AbstractKey
+  } = Universa.pki;
   const { SHA } = Universa.hash;
 
   Universa.seed = Universa.seed || {};
@@ -356,6 +359,24 @@ describe('RSA', function() {
 
       expect(hex(seedPSS.message)).to.equal(hex(decrypted2));
       expect(encode64(symmetricKey.pack())).to.equal(encode64(keyBytes));
+    });
+  });
+
+  describe('Abstract key', function() {
+    it('should verify address', function() {
+      const pub = decode64("HggcAQABxAEBAKPW/V0ov09rGWAMoBSWuRHzf2yzA29WgLRzJvZutClo9xfo8KaOryl1NxtvOBJ9xsdH0fMXyV/1LBWa9U5v7vBO49m7oneIQt0GIJ35mWcZPp9WjZVzMogy9xvRoDSTMrfWuApJRWnD0Z5bYDxI9kObKA17Vrv8gr0YD7kK9r2J9tJDcV7pPthHWzLDgLVQHX/l86zK+MGDFypX8OWo5murr7ESTzqA42VHprwdwhJ2zrwqdFMbVozwC4OpWkCEEgQNZUDYYx1fAUR4RnoCB/51RkoRmKkLjjJpV+ZIXg+SqU9hUJPtJ08JnaHcz66lbA3utcolnck4NT1MtVeZKAs=");
+
+      expect(AbstractKey.TYPE_PRIVATE).to.equal(0);
+      expect(AbstractKey.TYPE_PUBLIC).to.equal(1);
+
+      expect(AbstractKey.typeOf(decode64(seedKeys[1]))).to.equal(AbstractKey.TYPE_PRIVATE);
+      expect(AbstractKey.typeOf(pub)).to.equal(AbstractKey.TYPE_PUBLIC);
+
+      const base64Encoded = seedKeys[2];
+      const key = new PrivateKey('BOSS', decode64(base64Encoded));
+      const keyPacked = key.pack("BOSS", "qwerty");
+
+      expect(AbstractKey.typeOf(keyPacked)).to.equal(AbstractKey.TYPE_PRIVATE_PASSWORD_V2);
     });
   });
 });

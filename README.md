@@ -255,6 +255,18 @@ publicKey.address({ long: true }); // long address (Uint8Array)
 publicKey.longAddress();           // long address (Uint8Array)
 ```
 
+Check if given address is valid
+
+```js
+const { PublicKey } = Universa.pki;
+
+PublicKey.isValidAddress(publicKey.address()) // true
+
+// accepts base58 representation of address too
+PublicKey.isValidAddress(addressBase58) // true
+
+```
+
 Generate private key
 
 ```js
@@ -292,6 +304,21 @@ const bossEncodedFast = privateKey.pack("BOSS", {
   password: "somepassword",
   rounds: 16000
 });
+```
+
+Get type of key package. There are 4 types of what key binary package may contain.
+
+AbstractKey.TYPE_PRIVATE - binary package of private key without password
+AbstractKey.TYPE_PUBLIC - binary package of public key without password
+AbstractKey.TYPE_PRIVATE_PASSWORD_V2 - binary package of private key with password (actual version)
+AbstractKey.TYPE_PRIVATE_PASSWORD_V1 - binary package of private key with password (deprecated version)
+
+```js
+const { AbstractKey } = Universa.pki;
+
+const bossEncoded = privateKey.pack("BOSS", "somepassword");
+
+AbstractKey.typeOf(bossEncoded) === AbstractKey.TYPE_PRIVATE_PASSWORD_V2 // true
 ```
 
 ### KEY INFO

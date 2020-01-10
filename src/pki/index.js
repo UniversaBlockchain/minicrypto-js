@@ -4,4 +4,5 @@ exports.KeyInfo = require('./key_info');
 exports.SymmetricKey = require('./symmetric_key');
 exports.PublicKey = require('./public_key');
 exports.PrivateKey = require('./private_key');
+exports.AbstractKey = require('./abstract_key');
 exports.ExtendedSignature = require('./extended_signature');
