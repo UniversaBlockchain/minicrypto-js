@@ -4,6 +4,7 @@ module.exports = [
   {
     entry: ['./index.js'],
     output: {
+      globalObject: 'this',
       filename: 'universa.min.js',
       path: __dirname + '/dist',
       library: 'Universa',
@@ -18,6 +19,7 @@ module.exports = [
   {
     entry: ['./src/boss/protocol.js'],
     output: {
+      globalObject: 'this',
       filename: 'boss.min.js',
       path: __dirname + '/dist',
       library: 'Boss',
