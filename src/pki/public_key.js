@@ -5,7 +5,6 @@ const Boss = require('../boss/protocol');
 const SHA = require('../hash/sha');
 const { Buffer } = require('buffer');
 const AbstractKey = require('./abstract_key');
-const ExtendedSignature = require('./extended_signature');
 
 const FINGERPRINT_SHA512 = '07';
 
@@ -16,6 +15,7 @@ const {
 
   decode58,
   encode58,
+  encode64,
 
   hexToBytes,
   byteStringToArray,
@@ -98,7 +98,25 @@ module.exports = class PublicKey extends AbstractKey {
   }
 
   verifyExtended(signature, data) {
-    return ExtendedSignature.verify(this, signature, data);
+    const boss = new Boss();
+    const dataHash = new SHA('512');
+    const unpacked = boss.load(signature);
+    const { exts, sign } = unpacked;
+
+    const verified = this.verify(exts, sign, {
+      pssHash: new SHA(512),
+      mgf1Hash: new SHA(1)
+    });
+
+    if (!verified) return null;
+
+    const targetSignature = boss.load(exts);
+    const { sha512, key, created_at } = targetSignature;
+
+    if (encode64(dataHash.get(data)) === encode64(sha512))
+      return { key, created_at };
+
+    return null;
   }
 
   /**

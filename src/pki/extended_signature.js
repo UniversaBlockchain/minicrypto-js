@@ -9,40 +9,9 @@ exports.keyId = keyId;
 exports.extractKeyId = extractKeyId;
 exports.extractPublicKey = extractPublicKey;
 
-exports.sign = (key, data) => {
-	const boss = new Boss();
-	const dataHash = new SHA('512');
-
-	const targetSignature = boss.dump({
-		'key': keyId(key),
-		'sha512': dataHash.get(data),
-		'created_at': new Date(),
-    'pub_key': key.publicKey.pack('BOSS')
-	});
-
-	return boss.dump({
-		'exts': targetSignature,
-		'sign': key.sign(targetSignature, { pssHash: new SHA(512), mgf1Hash: new SHA(1) })
-	});
-}
-
-exports.verify = (publicKey, signature, data) => {
-	const boss = new Boss();
-	const dataHash = new SHA('512');
-	const unpacked = boss.load(signature);
-	const { exts, sign } = unpacked;
-
-	const verified = publicKey.verify(exts, sign, { pssHash: new SHA(512), mgf1Hash: new SHA(1) });
-
-	if (!verified) return null;
-
-	const targetSignature = boss.load(exts);
-	const { sha512, key, created_at } = targetSignature;
-
-	if (arrayToByteString(dataHash.get(data)) === arrayToByteString(sha512)) return { key, created_at };
-
-	return null;
-}
+exports.sign = (key, data) => key.signExtended(data);
+exports.verify = (publicKey, signature, data) =>
+	publicKey.verifyExtended(signature, data);
 
 function extractKeyId(signature) {
 	const boss = new Boss();

@@ -8,7 +8,7 @@ describe('Extended signature', function() {
 
   const { PrivateKey, ExtendedSignature } = Universa.pki;
   const { bytesToHex: hex, decode64, hexToBytes, textToHex } = Universa.utils;
-  const { keyId, extractKeyId } = ExtendedSignature;
+  const { keyId, extractKeyId, extractPublicKey } = ExtendedSignature;
 
   it('should get key id', function() {
     const key = new PrivateKey('BOSS', decode64(seedKeys[1]));
@@ -30,5 +30,17 @@ describe('Extended signature', function() {
     expect(hex(es.key)).to.equal(hex(id));
     expect(hex(extractKeyId(signature))).to.equal(hex(keyId(pubKey)));
     expect(hex(keyId(key))).to.equal(hex(keyId(pubKey)));
+  });
+
+  it('should extract key from signature', function () {
+    const data = hexToBytes(textToHex('Hello world'));
+    const key = new PrivateKey('BOSS', decode64(seedKeys[3]));
+    const id = keyId(key);
+    const pubKey = key.publicKey;
+    const signature = key.signExtended(data);
+
+    const extractedKey = extractPublicKey(signature);
+
+    expect(hex(pubKey.fingerprint())).to.equal(hex(extractedKey.fingerprint()));
   });
 });

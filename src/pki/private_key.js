@@ -105,7 +105,25 @@ module.exports = class PrivateKey extends AbstractKey {
   }
 
   signExtended(data) {
-    return ExtendedSignature.sign(this, data);
+    const self = this;
+    const pub = this.publicKey;
+    const boss = new Boss();
+    const dataHash = new SHA('512');
+
+    const targetSignature = boss.dump({
+      'key': pub.fingerprint(),
+      'sha512': dataHash.get(data),
+      'created_at': new Date(),
+      'pub_key': pub.pack('BOSS')
+    });
+
+    return boss.dump({
+      'exts': targetSignature,
+      'sign': self.sign(targetSignature, {
+        pssHash: new SHA(512),
+        mgf1Hash: new SHA(1)
+      })
+    });
   }
 
   getBitStrength() { return this.key.n.bitLength(); }
