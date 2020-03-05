@@ -130,9 +130,8 @@ module.exports = class PublicKey extends AbstractKey {
     return byteStringToArray(this.key.encrypt(arrayToByteString(bytes), 'RSA-OAEP', wrapOptions(options)));
   }
 
-  pack(type, options) {
-    return transit[type].pack(this.key, options);
-  }
+  pack(type, options) { return transit[type].pack(this.key, options); }
+  get packed() { return this.pack("BOSS"); }
 
   fingerprint() {
     if (this._fingerprint) return this._fingerprint;
@@ -217,6 +216,8 @@ module.exports = class PublicKey extends AbstractKey {
 
     return isValid;
   }
+
+  static unpack(bytes) { return new PublicKey("BOSS", bytes); }
 }
 
 /**

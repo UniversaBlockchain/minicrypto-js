@@ -10,7 +10,11 @@ const { jsbn } = forge;
 
 const { BigInteger } = jsbn;
 
-crc32.bytes = (data) => bytes.hexToBytes((new BigInteger(crc32(data) + '', 10)).toString(16));
+const engLower = "qwertyuiopasdfghjklzxcvbnm";
+const idChars = (engLower + engLower.toUpperCase() + "_1234567890").split("");
+
+crc32.bytes = (data) =>
+  bytes.hexToBytes((new BigInteger(crc32(data) + '', 10)).toString(16));
 //--------------------------------------------------------------
 
 exports.hashId = SHA.hashId;
@@ -42,6 +46,8 @@ exports.randomBytes = bytes.randomBytes;
 
 exports.encode64 = base64.encode64;
 exports.decode64 = base64.decode64;
+exports.encode64Short = base64.encode64Short;
+exports.decode64Short = base64.decode64Short;
 exports.encode58 = base58.encode;
 exports.decode58 = base58.decode;
 
@@ -50,4 +56,15 @@ exports.concatBytes = function(a, b) {
   c.set(a);
   c.set(b, a.length);
   return c;
-}
+};
+
+exports.randomAlnums = (size) => {
+  const idCharsTotal = idChars.length;
+  let result = "";
+
+  for (let _i = 0; _i < size; _i++) {
+    result += idChars[Math.floor(Math.random() * idCharsTotal)];
+  }
+
+  return result;
+};

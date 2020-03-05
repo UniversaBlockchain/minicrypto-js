@@ -1,8 +1,9 @@
 {
   "name": "universa-minicrypto",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Minimalistic Javascript library required to perform basic operations with Universa smart contracts and other objects.",
   "main": "index.js",
+  "types": "./types.d.ts",
   "scripts": {
     "test": "mocha",
     "coverage": "nyc npm test",

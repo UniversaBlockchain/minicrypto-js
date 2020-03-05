@@ -1,7 +1,8 @@
+const SHA = require('../hash/sha');
 const forge = require('../vendor/forge');
-const PrivateKey = require('./private_key');
-const PublicKey = require('./public_key');
 const worker = require('../vendor/worker');
+const PublicKey = require('./public_key');
+const PrivateKey = require('./private_key');
 
 const { rsa } = forge.pki;
 
@@ -51,3 +52,8 @@ exports.keysEqual = function keysEqual(key1, key2) {
 
   return n1.equals(n2) && e1.equals(e2);
 };
+
+exports.defaultPSSConfig = () => ({
+  pssHash: new SHA("3_384"),
+  mgf1Hash: new SHA("1")
+});

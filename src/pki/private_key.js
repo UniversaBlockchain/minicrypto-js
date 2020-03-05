@@ -150,6 +150,12 @@ module.exports = class PrivateKey extends AbstractKey {
     reader.onload = e => callback(null, new PrivateKey('BOSS', e.target.result));
     reader.readAsBinaryString(file);
   }
+
+  static unpack(bytes, password) {
+    if (!password) return new PrivateKey("BOSS", bytes);
+
+    return new PrivateKey("BOSS", { bin: bytes, password });
+  }
 }
 
 /**

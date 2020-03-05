@@ -79,6 +79,39 @@ const { Capsule } = Universa;
 const publicKeys = Capsule.getSignatureKeys(capsuleBin); // Array[PublicKey]
 ```
 
+### Signed record
+
+Pack data to signed record (Uint8Array) with key:
+
+```js
+const { SignedRecord, decode64, PrivateKey } = Universa;
+
+const payload = { ab: "cd" };
+const nonce = decode64("abc");
+const key = PrivateKey.unpack(privateKeyPacked);
+
+const recordBinary = SignedRecord.packWithKey(key, payload, nonce); // Uint8Array
+```
+
+Unpack signed record:
+
+```js
+const { SignedRecord, decode64, PrivateKey } = Universa;
+
+const payload = { ab: "cd" };
+const nonce = decode64("abc");
+const key = PrivateKey.unpack(privateKeyPacked);
+
+const recordBinary = SignedRecord.packWithKey(key, payload, nonce); // Uint8Array
+
+const record = SignedRecord.unpack(recordBinary);
+
+record.recordType === SignedRecord.RECORD_WITH_KEY; // true
+record.nonce // nonce
+record.payload // payload
+record.key // PublicKey
+```
+
 ### Misc
 
 Random byte array for given length
@@ -122,9 +155,12 @@ Convert plain text to bytes
 Convert bytes to base64 and back
 
 ```js
-const { encode64, decode64 } = Universa.utils;
+const { encode64, encode64Short, decode64 } = Universa.utils;
 const bytes = decode64("abc"); // Uint8Array
 const base64str = encode64(bytes); // String
+
+// short representation of base64 string
+const base64ShortString = encode64Short(bytes);
 ```
 
 Convert bytes to base58 and back
@@ -210,17 +246,19 @@ const { decode64, BigInteger } = Universa.utils;
 const bossEncodedKey = decode64(keyPacked64);
 
 const privateKey1 = new PrivateKey('BOSS', bossEncodedKey);
-const privateKey2 = new PrivateKey('EXPONENTS', {
+const privateKey2 = PrivateKey.unpack(bossEncodedKey);
+const privateKey3 = new PrivateKey('EXPONENTS', {
   e: new BigInteger(eHex, 16),
   p: new BigInteger(pHex, 16),
   q: new BigInteger(qHex, 16)
 });
 
 // Read password-protected key
-const privateKey3 = new PrivateKey('BOSS', {
+const privateKey4 = new PrivateKey('BOSS', {
   bin: bossEncodedKey,
   password: "somepassword"
 })
+const privateKey5 = PrivateKey.unpack(bossEncodedKey, password);
 ```
 
 Public key unpack
@@ -238,6 +276,7 @@ const publicKey3 = new PublicKey('EXPONENTS', {
   n: new BigInteger(nHex, 16),
   e: new BigInteger(eHex, 16),
 });
+const publicKey4 = PublicKey.unpack(bossEncodedKey);
 ```
 
 Public key fingerprint
@@ -291,6 +330,8 @@ const priv = new PrivateKey('BOSS', bossEncodedKey);
 
 const hashWithExponents = priv.pack('EXPONENTS'); // hash map with exponents
 const bossEncoded = priv.pack('BOSS'); // Uint8Array
+
+const bossEncodedPublic = priv.publicKey.packed;
 ```
 
 Password-protected Private key export
