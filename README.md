@@ -117,21 +117,21 @@ record.key // PublicKey
 Random byte array for given length
 
 ```js
-const { randomBytes } = Universa.utils;
+const { randomBytes } = Universa;
 const bytes16 = randomBytes(16); // Uint8Array
 ```
 
 HashId for binary data
 
 ```js
-const { hashId } = Universa.utils;
+const { hashId } = Universa;
 const id = hashId(decode64("abc")); // Uint8Array
 ```
 
 CRC32
 
 ```js
-const { crc32 } = Universa.utils;
+const { crc32 } = Universa;
 const digest = crc32(decode64("abc")); // Uint8Array
 ```
 
@@ -140,7 +140,7 @@ const digest = crc32(decode64("abc")); // Uint8Array
 Convert byte array to hex string and back
 
 ```js
-    const { bytesToHex, hexToBytes } = Universa.utils;
+    const { bytesToHex, hexToBytes } = Universa;
     const hexString = bytesToHex(uint8arr);  // String
     const bytesArray = hexToBytes(hexString); // Uint8Array
 ```
@@ -148,7 +148,7 @@ Convert byte array to hex string and back
 Convert plain text to bytes
 
 ```js
-  const { textToBytes } = Universa.utils;
+  const { textToBytes } = Universa;
   textToBytes("one two three") // Uint8Array
 ```
 
@@ -229,9 +229,9 @@ const { SHA } = Universa.hash;
 
 const derivedKey = pbkdf2(new SHA('256'), {
   iterations: 1, // number of iterations
-  keyLength: 20  // bytes length
+  keyLength: 20,  // bytes length
   password: 'password',
-  salt: hexToBytes('abc123'),
+  salt: hexToBytes('abc123')
 }); // Uint8Array
 ```
 

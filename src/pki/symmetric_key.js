@@ -32,7 +32,8 @@ class SymmetricKey {
       algorithm: KeyInfo.PRF.HMAC_SHA256,
       rounds,
       salt,
-      tag: null
+      tag: null,
+      keyLength: 32
     });
 
     return new SymmetricKey({

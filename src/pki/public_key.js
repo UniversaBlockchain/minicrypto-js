@@ -191,7 +191,7 @@ module.exports = class PublicKey extends AbstractKey {
 
     try {
       decoded = decode58(address);
-    } catch (err) { return false; }
+    } catch (err) { decoded = address; }
 
     if ([37, 53].indexOf(decoded.length) == -1) return false;
     if ([16, 32].indexOf(decoded[0]) == -1) return false;

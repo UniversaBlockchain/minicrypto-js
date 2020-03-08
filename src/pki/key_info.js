@@ -146,6 +146,8 @@ class KeyInfo {
       salt
     });
   }
+
+  static unpack(encoded) { return KeyInfo.fromBOSS(encoded); }
 }
 
 KeyInfo.PRF = PRF;
