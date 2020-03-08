@@ -21,7 +21,7 @@ describe('BOSS Protocol', function() {
     arrayToByteString,
     byteStringToArray,
     decode64
-  } = Universa.utils;
+  } = Universa;
 
   beforeEach(function() {
     boss = new Boss();

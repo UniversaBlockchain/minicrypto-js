@@ -9,13 +9,13 @@ describe('RSA', function() {
     encode58,
     bytesToHex: hex,
     hexToBytes
-  } = Universa.utils;
+  } = Universa;
 
   const {
     rsa, PrivateKey, PublicKey,
     SymmetricKey, AbstractKey
-  } = Universa.pki;
-  const { SHA } = Universa.hash;
+  } = Universa;
+  const { SHA } = Universa;
 
   Universa.seed = Universa.seed || {};
   const seedKeys = Universa.seed.keys || require('./seed/keys');

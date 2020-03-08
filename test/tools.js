@@ -12,9 +12,9 @@ describe('Tools', function() {
     byteStringToArray,
     arrayToByteString,
     hashId
-  } = Universa.utils;
+  } = Universa;
 
-  const { randomByteString } = Universa.utils.bytes;
+  const { randomByteString } = Universa.bytes;
 
   it('should calc crc32 for bin', function() {
     const data = decode64('gvyrDZKjMVPIhManWZaKNMQIgSb6jpUles+5LvB8EVwRlqk5BACZN1J9L59ZOz1a+cEOt0vjOYoww7M5EjyurHgVc3ht7ras4Iocej2FnoSeGlx1sWe/NdpfXZtDSCKLRlRmIS2bjUbURDk=');

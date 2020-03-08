@@ -5,11 +5,6 @@ const cipher = require('./src/cipher');
 const Boss = require('./src/boss/protocol');
 const universa = require('./src/universa');
 
-exports.hash = hash;
-exports.pki = pki;
-exports.utils = utils;
-exports.cipher = cipher;
-
 exports.Boss = Boss;
 
 for (var key in universa) { exports[key] = universa[key]; }

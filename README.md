@@ -155,7 +155,7 @@ Convert plain text to bytes
 Convert bytes to base64 and back
 
 ```js
-const { encode64, encode64Short, decode64 } = Universa.utils;
+const { encode64, encode64Short, decode64 } = Universa;
 const bytes = decode64("abc"); // Uint8Array
 const base64str = encode64(bytes); // String
 
@@ -166,7 +166,7 @@ const base64ShortString = encode64Short(bytes);
 Convert bytes to base58 and back
 
 ```js
-const { encode58, decode58 } = Universa.utils;
+const { encode58, decode58 } = Universa;
 const bytes = decode58("abc"); // Uint8Array
 const base58str = encode58(bytes); // String
 ```
@@ -178,7 +178,7 @@ Supports SHA256, SHA512, SHA1, SHA3(256, 384, 512)
 Get instant hash value for given byte array
 
 ```js
-const { SHA } = Universa.hash;
+const { SHA } = Universa;
 
 // sha3 identifiers: "3_256", "3_384", "3_512"
 const sha256 = new SHA(256);
@@ -189,7 +189,7 @@ const resultBytes = sha256.get(textToBytes('somevalue')); // Uint8Array
 Get hash value for large data
 
 ```js
-const { SHA } = Universa.hash;
+const { SHA } = Universa;
 const sha512 = new SHA(512);
 
 sha512.put(dataPart1); // dataPart1 is Uint8Array
@@ -203,7 +203,7 @@ const resultBytes = sha512.get(); // Uint8Array
 Get hash value in HEX
 
 ```js
-const { SHA } = Universa.hash;
+const { SHA } = Universa;
 const sha256 = new SHA(256);
 const hexResult = sha256.get(textToBytes("one two three"), 'hex'); // String
 ```
@@ -211,7 +211,7 @@ const hexResult = sha256.get(textToBytes("one two three"), 'hex'); // String
 ### HMAC
 
 ```js
-const { SHA, HMAC } = Universa.hash;
+const { SHA, HMAC } = Universa;
 const data = textToBytes('a quick brown for his done something disgusting');
 const key = textToBytes('1234567890abcdef1234567890abcdef');
 
@@ -223,9 +223,7 @@ const result = hmac.get(data) // Uint8Array
 ### PBKDF2
 
 ```js
-const { hexToBytes } = Universa.utils;
-const { pbkdf2 } = Universa.pki;
-const { SHA } = Universa.hash;
+const { hexToBytes, pbkdf2, SHA } = Universa;
 
 const derivedKey = pbkdf2(new SHA('256'), {
   iterations: 1, // number of iterations
@@ -240,8 +238,7 @@ const derivedKey = pbkdf2(new SHA('256'), {
 Private key unpack
 
 ```js
-const { PrivateKey } = Universa.pki;
-const { decode64, BigInteger } = Universa.utils;
+const { PrivateKey, decode64, BigInteger } = Universa;
 
 const bossEncodedKey = decode64(keyPacked64);
 
@@ -264,8 +261,7 @@ const privateKey5 = PrivateKey.unpack(bossEncodedKey, password);
 Public key unpack
 
 ```js
-const { PublicKey, PrivateKey } = Universa.pki;
-const { decode64, BigInteger } = Universa.utils;
+const { PublicKey, PrivateKey, decode64, BigInteger } = Universa;
 
 const bossEncodedKey = decode64(keyPacked64);
 const privateKey2 = new PrivateKey('BOSS', privateEncoded);
@@ -297,7 +293,7 @@ publicKey.longAddress();           // long address (Uint8Array)
 Check if given address is valid
 
 ```js
-const { PublicKey } = Universa.pki;
+const { PublicKey } = Universa;
 
 PublicKey.isValidAddress(publicKey.address()) // true
 
@@ -309,8 +305,7 @@ PublicKey.isValidAddress(addressBase58) // true
 Generate private key
 
 ```js
-const { PrivateKey, PublicKey } = Universa.pki;
-const { createKeys } = Universa.pki.rsa;
+const { PrivateKey, PublicKey, createKeys } = Universa;
 
 const options = { bits: 2048, e: 0x10001 };
 
@@ -323,7 +318,7 @@ createKeys(options, (err, pair) => {
 Private(public) key - export
 
 ```js
-const { PrivateKey } = Universa.pki;
+const { PrivateKey } = Universa;
 const bossEncodedKey = decode64(keyPacked64);
 
 const priv = new PrivateKey('BOSS', bossEncodedKey);
@@ -355,7 +350,7 @@ AbstractKey.TYPE_PRIVATE_PASSWORD_V2 - binary package of private key with passwo
 AbstractKey.TYPE_PRIVATE_PASSWORD_V1 - binary package of private key with password (deprecated version)
 
 ```js
-const { AbstractKey } = Universa.pki;
+const { AbstractKey } = Universa;
 
 const bossEncoded = privateKey.pack("BOSS", "somepassword");
 
@@ -371,7 +366,7 @@ Supported algorithms: RSAPublic, RSAPrivate, AES256
 Supported PRF: HMAC_SHA1, HMAC_SHA256, HMAC_SHA512
 
 ```js
-const { KeyInfo} = Universa.pki;
+const { KeyInfo} = Universa;
 const keyInfo = new KeyInfo({
   algorithm: KeyInfo.Algorithm.AES256,
   tag: decode64("abc"), // Uint8Array
@@ -414,7 +409,7 @@ Symmetric key: main interface to the symmetric cipher.
 This implementation uses AES256 in CTR mode with IV to encrypt / decrypt.
 
 ```js
-const { SymmetricKey } = Universa.pki;
+const { SymmetricKey } = Universa;
 
 // Creates random key (AES256, CTR)
 const symmetricKey = new SymmetricKey();
@@ -438,7 +433,7 @@ const symmetricKey3 = SymmetricKey.fromPassword(password, rounds, salt);
 Pack symmetric key (get derived key bytes)
 
 ```js
-const { SymmetricKey } = Universa.pki;
+const { SymmetricKey } = Universa;
 
 // Creates random key (AES256, CTR)
 const symmetricKey = new SymmetricKey();
@@ -509,7 +504,7 @@ console.log(isCorrect); // true
 Sign/verify
 
 ```js
-const { ExtendedSignature } = Universa.pki;
+const { ExtendedSignature } = Universa;
 const data = decode64("abcde12345");
 const privateKey; // some PrivateKey instance
 const publicKey = privateKey.publicKey;
@@ -572,7 +567,7 @@ const arg5 = reader.read(); // undefined
 Encrypt/decrypt
 
 ```js
-const { AES } = Universa.cipher;
+const { AES } = Universa;
 const key = decode64("abc"); // 16 bytes for aes128, 32 bytes for aes256
 const message = textToBytes('some text');
 

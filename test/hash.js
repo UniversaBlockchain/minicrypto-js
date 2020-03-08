@@ -10,9 +10,9 @@ describe('Hash', function() {
     bytesToHex,
     encode64,
     decode64
-  } = Universa.utils;
+  } = Universa;
 
-  const { SHA, HMAC } = Universa.hash;
+  const { SHA, HMAC } = Universa;
 
   const STANDARD = {
     sha256: {

@@ -3,16 +3,14 @@ var chai = chai || require('chai');
 var expect = chai.expect;
 
 describe('AES', function() {
-  const { SHA } = Universa.hash;
-  const { pbkdf2 } = Universa.pki;
-  const { AES, AESCTRTransformer } = Universa.cipher;
   const {
+    AES, AESCTRTransformer, pbkdf2, SHA,
     bytesToHex: hex,
     hexToBytes,
     textToBytes,
     randomBytes,
     byteStringToArray
-  } = Universa.utils;
+  } = Universa;
 
   const key = hexToBytes('000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f');
   const message = hexToBytes('00112233445566778899aabbccddeeff');

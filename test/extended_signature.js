@@ -6,8 +6,8 @@ describe('Extended signature', function() {
   Universa.seed = Universa.seed || {};
   var seedKeys = Universa.seed.keys || require('./seed/keys');
 
-  const { PrivateKey, ExtendedSignature } = Universa.pki;
-  const { bytesToHex: hex, decode64, hexToBytes, textToHex } = Universa.utils;
+  const { PrivateKey, ExtendedSignature } = Universa;
+  const { bytesToHex: hex, decode64, hexToBytes, textToHex } = Universa;
   const { keyId, extractKeyId, extractPublicKey } = ExtendedSignature;
 
   it('should get key id', function() {

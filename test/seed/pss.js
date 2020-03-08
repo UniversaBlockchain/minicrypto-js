@@ -1,5 +1,5 @@
 var Universa = Universa || require('../../index');
-var { hexToBytes, BigInteger } = Universa.utils;
+var { hexToBytes, BigInteger } = Universa;
 var i = (hex) => new BigInteger(hex, 16);
 
 var pssSeed = {

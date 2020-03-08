@@ -1,5 +1,5 @@
 var Universa = Universa || require('../../index');
-var { hexToBytes, bytesToHex, BigInteger } = Universa.utils;
+var { hexToBytes, bytesToHex, BigInteger } = Universa;
 var i = (hex) => new BigInteger(hex, 16);
 
 var oaepSeed = {

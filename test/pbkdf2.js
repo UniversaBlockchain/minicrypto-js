@@ -3,9 +3,9 @@ var chai = chai || require('chai');
 var expect = chai.expect;
 
 describe('PBKDF2', function() {
-  const { pbkdf2 } = Universa.pki;
-  const { SHA } = Universa.hash;
-  const { decode64, textToHex, hexToBytes, bytesToHex: hex } = Universa.utils;
+  const { pbkdf2 } = Universa;
+  const { SHA } = Universa;
+  const { decode64, textToHex, hexToBytes, bytesToHex: hex } = Universa;
 
   it('should get derived key with SHA512', function() {
     var password = 'test';
