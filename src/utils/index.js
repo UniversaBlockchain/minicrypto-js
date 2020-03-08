@@ -3,7 +3,7 @@ const bytes = require('./bytes');
 const base58 = require('./base58');
 const base64 = require('./base64');
 const idGenerators = require('./id_generators');
-const crc32 = require('../hash/CRC32');
+const crc32 = require('../hash/crc32');
 const SHA = require('../hash/sha');
 
 const { jsbn } = forge;
