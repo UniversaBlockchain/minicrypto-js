@@ -145,11 +145,12 @@ Convert byte array to hex string and back
     const bytesArray = hexToBytes(hexString); // Uint8Array
 ```
 
-Convert plain text to bytes
+Convert plain text to bytes and back
 
 ```js
-  const { textToBytes } = Universa;
-  textToBytes("one two three") // Uint8Array
+  const { textToBytes, bytesToText } = Universa;
+  const bytes = textToBytes("one two three"); // Uint8Array
+  const text = bytesToText(bytes); // "one two three"
 ```
 
 Convert bytes to base64 and back

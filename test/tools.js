@@ -11,7 +11,9 @@ describe('Tools', function() {
     randomBytes,
     byteStringToArray,
     arrayToByteString,
-    hashId
+    hashId,
+    textToBytes,
+    bytesToText
   } = Universa;
 
   const { randomByteString } = Universa.bytes;
@@ -47,5 +49,11 @@ describe('Tools', function() {
 
   it('should decode64', function() {
     expect(decode64("f7YrNmKlscCxpIwNw7jIIKrDtN1fkhsdsc7RDsZEb20").length).to.equal(32);
+  });
+
+  it('should convert bytes to Uint8Array', () => {
+    const str = "ll3bklbj123klbj2b34ljk234=sd dfg*)&#$)*^!#%";
+    const bytes = textToBytes(str);
+    expect(bytesToText(bytes)).to.equal(str);
   });
 });

@@ -44,8 +44,8 @@ exports.arrayToByteString = function(list, offset = 10000) {
 };
 
 exports.textToHex = textToHex;
-exports.textToBytes = (text) => Buffer.from(hexToBytes(textToHex(text)));
-
+exports.textToBytes = (text) => hexToBytes(textToHex(text));
+exports.bytesToText = (bytes) => Buffer.from(bytes).toString('utf-8');
 exports.ensureBytes = (bytes) => {
   return bytes.constructor.name == 'Array' ? new Uint8Array(bytes) : bytes;
 }

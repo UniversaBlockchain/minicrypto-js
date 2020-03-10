@@ -39,6 +39,7 @@ exports.arrayToByteString = bytes.arrayToByteString;
 exports.hexToBytes = bytes.hexToBytes;
 exports.bytesToHex = bytes.bytesToHex;
 exports.textToBytes = bytes.textToBytes;
+exports.bytesToText = bytes.bytesToText;
 exports.textToHex = bytes.textToHex;
 exports.randomBytes = bytes.randomBytes;
 
