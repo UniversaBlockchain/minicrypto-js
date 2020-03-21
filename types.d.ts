@@ -13,9 +13,12 @@ declare module 'universa-minicrypto' {
   export function randomBytes(size: number): Uint8Array;
   export function crc32(data: Uint8Array): Uint8Array;
 
-  export function createKeys(opts: any, cb: (err: Error, pair: Pair) => void): void;
+  export function createKeys(
+    opts: generateKeysOpts,
+    cb: (err: Error, pair: Pair) => void
+  ): void;
 
-  export function pbkdf2(sha: SHA, options: any): Uint8Array;
+  export function pbkdf2(sha: SHA, options: pbkdf2Opts): Uint8Array;
 
   export class BigInteger {
     constructor(value: any, encoding: any);
@@ -50,29 +53,36 @@ declare module 'universa-minicrypto' {
   export class PrivateKey {
     public publicKey: PublicKey;
 
-    constructor(tpe: string, options: any);
+    constructor(
+      tpe: string,
+      options: Uint8Array | PrivateKeyUnpackBOSS
+    );
 
-    pack(mode: any, options?: any): Uint8Array;
-    sign(data: Uint8Array, options: any): Uint8Array;
+    pack(mode: string, options?: string | PrivateKeyPackBOSS): Uint8Array;
+    sign(data: Uint8Array, options: PrivateKeySignOpts): Uint8Array;
     signExtended(data: Uint8Array): Uint8Array;
-    decrypt(data: Uint8Array, options?: any): Uint8Array;
+    decrypt(data: Uint8Array, options?: PublicKeyEncryptOpts): Uint8Array;
 
     static unpack(packed: Uint8Array, password?: string): PrivateKey;
   }
 
   export class PublicKey {
-    constructor(tpe: string, options: any);
+    constructor(tpe: string, options: Uint8Array);
 
     readonly packed: Uint8Array;
 
     fingerprint(): Uint8Array;
-    address(options?: any): Uint8Array;
+    address(options?: addressOpts): Uint8Array;
     shortAddress(): Uint8Array;
     longAddress(): Uint8Array;
-    pack(options: any): Uint8Array;
-    verify(message: Uint8Array, signature: Uint8Array, options: any): boolean;
+    pack(mode: string): Uint8Array;
+    verify(
+      message: Uint8Array,
+      signature: Uint8Array,
+      options: PrivateKeySignOpts
+    ): boolean;
     verifyExtended(signature: Uint8Array, message: Uint8Array): any;
-    encrypt(data: Uint8Array, options?: any): Uint8Array;
+    encrypt(data: Uint8Array, options?: PublicKeyEncryptOpts): Uint8Array;
 
     static unpack(packed: Uint8Array): PublicKey;
     static isValidAddress(address: Uint8Array | string): boolean;
@@ -123,6 +133,56 @@ declare module 'universa-minicrypto' {
     static getSignatureKeys(capsuleBinary): PublicKey[];
   }
 
+  export interface PrivateKeyUnpackBOSS {
+    bin: Uint8Array,
+    password: string
+  }
+
+  export interface PrivateKeyPackBOSS {
+    rounds?: number,
+    password: string
+  }
+
+  export interface PrivateKeySignOpts {
+    pssHash?: SHA | HMAC,
+    mgf1Hash?: SHA | HMAC,
+    oaepHash?: SHA | HMAC,
+    salt?: string | Uint8Array,
+    saltLength?: number,
+    seed?: string | Uint8Array
+  }
+
+  export interface PublicKeyEncryptOpts {
+    pssHash?: SHA | HMAC,
+    mgf1Hash?: SHA | HMAC,
+    oaepHash?: SHA | HMAC,
+    salt?: string | Uint8Array,
+    saltLength?: number,
+    seed?: string | Uint8Array
+  }
+
+  export interface createKeysOpts {
+    bits?: number,
+    e?: number
+  }
+
+  export interface addressOpts {
+    long?: boolean,
+    typeMark?: number
+  }
+
+  export interface pbkdf2Opts {
+    password: string | Uint8Array,
+    salt?: string | Uint8Array,
+    rounds?: number,
+    keyLength?: number
+  }
+
+  export interface SymmetricKeyOpts {
+    keyBytes?: Uint8Array,
+    keyInfo?: KeyInfo
+  }
+
   export interface Pair {
     publicKey: PublicKey;
     privateKey: PrivateKey;
@@ -165,7 +225,7 @@ declare module 'universa-minicrypto' {
   }
 
   export class SymmetricKey {
-    constructor(options?: any);
+    constructor(options?: SymmetricKeyOpts);
 
     pack(): Uint8Array;
     encrypt(data: Uint8Array): Uint8Array;
