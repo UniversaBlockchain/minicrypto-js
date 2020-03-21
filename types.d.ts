@@ -1,14 +1,14 @@
 declare module 'universa-minicrypto' {
-  export function encode64(data: Uint8Array): String;
-  export function encode64Short(data: Uint8Array): String;
-  export function decode64(encoded: String): Uint8Array;
-  export function decode64Short(encoded: String): Uint8Array;
-  export function encode58(data: Uint8Array): String;
-  export function decode58(encoded: String): Uint8Array;
+  export function encode64(data: Uint8Array): string;
+  export function encode64Short(data: Uint8Array): string;
+  export function decode64(encoded: string): Uint8Array;
+  export function decode64Short(encoded: string): Uint8Array;
+  export function encode58(data: Uint8Array): string;
+  export function decode58(encoded: string): Uint8Array;
 
-  export function textToBytes(text: String): Uint8Array;
-  export function hexToBytes(hexString: String): Uint8Array;
-  export function bytesToHex(bytes: Uint8Array): String;
+  export function textToBytes(text: string): Uint8Array;
+  export function hexToBytes(hexstring: string): Uint8Array;
+  export function bytesToHex(bytes: Uint8Array): string;
   export function hashId(data: Uint8Array): Uint8Array;
   export function randomBytes(size: number): Uint8Array;
   export function crc32(data: Uint8Array): Uint8Array;
@@ -24,8 +24,8 @@ declare module 'universa-minicrypto' {
   export class SHA {
     constructor(size: string | number);
 
-    get(encoding?: String): Uint8Array;
-    get(data?: Uint8Array, encoding?: String): Uint8Array;
+    get(encoding?: string): Uint8Array;
+    get(data?: Uint8Array, encoding?: string): Uint8Array;
     put(data: Uint8Array): void;
   }
 
@@ -57,7 +57,7 @@ declare module 'universa-minicrypto' {
     signExtended(data: Uint8Array): Uint8Array;
     decrypt(data: Uint8Array, options?: any): Uint8Array;
 
-    static unpack(packed: Uint8Array, password?: String): PrivateKey;
+    static unpack(packed: Uint8Array, password?: string): PrivateKey;
   }
 
   export class PublicKey {
@@ -75,7 +75,7 @@ declare module 'universa-minicrypto' {
     encrypt(data: Uint8Array, options?: any): Uint8Array;
 
     static unpack(packed: Uint8Array): PublicKey;
-    static isValidAddress(address: Uint8Array | String): boolean;
+    static isValidAddress(address: Uint8Array | string): boolean;
   }
 
   export class Boss {
@@ -159,7 +159,7 @@ declare module 'universa-minicrypto' {
 
     pack(): Uint8Array;
     matchType(other: KeyInfo): boolean;
-    derivePassword(password: String): Uint8Array;
+    derivePassword(password: string): Uint8Array;
 
     static unpack(packed: Uint8Array): KeyInfo;
   }
@@ -173,7 +173,7 @@ declare module 'universa-minicrypto' {
     etaEncrypt(data: Uint8Array): Uint8Array;
     etaDecrypt(data: Uint8Array): Uint8Array;
 
-    static fromPassword(password: String, rounds: number, salt?: Uint8Array): SymmetricKey;
+    static fromPassword(password: string, rounds: number, salt?: Uint8Array): SymmetricKey;
   }
 
   export class AES {

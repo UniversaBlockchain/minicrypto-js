@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>wasm crypto test</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=yes, minimum-scale=1.0, maximum-scale=5.0">
+</head>
+<body id="idBody" style="height: 100%; width: 100%; overflow: scroll;">
+<h3>wasm crypto test</h3>
+<p>look for output in console</p>
+<script type="text/javascript" src="main.js"></script>
+
+<script type='text/javascript'>
+
+Module.onRuntimeInitialized = () => {
+
+  ////////////////////////////////////////////////////
+  // initialize wasm bindings
+  ////////////////////////////////////////////////////
+
+  /**
+   * what key pair we want to use for test.
+   * string parameter: base64 representation of packed private key (public key will be generated from private)
+   */
+  let setPrivateAndPublicKeys = Module.cwrap('setPrivateAndPublicKeys', '', ['string']);
+
+  /**
+   * Encrypt binary data with selected keys.
+   * string parameter: base64 representation of binary data to encrypt
+   * returns: base64 representation of encrypted binary
+   */
+  let pubKey_encrypt = Module.cwrap('pubKey_encrypt_b64', 'string', ['string']);
+
+  /**
+   * Decrypt binary data with selected keys.
+   * string parameter: base64 representation of binary data to decrypt
+   * returns: base64 representation of decrypted binary
+   */
+  let privKey_decrypt = Module.cwrap('privKey_decrypt_b64', 'string', ['string']);
+
+  ////////////////////////////////////////////////////
+  // start test
+  ////////////////////////////////////////////////////
+
+  // private key we want to use
+  let privKeyB64 = "JgAcAQABvIDvms9/X4wI2Rzb7vIcFYOKP2ZS8ppQwbXp2/PDG4BKbUvH669L4ZKkoOrQACtrtZi34Axpa+t8uBHEFFhD3Fba7v4vNzP8/9euZ38kZ+tAlbNxbmfbU5CS7y5joyrJTZyn/50ruSO79O1T28BQAO3IgQG6xtdC0adnXbEsBUOu7byA0+8Zx1sAkNfEBbluXsv75v4tu9xh2xoxiQQi1e+42efBi3NRflmETuJdtQ6r9vzt7hZ3faO45wksuj9140tVBc5+lGz//V4yl7iddBnbX0dIZeoz2LrVSyqrFnSZNjEeL0cOPXYZso0DGJemC5kZNogjBVofA33xD7Z6U8W6qB0=";
+
+  setPrivateAndPublicKeys(privKeyB64);
+
+  let testBody = "hello world!asdfasdfasdfasdfasdfasdfasdfasdfasdfasdfas23rp98np98374nvp98we7pt98v034v";
+  let testBodyB64 = btoa(testBody)
+  console.log("testBodyB64: " + testBodyB64);
+
+  // do encrypt
+  let d1 = new Date();
+  let encryptedB64 = pubKey_encrypt(testBodyB64);
+  console.log("encryptedB64: " + encryptedB64);
+
+  // do decrypt
+  let d2 = new Date();
+  let decryptedB64 = privKey_decrypt(encryptedB64);
+  let d3 = new Date();
+
+  console.log(d2.getTime()- d1.getTime(), d3.getTime() -d2.getTime());
+  console.log("decryptedB64: " + decryptedB64);
+
+  let decrypted = atob(decryptedB64);
+  console.log("decrypted: " + decrypted);
+
+  // check result
+  if (decrypted !== testBody)
+    console.error("wrong result");
+
+}
+
+</script>
+
+</body>
+</html>
+
