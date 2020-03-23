@@ -179,8 +179,8 @@ declare module 'universa-minicrypto' {
     constructor();
 
     static sign(capsuleBinary: Uint8Array, key: PrivateKey): Uint8Array;
-    static getSignatures(capsuleBinary): Uint8Array[];
-    static getSignatureKeys(capsuleBinary): PublicKey[];
+    static getSignatures(capsuleBinary: Uint8Array): Uint8Array[];
+    static getSignatureKeys(capsuleBinary: Uint8Array): PublicKey[];
   }
 
   export interface KeyInfoOpts {
