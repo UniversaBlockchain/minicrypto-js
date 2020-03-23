@@ -227,7 +227,7 @@ const result = hmac.get(data) // Uint8Array
 const { hexToBytes, pbkdf2, SHA } = Universa;
 
 const derivedKey = pbkdf2(new SHA('256'), {
-  iterations: 1, // number of iterations
+  rounds: 1, // number of iterations
   keyLength: 20,  // bytes length
   password: 'password',
   salt: hexToBytes('abc123')
