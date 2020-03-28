@@ -342,14 +342,14 @@ describe('RSA', function() {
       expect(hex(signature)).to.equal(hex(seedPSS.signature));
     });
 
-    it('should sign message with PSS without params', function() {
+    it('should sign message with PSS with 256 params', function() {
       var privateKey = new PrivateKey('EXPONENTS', seedPSS);
 
-      var signature = privateKey.sign(seedPSS.message, { salt: seedPSS.salt });
+      var signature = privateKey.sign(seedPSS.message, { salt: seedPSS.salt, mgf1Hash: new SHA(256), pssHash: new SHA(256) });
 
       expect(hex(signature)).to.equal('39703c8bfbf6a54db3242769c03af7cedc4237e210aafd7802fcd34f68d9a7c57e766b59b8940196ca5ee6fbb549f5c8eb224a7e4280253b8f425c91014e05c08dacb830b4a753199b070caac0908368efa2134ec32670f48f8166e07564b5c3aa06a871772252b502f384ca96a4ae916805c255146b4b71ff7e74642f00b356');
 
-      var isCorrect = privateKey.publicKey.verify(seedPSS.message, signature, { salt: seedPSS.salt });
+      var isCorrect = privateKey.publicKey.verify(seedPSS.message, signature, { salt: seedPSS.salt, mgf1Hash: new SHA(256), pssHash: new SHA(256) });
 
       expect(isCorrect).to.equal(true);
     });

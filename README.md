@@ -502,6 +502,18 @@ const options = {
 const maxLength = publicKey.encryptionMaxLength(options);
 ```
 
+OAEP default hash
+
+```js
+publicKey.DEFAULT_OAEP_HASH // SHA1 instance
+```
+
+MGF1 default hash
+
+```js
+publicKey.DEFAULT_MGF1_HASH // SHA1 instance
+```
+
 PSS sign/verify
 
 ```js

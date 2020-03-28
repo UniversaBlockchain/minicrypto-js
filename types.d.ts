@@ -126,7 +126,7 @@ declare module 'universa-minicrypto' {
     shortAddress(): Uint8Array;
     longAddress(): Uint8Array;
     getBitStrength(): number;
-    encryptionMaxLength(options: PublicKeyEncryptOpts): number;
+    encryptionMaxLength(options?: PublicKeyEncryptOpts): number;
     pack(mode: string): Uint8Array;
     verify(
       message: Uint8Array,
@@ -138,6 +138,8 @@ declare module 'universa-minicrypto' {
 
     static unpack(packed: Uint8Array): PublicKey;
     static isValidAddress(address: Uint8Array | string): boolean;
+    static readonly DEFAULT_OAEP_HASH: SHA;
+    static readonly DEFAULT_MGF1_HASH: SHA;
   }
 
   export class Boss {

@@ -19,11 +19,11 @@ function wrapOptions(options = {}) {
   const shouldCopy = ['seed', 'salt', 'saltLength'];
   const converted = {};
 
-  const mgfHash = (options.mgf1Hash || new SHA('256'))._getForgeMD();
+  const mgfHash = (options.mgf1Hash || new SHA('1'))._getForgeMD();
 
   converted.mgf = forge.mgf.mgf1.create(mgfHash);
 
-  var wrappedMD = options.oaepHash || options.pssHash || new SHA('256');
+  var wrappedMD = options.oaepHash || options.pssHash || new SHA('1');
   if (wrappedMD._getForgeMD) wrappedMD = wrappedMD._getForgeMD();
   converted.md = wrappedMD;
 

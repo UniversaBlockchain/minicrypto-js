@@ -141,6 +141,9 @@ module.exports = class PublicKey extends AbstractKey {
   pack(type, options) { return transit[type].pack(this.key, options); }
   get packed() { return this.pack("BOSS"); }
 
+  static get DEFAULT_MGF1_HASH() { return new SHA(1); }
+  static get DEFAULT_OAEP_HASH() { return new SHA(1); }
+
   fingerprint() {
     if (this._fingerprint) return this._fingerprint;
 
