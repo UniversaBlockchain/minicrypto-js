@@ -125,6 +125,8 @@ declare module 'universa-minicrypto' {
     address(options?: AddressOpts): Uint8Array;
     shortAddress(): Uint8Array;
     longAddress(): Uint8Array;
+    getBitStrength(): number;
+    encryptionMaxLength(options: PublicKeyEncryptOpts): number;
     pack(mode: string): Uint8Array;
     verify(
       message: Uint8Array,

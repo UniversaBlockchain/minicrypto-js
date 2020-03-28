@@ -130,6 +130,14 @@ module.exports = class PublicKey extends AbstractKey {
     return byteStringToArray(this.key.encrypt(arrayToByteString(bytes), 'RSA-OAEP', wrapOptions(options)));
   }
 
+  encryptionMaxLength(options) {
+    const { md } = wrapOptions(options);
+    const keyLength = Math.ceil(this.key.n.bitLength() / 8);
+    const maxLength = keyLength - 2 * md.digestLength - 2;
+
+    return maxLength;
+  }
+
   pack(type, options) { return transit[type].pack(this.key, options); }
   get packed() { return this.pack("BOSS"); }
 

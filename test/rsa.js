@@ -103,6 +103,31 @@ describe('RSA', function() {
   });
 
   describe('Public key', function() {
+    it('should return bit strength', function(done) {
+      const options = {
+        bits: 2048,
+        e: 0x10001
+      };
+
+      rsa.createKeys(options, function(err, pair) {
+        expect(err).to.be.null;
+        expect(pair.publicKey.getBitStrength()).to.be.equal(2048);
+
+        done();
+      });
+    });
+
+    it('should return encryption max length', function() {
+      var oaepOpts = {
+        seed: seedOAEP.seed,
+        pssHash: new SHA(1),
+        mgf1Hash: new SHA(1)
+      };
+
+      var publicKey = new PublicKey('EXPONENTS', seedOAEP);
+      expect(publicKey.encryptionMaxLength(oaepOpts)).to.equal(86);
+    });
+
     it('should verify address', function() {
       const publicKey = new PublicKey('EXPONENTS', seedOAEP);
       const address = publicKey.address({ long: true });

@@ -282,6 +282,12 @@ Public key fingerprint
 publicKey.fingerprint(); // fingerprint (Uint8Array)
 ```
 
+Public key bit strength
+
+```js
+publicKey.getBitStrength(); // number
+```
+
 Public key address
 
 ```js
@@ -478,6 +484,22 @@ const encrypted = publicKey.encrypt(data, options);
 const decrypted = privateKey.decrypt(encrypted, options);
 
 encode64(data) === encode64(decrypted); // true
+```
+
+OAEP max encryption message length
+
+```js
+const privateKey; // some PrivateKey instance
+const publicKey = privateKey.publicKey;
+
+// encrypt data
+const options = {
+  seed: decode64("abcabc"), // optional, default none
+  mgf1Hash: new SHA(512), // optional, default SHA(256)
+  oaepHash: new SHA(512) // optional, default SHA(256)
+};
+
+const maxLength = publicKey.encryptionMaxLength(options);
 ```
 
 PSS sign/verify
