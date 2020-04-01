@@ -67,6 +67,8 @@ declare module 'universa-minicrypto' {
     static typeOf(key: Uint8Array): number;
   }
 
+  export type SHAStringType = "sha1" | "sha256" | "sha384" | "sha512" | "sha512/256" | "sha3_256" | "sha3_384" | "sha3_512";
+
   export interface PrivateKeyUnpackBOSS {
     bin: Uint8Array,
     password: string
@@ -78,9 +80,9 @@ declare module 'universa-minicrypto' {
   }
 
   export interface PrivateKeySignOpts {
-    pssHash?: SHA | HMAC,
-    mgf1Hash?: SHA | HMAC,
-    oaepHash?: SHA | HMAC,
+    pssHash?: SHA | HMAC | SHAStringType,
+    mgf1Hash?: SHA | HMAC | SHAStringType,
+    oaepHash?: SHA | HMAC | SHAStringType,
     salt?: string | Uint8Array,
     saltLength?: number,
     seed?: string | Uint8Array
@@ -103,9 +105,9 @@ declare module 'universa-minicrypto' {
   }
 
   export interface PublicKeyEncryptOpts {
-    pssHash?: SHA | HMAC,
-    mgf1Hash?: SHA | HMAC,
-    oaepHash?: SHA | HMAC,
+    pssHash?: SHA | HMAC | SHAStringType,
+    mgf1Hash?: SHA | HMAC | SHAStringType,
+    oaepHash?: SHA | HMAC | SHAStringType,
     salt?: string | Uint8Array,
     saltLength?: number,
     seed?: string | Uint8Array
