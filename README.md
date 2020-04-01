@@ -469,7 +469,7 @@ const decrypted = symmetricKey.etaDecrypt(encrypted); // Uint8Array
 
 OAEP encrypt/decrypt
 
-You can pass hash types with instances of with string types. Supported types for SHA:
+You can pass hash types with instances or with string types. Supported types for SHA:
 sha1
 sha256
 sha384
@@ -526,7 +526,7 @@ publicKey.DEFAULT_MGF1_HASH // SHA1 instance
 
 PSS sign/verify
 
-You can pass hash types with instances of with string types. Supported types for SHA:
+You can pass hash types with instances or with string types. Supported types for SHA:
 sha1
 sha256
 sha384
