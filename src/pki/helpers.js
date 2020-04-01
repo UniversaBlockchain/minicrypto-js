@@ -22,13 +22,20 @@ function getHash(hashType) {
 }
 
 function normalizeOptions(options = {}) {
-  const keys = ['mgf1Hash', 'oaepHash', 'pssHash'];
+  const hashesKeys = ['mgf1Hash', 'oaepHash', 'pssHash'];
+  const normalizedOptions = {};
+  const optionKeys = Object.keys(options);
+  const optionsTotal = optionKeys.length;
 
-  for (let i = 0; i < keys.length; i++) {
-    const key = keys[i];
-
-    options[key] = getHash(options[key]);
+  for (let i = 0; i < optionsTotal; i++) {
+    const optionKey = optionKeys[i];
+    if (hashesKeys.indexOf(optionKey) !== -1)
+      normalizedOptions[optionKey] = getHash(options[optionKey]);
+    else
+      normalizedOptions[optionKey] = options[optionKey];
   }
+
+  return normalizedOptions;
 }
 /**
  * Converts options to forge format
@@ -39,13 +46,13 @@ function wrapOptions(options = {}) {
   const shouldCopy = ['seed', 'salt', 'saltLength'];
   const converted = {};
 
-  normalizeOptions(options);
+  const normalizedOpts = normalizeOptions(options);
 
-  const mgfHash = (options.mgf1Hash || new SHA('1'))._getForgeMD();
+  const mgfHash = (normalizedOpts.mgf1Hash || new SHA('1'))._getForgeMD();
 
   converted.mgf = forge.mgf.mgf1.create(mgfHash);
 
-  var wrappedMD = options.oaepHash || options.pssHash || new SHA('1');
+  var wrappedMD = normalizedOpts.oaepHash || normalizedOpts.pssHash || new SHA('1');
   if (wrappedMD._getForgeMD) wrappedMD = wrappedMD._getForgeMD();
   converted.md = wrappedMD;
 

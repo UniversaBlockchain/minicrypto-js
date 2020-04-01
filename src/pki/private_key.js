@@ -89,19 +89,19 @@ module.exports = class PrivateKey extends AbstractKey {
    * @return {String} (in bytes) signature
    */
   sign(message, options = {}) {
-    normalizeOptions(options);
+    const normalizedOpts = normalizeOptions(options);
 
-    const hash = options.pssHash = options.pssHash || new SHA(256);
+    const hash = normalizedOpts.pssHash = normalizedOpts.pssHash || new SHA(256);
     hash.put(message);
 
-    if (!options.salt && !options.saltLength) {
+    if (!normalizedOpts.salt && !normalizedOpts.saltLength) {
       const digestLength = typeof hash.digestLength === "number" ?
         hash.digestLength : hash.digestLength();
 
-      options.saltLength = getMaxSalt(this.getBitStrength(), digestLength);
+      normalizedOpts.saltLength = getMaxSalt(this.getBitStrength(), digestLength);
     }
 
-    const pss = forge.pss.create(wrapOptions(options));
+    const pss = forge.pss.create(wrapOptions(normalizedOpts));
 
     return byteStringToArray(this.key.sign(hash._getForgeMD ? hash._getForgeMD() : hash, pss));
   }

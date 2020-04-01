@@ -83,18 +83,18 @@ module.exports = class PublicKey extends AbstractKey {
    * @param {Hash} [options.hash] - hash instance for PSS (SHA1 by default)
    */
   verify(message, signature, options = {}) {
-    normalizeOptions(options);
+    const normalizedOpts = normalizeOptions(options);
 
-    const hash = options.pssHash = options.pssHash || new SHA(256);
+    const hash = normalizedOpts.pssHash = normalizedOpts.pssHash || new SHA(256);
 
-    if (!options.salt && !options.saltLength) {
+    if (!normalizedOpts.salt && !normalizedOpts.saltLength) {
       const digestLength = typeof hash.digestLength === "number" ?
         hash.digestLength : hash.digestLength();
 
-      options.saltLength = getMaxSalt(this.getBitStrength(), digestLength);
+      normalizedOpts.saltLength = getMaxSalt(this.getBitStrength(), digestLength);
     }
 
-    const pss = forge.pss.create(wrapOptions(options));
+    const pss = forge.pss.create(wrapOptions(normalizedOpts));
 
     return this.key.verify(arrayToByteString(hash.get(message)), signature, pss);
   }
