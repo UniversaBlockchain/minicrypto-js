@@ -127,6 +127,27 @@ SHA.hashId = function(data) {
   return hashId;
 };
 
+SHA.StringTypes = {
+  "sha1": "1",
+  "sha256": "256",
+  "sha384": "384",
+  "sha512": "512",
+  "sha512/256": "512/256",
+  "sha3_256": "3_256",
+  "sha3_384": "3_384",
+  "sha3_512": "3_512"
+};
+
+SHA.createByStringType = function(stringType) {
+  const normalized = stringType.toLowerCase();
+  const type = SHA.StringTypes[normalized];
+
+  if (!type)
+    throw new Error("SHA type " + stringType + " is unknown");
+
+  return new SHA(type);
+};
+
 SHA.prototype = Object.create(Hash.prototype);
 
 SHA.prototype._init = function() {

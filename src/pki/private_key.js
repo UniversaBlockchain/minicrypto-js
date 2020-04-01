@@ -28,7 +28,7 @@ const {
 const { AESCTRTransformer } = cipher;
 
 const { ONE: one } = BigInteger;
-const { wrapOptions, getMaxSalt } = helpers;
+const { wrapOptions, getMaxSalt, normalizeOptions } = helpers;
 
 const { pki, rsa } = forge;
 
@@ -89,6 +89,8 @@ module.exports = class PrivateKey extends AbstractKey {
    * @return {String} (in bytes) signature
    */
   sign(message, options = {}) {
+    normalizeOptions(options);
+
     const hash = options.pssHash = options.pssHash || new SHA(256);
     hash.put(message);
 

@@ -26,7 +26,7 @@ const {
 const { pki } = forge;
 const { rsa } = pki;
 
-const { wrapOptions, getMaxSalt } = helpers;
+const { wrapOptions, getMaxSalt, normalizeOptions } = helpers;
 
 const transit = {
   PEM: {
@@ -83,6 +83,8 @@ module.exports = class PublicKey extends AbstractKey {
    * @param {Hash} [options.hash] - hash instance for PSS (SHA1 by default)
    */
   verify(message, signature, options = {}) {
+    normalizeOptions(options);
+
     const hash = options.pssHash = options.pssHash || new SHA(256);
 
     if (!options.salt && !options.saltLength) {

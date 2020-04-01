@@ -469,6 +469,16 @@ const decrypted = symmetricKey.etaDecrypt(encrypted); // Uint8Array
 
 OAEP encrypt/decrypt
 
+You can pass hash types with instances of with string types. Supported types for SHA:
+sha1
+sha256
+sha384
+sha512
+sha512
+sha3_256
+sha3_384
+sha3_512
+
 ```js
 const privateKey; // some PrivateKey instance
 const publicKey = privateKey.publicKey;
@@ -478,7 +488,7 @@ const data = decode64("abc123");
 const options = {
   seed: decode64("abcabc"), // optional, default none
   mgf1Hash: new SHA(512), // optional, default SHA(256)
-  oaepHash: new SHA(512) // optional, default SHA(256)
+  oaepHash: 'sha512' // optional, default SHA(256)
 };
 const encrypted = publicKey.encrypt(data, options);
 const decrypted = privateKey.decrypt(encrypted, options);
@@ -495,8 +505,8 @@ const publicKey = privateKey.publicKey;
 // encrypt data
 const options = {
   seed: decode64("abcabc"), // optional, default none
-  mgf1Hash: new SHA(512), // optional, default SHA(256)
-  oaepHash: new SHA(512) // optional, default SHA(256)
+  mgf1Hash: 'SHA512', // optional, default SHA(256)
+  oaepHash: 'SHA512' // optional, default SHA(256)
 };
 
 const maxLength = publicKey.encryptionMaxLength(options);
@@ -516,6 +526,16 @@ publicKey.DEFAULT_MGF1_HASH // SHA1 instance
 
 PSS sign/verify
 
+You can pass hash types with instances of with string types. Supported types for SHA:
+sha1
+sha256
+sha384
+sha512
+sha512
+sha3_256
+sha3_384
+sha3_512
+
 ```js
 const privateKey; // some PrivateKey instance
 const publicKey = privateKey.publicKey;
@@ -523,8 +543,8 @@ const publicKey = privateKey.publicKey;
 const options = {
   salt: decode64("abcabc"), // optional
   saltLength: null, // optional, numeric
-  mgf1Hash: new SHA(512), // optional, default SHA(256)
-  pssHash: new SHA(512) // optional, default SHA(256)
+  mgf1Hash: 'sha512', // optional, default SHA(256)
+  pssHash: 'sha512' // optional, default SHA(256)
 };
 
 const message = 'abc123';

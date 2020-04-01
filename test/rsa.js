@@ -128,6 +128,17 @@ describe('RSA', function() {
       expect(publicKey.encryptionMaxLength(oaepOpts)).to.equal(86);
     });
 
+    it('should return encryption max length with string opts', function() {
+      var oaepOpts = {
+        seed: seedOAEP.seed,
+        pssHash: 'sha1',
+        mgf1Hash: 'SHA1'
+      };
+
+      var publicKey = new PublicKey('EXPONENTS', seedOAEP);
+      expect(publicKey.encryptionMaxLength(oaepOpts)).to.equal(86);
+    });
+
     it('should verify address', function() {
       const publicKey = new PublicKey('EXPONENTS', seedOAEP);
       const address = publicKey.address({ long: true });
@@ -154,6 +165,19 @@ describe('RSA', function() {
       expect(hex(encrypted)).to.equal(hex(seedOAEP.encryptedMessage));
     });
 
+    it('should encrypt data with OAEP and MGF1 with string opts', function() {
+      // To make test repeatable
+      var oaepOpts = {
+        seed: seedOAEP.seed,
+        pssHash: 'SHA1',
+        mgf1Hash: 'sha1'
+      };
+      var publicKey = new PublicKey('EXPONENTS', seedOAEP);
+      var encrypted = publicKey.encrypt(seedOAEP.originalMessage, oaepOpts);
+
+      expect(hex(encrypted)).to.equal(hex(seedOAEP.encryptedMessage));
+    });
+
     it('should calculate fingerprint', function() {
       const base64Encoded = seedKeys[1];
       const key = new PrivateKey('BOSS', decode64(base64Encoded));
@@ -169,6 +193,19 @@ describe('RSA', function() {
         salt: seedPSS.salt,
         pssHash: new SHA(1),
         mgf1Hash: new SHA(1)
+      };
+
+      var isCorrect = publicKey.verify(seedPSS.message, seedPSS.signature, pssOpts);
+
+      expect(isCorrect).to.be.true;
+    });
+
+    it('should verify message PSS signature with string opts', function() {
+      var publicKey = new PublicKey('EXPONENTS', seedPSS);
+      var pssOpts = {
+        salt: seedPSS.salt,
+        pssHash: 'SHA1',
+        mgf1Hash: 'sha1'
       };
 
       var isCorrect = publicKey.verify(seedPSS.message, seedPSS.signature, pssOpts);
