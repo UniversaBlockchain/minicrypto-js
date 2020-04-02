@@ -184,7 +184,7 @@ const { SHA } = Universa;
 // sha3 identifiers: "3_256", "3_384", "3_512"
 const sha256 = new SHA(256);
 
-const resultBytes = sha256.get(textToBytes('somevalue')); // Uint8Array
+const resultBytes = await sha256.get(textToBytes('somevalue')); // Uint8Array
 ```
 
 Get hash value for large data
@@ -198,7 +198,7 @@ sha512.put(dataPart2);
 // .....
 sha512.put(dataPartFinal);
 
-const resultBytes = sha512.get(); // Uint8Array
+const resultBytes = await sha512.get(); // Uint8Array
 ```
 
 Get hash value in HEX
@@ -206,7 +206,7 @@ Get hash value in HEX
 ```js
 const { SHA } = Universa;
 const sha256 = new SHA(256);
-const hexResult = sha256.get(textToBytes("one two three"), 'hex'); // String
+const hexResult = await sha256.get(textToBytes("one two three"), 'hex'); // String
 ```
 
 ### HMAC

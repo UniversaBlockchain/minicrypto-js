@@ -2,6 +2,8 @@ var Universa = Universa || require('../index');
 var chai = chai || require('chai');
 var expect = chai.expect;
 
+var Module = Module || require('../src/vendor/wasm/wrapper');
+
 describe('Tools', function() {
   const {
     crc32,
@@ -15,6 +17,10 @@ describe('Tools', function() {
     textToBytes,
     bytesToText
   } = Universa;
+
+  before((done) => {
+    Module.onRuntimeInitialized = () => done();
+  });
 
   const { randomByteString } = Universa.bytes;
 
@@ -35,11 +41,11 @@ describe('Tools', function() {
     expect(sample).to.equal(converted2);
   });
 
-  it('should calculate hashId', function() {
+  it('should calculate hashId', async () => {
     const data = decode64('gvyrDZKjMVPIhManWZaKNMQIgSb6jpUles+5LvB8EVwRlqk5BACZN1J9L59ZOz1a+cEOt0vjOYoww7M5EjyurHgVc3ht7ras4Iocej2FnoSeGlx1sWe/NdpfXZtDSCKLRlRmIS2bjUbURDk=');
     const result = decode64('DdNQDJ5NBT8JKi1TEm+ZxTgFmW8Yh1YD0sWxqCqOjAw4vAzDDImHMJcpOeqijjRPr72mdXugR55Fyl8TCIjI7+FP+wsbf/eewiTHPW6B/kUTJ8JwgrR/BGUlaUwiHv7n');
 
-    expect(hex(hashId(data))).eql(hex(result));
+    expect(hex(await hashId(data))).eql(hex(result));
   });
 
   it('should calc b64 from array', function() {

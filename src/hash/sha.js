@@ -1,155 +1,73 @@
-const forge = require('../vendor/forge');
-const gost = require('../vendor/gost');
-const sha3 = require('../vendor/sha3');
-const sha512 = require('../vendor/sha512');
+var Module = Module || require('../vendor/wasm/wrapper');
 
-const Hash = require('./hash');
+const { bytesToHex } = require('../utils/bytes');
 
-const {
-  byteStringToArray,
-  arrayToByteString,
-  hexToBytes
-} = require('../utils/bytes');
+const StringTypes = {
+  "sha1": 0,
+  "sha256": 1,
+  "sha512": 2,
+  "sha3_256": 3,
+  "sha3_384": 4,
+  "sha3_512": 5
+};
+
+class SHA {
+  constructor(hashType) {
+    this.hash = new Module.DigestImpl(StringTypes[`sha${hashType}`] || hashType);
+    this.empty = true;
+  }
+
+  delete() {
+    this.hash.delete();
+  }
+
+  update(data) {
+    this.empty = false;
+    this.hash.update(data);
+  }
+
+  put(data) {
+    this.update(data);
+  }
+
+  doFinal() {
+    this.hash.doFinal();
+  }
+
+  getDigestSize() {
+    return this.hash.getDigestSize();
+  }
+
+  async getDigest(encoding) {
+    const self = this;
+
+    return new Promise((resolve, reject) => {
+      self.hash.getDigest(res => {
+        const bytes = new Uint8Array(res);
+
+        if (encoding === 'hex') resolve(bytesToHex(bytes));
+        else resolve(bytes);
+      });
+    });
+  }
+
+  async get(data, encoding) {
+    if (typeof data !== 'string' || this.empty) this.update(data);
+    else encoding = data;
+
+    // if (data) this.update(data);
+
+    this.doFinal();
+    return this.getDigest(encoding);
+  }
+
+  static hashId(data) {
+    return new Promise(resolve => {
+      Module.calcHashId(data, res => resolve(new Uint8Array(res)));
+    });
+  }
+}
+
+SHA.StringTypes = StringTypes;
 
 module.exports = SHA;
-
-const extra = {
-  '512/256': {
-    digestLength: 32,
-    md: sha512.sha512_256
-  },
-  '3_256': {
-    digestLength: 32,
-    md: sha3.sha3_256
-  },
-  '3_384': {
-    digestLength: 48,
-    md: sha3.sha3_384
-  },
-  '3_512': {
-    digestLength: 64,
-    md: sha3.sha3_512
-  },
-  'KECCAK': {
-    digestLength: 0,
-    md: sha3.keccak256
-  }
-};
-
-function arrayToBytes(list, offset = 10000) {
-  const { raw } = forge.util.binary;
-  const total = list.length;
-  var cursor = 0;
-
-  if (offset > total) return raw.encode(list);
-
-  var result = '';
-
-  for(cursor = 0; cursor < total; cursor += offset) {
-    var start = cursor;
-    var end = start + offset;
-    if (end > total) end = total;
-
-    result += raw.encode(list.subarray(start, end));
-  }
-
-  return result;
-}
-
-/**
- * Creates SHA type of hash function
- *
- * @param {String} type - type of SHA ('1', '256', '512' is supported)
- */
-function SHA(type) {
-  const { raw } = forge.util.binary;
-
-	if (type === 'GOST') {
-  	var cipher = new gost({ name: 'GOST R 34.11', version: 2012 });
-
-  	return {
-  		get: function(data, format) {
-  			return Buffer.from(cipher.digest(data));
-  		}
-  	}
-  }
-
-  if (extra[type]) {
-  	var instance = extra[type].md.create();
-  	var empty = true;
-
-  	return {
-  		get: function(data, format) {
-  			if (empty) instance.update(data);
-  			else format = data;
-
-  			var hexValue = instance.hex();
-
-        if (format === 'hex') return hexValue;
-
-        return raw.decode(forge.util.hexToBytes(hexValue));
-  		},
-  		put: function(data) {
-  			empty = false;
-  			instance.update(data);
-  		},
-      start: function() { instance = extra[type].md.create(); },
-      update: function(data) {
-        empty = false;
-        instance.update(byteStringToArray(data));
-      },
-      digest: function() {
-        const result = arrayToByteString(hexToBytes(instance.hex()));
-        const buffer = new forge.util.ByteStringBuffer(result);
-
-        return buffer;
-      },
-      digestLength: extra[type].digestLength
-  	};
-  }
-
-  Hash.call(this, type);
-}
-
-SHA.hashId = function(data) {
-  const gost = new SHA('GOST');
-  const sha3_256 = new SHA('3_256');
-  const sha512_256 = new SHA('512/256');
-
-  var part1 = sha512_256.get(data);
-  var part2 = sha3_256.get(data);
-  var part3 = gost.get(data);
-  var hashId = new Uint8Array(part1.length + part2.length + part3.length);
-  hashId.set(part1, 0);
-  hashId.set(part2, part1.length);
-  hashId.set(part3, part1.length + part2.length);
-
-  return hashId;
-};
-
-SHA.StringTypes = {
-  "sha1": "1",
-  "sha256": "256",
-  "sha384": "384",
-  "sha512": "512",
-  "sha512/256": "512/256",
-  "sha3_256": "3_256",
-  "sha3_384": "3_384",
-  "sha3_512": "3_512"
-};
-
-SHA.createByStringType = function(stringType) {
-  const normalized = stringType.toLowerCase();
-  const type = SHA.StringTypes[normalized];
-
-  if (!type)
-    throw new Error("SHA type " + stringType + " is unknown");
-
-  return new SHA(type);
-};
-
-SHA.prototype = Object.create(Hash.prototype);
-
-SHA.prototype._init = function() {
-  this.forgeMD = forge.md['sha' + this.type].create();
-};

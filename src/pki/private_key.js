@@ -1,3 +1,5 @@
+var Module = Module || require('../vendor/wasm/wrapper');
+
 const Boss = require('../boss/protocol');
 const utils = require('../utils');
 const forge = require('../vendor/forge');
@@ -33,197 +35,218 @@ const { wrapOptions, getMaxSalt, normalizeOptions } = helpers;
 const { pki, rsa } = forge;
 
 const transit = {
-  PEM: {
-    pack: toPEM,
-    unpack: fromPEM
-  },
-
   BOSS: {
     pack: toBOSS,
     unpack: fromBOSS
   },
 
-  FORGE: {
-    pack: toForge,
-    unpack: fromForge
-  },
-
   EXPONENTS: {
     pack: toExponents,
     unpack: fromExponents
-  },
-
-  FILE: {
-    pack: toFile
   }
 };
 
 module.exports = class PrivateKey extends AbstractKey {
-  /**
-   * Creates an RSA private key from specific format
-   *
-   * @param {Object} type - input format (PEM, BOSS, FORGE, EXPONENTS)
-   * @param {String} options - format specific options
-   *
-   * @return the private key.
-   */
-  constructor(type, options) {
+  constructor(encodingType, options) {
     super();
 
-    const key = this.key = transit[type].unpack(options);
-    const { n, e, d, p, q, dP, dQ, qInv } = key;
+    const key = this.key = transit[encodingType].unpack(options);
 
-    this.publicKey = new PublicKey('EXPONENTS', { n, e });
-    this.params = { n, e, d, p, q, dP, dQ, qInv };
+    this.publicKey = new PublicKey("KEY", key);
   }
 
-  /**
-   * Creates PSS signature for hashed message
-   *
-   * @param {Hash} hash - instance of hash that contains message
-   * @param {Number} [options.saltLength] - length of salt if salt wasn't provided
-   * @param {String} [options.salt] - salt (in bytes)
-   * @param {Hash} [options.mgf1Hash] - hash instance for MGF (SHA1 by default)
-   * @param {Hash} [options.pssHash] - hash instance for PSS (SHA1 by default)
-   *
-   * @return {String} (in bytes) signature
-   */
-  sign(message, options = {}) {
-    const normalizedOpts = normalizeOptions(options);
-
-    const hash = normalizedOpts.pssHash = normalizedOpts.pssHash || new SHA(256);
-    hash.put(message);
-
-    if (!normalizedOpts.salt && !normalizedOpts.saltLength) {
-      const digestLength = typeof hash.digestLength === "number" ?
-        hash.digestLength : hash.digestLength();
-
-      normalizedOpts.saltLength = getMaxSalt(this.getBitStrength(), digestLength);
-    }
-
-    const pss = forge.pss.create(wrapOptions(normalizedOpts));
-
-    return byteStringToArray(this.key.sign(hash._getForgeMD ? hash._getForgeMD() : hash, pss));
+  delete() {
+    this.key.delete();
   }
 
-  signExtended(data) {
+  async sign(data, options) {
     const self = this;
-    const pub = this.publicKey;
-    const boss = new Boss();
-    const dataHash = new SHA('512');
+    const hashType = SHA.StringTypes[options.pssHash || 'sha256'];
 
-    const targetSignature = boss.dump({
-      'key': pub.fingerprint(),
-      'sha512': dataHash.get(data),
-      'created_at': new Date(),
-      'pub_key': pub.pack('BOSS')
-    });
-
-    return boss.dump({
-      'exts': targetSignature,
-      'sign': self.sign(targetSignature, {
-        pssHash: new SHA(512),
-        mgf1Hash: new SHA(1)
-      })
+    return new Promise(resolve => {
+      this.key.sign(data, hashType, (res) => {
+        resolve(new Uint8Array(res));
+      });
     });
   }
 
-  getBitStrength() { return this.key.n.bitLength(); }
+  async decrypt(data) {
+    const self = this;
 
-  /**
-   * Decrypts OAEP encoded data
-   *
-   * @param {String} bytes - (in bytes) encrypted data
-   * @param {Hash} [options.mgf1] - hash instance for MGF (SHA1 by default)
-   * @param {Hash} [options.hash] - hash instance for OAEP (SHA1 by default)
-   */
-  decrypt(bytes, options) {
-    return byteStringToArray(this.key.decrypt(bytes, 'RSA-OAEP', wrapOptions(options)));
-  }
-
-  pack(type, options) {
-    return transit[type].pack(this, options);
-  }
-
-  static fromFile(file, callback) {
-    if (!file) return callback(new Error('No file provided'));
-
-    const reader = new FileReader();
-    reader.onload = e => callback(null, new PrivateKey('BOSS', e.target.result));
-    reader.readAsBinaryString(file);
-  }
-
-  static unpack(bytes, password) {
-    if (!password) return new PrivateKey("BOSS", bytes);
-
-    return new PrivateKey("BOSS", { bin: bytes, password });
+    return new Promise(resolve => {
+      self.key.decrypt(data, (res) => {
+        resolve(new Uint8Array(res));
+      });
+    });
   }
 }
 
-/**
- * Decrypts password-protected key
- *
- * @param {String} options.password - password for decrypt
- * @param {Uint8Array} options.encodedBinary - encoded key binary
- */
-function fromPassword(options) {
-  const { encodedBinary, password } = options;
+// module.exports = class PrivateKey extends AbstractKey {
+//   /**
+//    * Creates an RSA private key from specific format
+//    *
+//    * @param {Object} type - input format (PEM, BOSS, FORGE, EXPONENTS)
+//    * @param {String} options - format specific options
+//    *
+//    * @return the private key.
+//    */
+//   constructor(type, options) {
+//     super();
+
+//     const key = this.key = transit[type].unpack(options);
+//     const { n, e, d, p, q, dP, dQ, qInv } = key;
+
+//     this.publicKey = new PublicKey('EXPONENTS', { n, e });
+//     this.params = { n, e, d, p, q, dP, dQ, qInv };
+//   }
+
+//   /**
+//    * Creates PSS signature for hashed message
+//    *
+//    * @param {Hash} hash - instance of hash that contains message
+//    * @param {Number} [options.saltLength] - length of salt if salt wasn't provided
+//    * @param {String} [options.salt] - salt (in bytes)
+//    * @param {Hash} [options.mgf1Hash] - hash instance for MGF (SHA1 by default)
+//    * @param {Hash} [options.pssHash] - hash instance for PSS (SHA1 by default)
+//    *
+//    * @return {String} (in bytes) signature
+//    */
+//   sign(message, options = {}) {
+//     const normalizedOpts = normalizeOptions(options);
+
+//     const hash = normalizedOpts.pssHash = normalizedOpts.pssHash || new SHA(256);
+//     hash.put(message);
+
+//     if (!normalizedOpts.salt && !normalizedOpts.saltLength) {
+//       const digestLength = typeof hash.digestLength === "number" ?
+//         hash.digestLength : hash.digestLength();
+
+//       normalizedOpts.saltLength = getMaxSalt(this.getBitStrength(), digestLength);
+//     }
+
+//     const pss = forge.pss.create(wrapOptions(normalizedOpts));
+
+//     return byteStringToArray(this.key.sign(hash._getForgeMD ? hash._getForgeMD() : hash, pss));
+//   }
+
+//   signExtended(data) {
+//     const self = this;
+//     const pub = this.publicKey;
+//     const boss = new Boss();
+//     const dataHash = new SHA('512');
+
+//     const targetSignature = boss.dump({
+//       'key': pub.fingerprint(),
+//       'sha512': dataHash.get(data),
+//       'created_at': new Date(),
+//       'pub_key': pub.pack('BOSS')
+//     });
+
+//     return boss.dump({
+//       'exts': targetSignature,
+//       'sign': self.sign(targetSignature, {
+//         pssHash: new SHA(512),
+//         mgf1Hash: new SHA(1)
+//       })
+//     });
+//   }
+
+//   getBitStrength() { return this.key.n.bitLength(); }
+
+//   /**
+//    * Decrypts OAEP encoded data
+//    *
+//    * @param {String} bytes - (in bytes) encrypted data
+//    * @param {Hash} [options.mgf1] - hash instance for MGF (SHA1 by default)
+//    * @param {Hash} [options.hash] - hash instance for OAEP (SHA1 by default)
+//    */
+//   decrypt(bytes, options) {
+//     return byteStringToArray(this.key.decrypt(bytes, 'RSA-OAEP', wrapOptions(options)));
+//   }
+
+//   pack(type, options) {
+//     return transit[type].pack(this, options);
+//   }
+
+//   static fromFile(file, callback) {
+//     if (!file) return callback(new Error('No file provided'));
+
+//     const reader = new FileReader();
+//     reader.onload = e => callback(null, new PrivateKey('BOSS', e.target.result));
+//     reader.readAsBinaryString(file);
+//   }
+
+//   static unpack(bytes, password) {
+//     if (!password) return new PrivateKey("BOSS", bytes);
+
+//     return new PrivateKey("BOSS", { bin: bytes, password });
+//   }
+// }
+
+// /**
+//  * Decrypts password-protected key
+//  *
+//  * @param {String} options.password - password for decrypt
+//  * @param {Uint8Array} options.encodedBinary - encoded key binary
+//  */
+// function fromPassword(options) {
+//   const { encodedBinary, password } = options;
 
 
-}
+// }
 
-function toPassword(instance, password) {
-  const packed = toBOSS(instance);
+// function toPassword(instance, password) {
+//   const packed = toBOSS(instance);
 
 
-}
+// }
 
-/**
- * Converts PEM-formatted key protected via password to an instance
- *
- * @param {String} options.pem - pem formatted key
- * @param {String} options.password - password for a key
- */
-function fromPEM(options) {
-  const { pem, password } = options;
+// /**
+//  * Converts PEM-formatted key protected via password to an instance
+//  *
+//  * @param {String} options.pem - pem formatted key
+//  * @param {String} options.password - password for a key
+//  */
+// function fromPEM(options) {
+//   const { pem, password } = options;
 
-  if (typeof password !== 'string') return pki.privateKeyFromPem(pem);
+//   if (typeof password !== 'string') return pki.privateKeyFromPem(pem);
 
-  return pki.decryptRsaPrivateKey(pem, password);
-}
+//   return pki.decryptRsaPrivateKey(pem, password);
+// }
 
-/**
- * Converts an RSA private key to PEM format.
- *
- * @return the PEM-foramatted public key.
- */
-function toPEM(instance, password) {
-  const { key } = instance;
+// /**
+//  * Converts an RSA private key to PEM format.
+//  *
+//  * @return the PEM-foramatted public key.
+//  */
+// function toPEM(instance, password) {
+//   const { key } = instance;
 
-  if (typeof password !== 'string') return pki.privateKeyToPem(key);
+//   if (typeof password !== 'string') return pki.privateKeyToPem(key);
 
-  return pki.encryptRsaPrivateKey(key, password);
-}
+//   return pki.encryptRsaPrivateKey(key, password);
+// }
 
-function fromForge(key) {
-  return key;
-}
+// function fromForge(key) {
+//   return key;
+// }
 
-function toForge(instance) {
-  const { key } = instance;
+// function toForge(instance) {
+//   const { key } = instance;
 
-  return key;
-}
+//   return key;
+// }
 
-function toFile(instance) {
-  const bossEncoded = toBOSS(instance);
+// function toFile(instance) {
+//   const bossEncoded = toBOSS(instance);
 
-  if (typeof Blob === 'undefined') return bossEncoded;
+//   if (typeof Blob === 'undefined') return bossEncoded;
 
-  const bytes = byteStringToArray(bossEncoded);
+//   const bytes = byteStringToArray(bossEncoded);
 
-  return new Blob([bytes], { type: 'application/octet-stream' });
-}
+//   return new Blob([bytes], { type: 'application/octet-stream' });
+// }
 
 function toBOSS(instance, options) {
   if (options) return toBOSSPassword(instance, options);
@@ -241,91 +264,84 @@ function toBOSS(instance, options) {
   ]);
 }
 
-function toBOSSPassword(instance, options) {
-  var password = options;
-  var rounds = 160000;
+// function toBOSSPassword(instance, options) {
+//   var password = options;
+//   var rounds = 160000;
 
-  if (typeof options === "object" && options) {
-    password = options.password;
-    rounds = options.rounds || rounds;
-  }
+//   if (typeof options === "object" && options) {
+//     password = options.password;
+//     rounds = options.rounds || rounds;
+//   }
 
-  const boss = new Boss();
-  const packedKey = toBOSS(instance);
+//   const boss = new Boss();
+//   const packedKey = toBOSS(instance);
 
-  const keyInfo = new KeyInfo({
-    algorithm: KeyInfo.Algorithm.AES256,
-    prf: KeyInfo.PRF.HMAC_SHA256,
-    rounds,
-    salt: randomBytes(12),
-    tag: null
-  });
+//   const keyInfo = new KeyInfo({
+//     algorithm: KeyInfo.Algorithm.AES256,
+//     prf: KeyInfo.PRF.HMAC_SHA256,
+//     rounds,
+//     salt: randomBytes(12),
+//     tag: null
+//   });
 
-  const keyBytes = keyInfo.derivePassword(password);
-  const key = new SymmetricKey({ keyBytes, keyInfo });
+//   const keyBytes = keyInfo.derivePassword(password);
+//   const key = new SymmetricKey({ keyBytes, keyInfo });
 
-  return boss.dump([
-    AbstractKey.TYPE_PRIVATE_PASSWORD_V2,
-    keyInfo.pack(),
-    key.etaEncrypt(packedKey)
-  ]);
-}
+//   return boss.dump([
+//     AbstractKey.TYPE_PRIVATE_PASSWORD_V2,
+//     keyInfo.pack(),
+//     key.etaEncrypt(packedKey)
+//   ]);
+// }
 
 function fromBOSS(dump) {
   if (dump.password) return fromBOSSPassword(dump);
-
-  const boss = new Boss();
-  const parts = boss.load(dump);
-
-  if (parts[0] !== AbstractKey.TYPE_PRIVATE)
-    throw new Error('Failed to read key');
-
-  return fromExponents({
-    e: byteArrayToBigInt(parts[1]),
-    p: byteArrayToBigInt(parts[2]),
-    q: byteArrayToBigInt(parts[3])
-  });
+  // Module.onRuntimeInitialized = () => {
+  //   console.log(Module.PrivateKeyImpl);
+  //   return new Module.PrivateKeyImpl(dump);
+  // };
+  return new Module.PrivateKeyImpl(dump);
 }
 
-function fromBOSSPassword(options) {
-  const { bin, password } = options;
-  const boss = new Boss();
-  const parts = boss.load(bin);
+// function fromBOSSPassword(options) {
+//   const { bin, password } = options;
+//   const boss = new Boss();
+//   const parts = boss.load(bin);
 
-  if (parts[0] == AbstractKey.TYPE_PRIVATE_PASSWORD_V2)
-    return fromBOSSPasswordV2(options);
+//   if (parts[0] == AbstractKey.TYPE_PRIVATE_PASSWORD_V2)
+//     return fromBOSSPasswordV2(options);
 
-  const keyBytes = pbkdf2(new SHA(256), {
-    "password": password,
-    "salt": parts[2],
-    "iterations": parts[1],
-    "keyLength": 32
-  });
+//   const keyBytes = pbkdf2(new SHA(256), {
+//     "password": password,
+//     "salt": parts[2],
+//     "iterations": parts[1],
+//     "keyLength": 32
+//   });
 
-  const encrypted = parts[4];
+//   const encrypted = parts[4];
 
-  // decrypt symmetric
-  const iv = encrypted.slice(0, 16);
-  const transformed = encrypted.slice(16, encrypted.length);
-  const transformer = new AESCTRTransformer(keyBytes, iv);
-  const packed = transformer.transform(transformed);
+//   // decrypt symmetric
+//   const iv = encrypted.slice(0, 16);
+//   const transformed = encrypted.slice(16, encrypted.length);
+//   const transformer = new AESCTRTransformer(keyBytes, iv);
+//   const packed = transformer.transform(transformed);
 
-  return fromBOSS(packed);
-}
+//   return fromBOSS(packed);
+// }
 
-function fromBOSSPasswordV2(options) {
-  const { bin, password } = options;
-  const boss = new Boss();
-  const parts = boss.load(bin);
+// function fromBOSSPasswordV2(options) {
+//   const { bin, password } = options;
+//   const boss = new Boss();
+//   const parts = boss.load(bin);
 
-  const keyInfo = KeyInfo.fromBOSS(parts[1]);
-  const keyBytes = keyInfo.derivePassword(password);
-  const key = new SymmetricKey({ keyBytes, keyInfo });
+//   const keyInfo = KeyInfo.fromBOSS(parts[1]);
+//   const keyBytes = keyInfo.derivePassword(password);
+//   const key = new SymmetricKey({ keyBytes, keyInfo });
 
-  const packed = key.etaDecrypt(parts[2]);
+//   const packed = key.etaDecrypt(parts[2]);
 
-  return fromBOSS(packed);
-}
+//   return fromBOSS(packed);
+// }
 
 /**
  * Restores private key exponents from e, p, q

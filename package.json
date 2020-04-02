@@ -31,7 +31,6 @@
     "webpack-merge": "^4.2.2"
   },
   "dependencies": {
-    "buffer": "^5.4.2",
-    "node-forge": "^0.8.5"
+    "buffer": "^5.4.2"
   }
 }

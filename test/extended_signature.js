@@ -2,6 +2,8 @@ var Universa = Universa || require('../index');
 var chai = chai || require('chai');
 var expect = chai.expect;
 
+var Module = Module || require('../src/vendor/wasm/wrapper');
+
 describe('Extended signature', function() {
   Universa.seed = Universa.seed || {};
   var seedKeys = Universa.seed.keys || require('./seed/keys');
@@ -9,6 +11,10 @@ describe('Extended signature', function() {
   const { PrivateKey, ExtendedSignature } = Universa;
   const { bytesToHex: hex, decode64, hexToBytes, textToHex } = Universa;
   const { keyId, extractKeyId, extractPublicKey } = ExtendedSignature;
+
+  before((done) => {
+    Module.onRuntimeInitialized = () => done();
+  });
 
   it('should get key id', function() {
     const key = new PrivateKey('BOSS', decode64(seedKeys[1]));
