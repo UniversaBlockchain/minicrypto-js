@@ -44,7 +44,17 @@ exports.arrayToByteString = function(list, offset = 10000) {
 };
 
 exports.textToHex = textToHex;
-exports.textToBytes = (text) => hexToBytes(textToHex(text));
+
+exports.textToBytes = (text) => {
+  const escapedString = encodeURIComponent(text);
+  const binString = escapedString.replace(/%([0-9A-F]{2})/g,
+    (match, p1) => String.fromCharCode('0x' + p1)
+  );
+  const ua = new Uint8Array(binString.length);
+  Array.prototype.forEach.call(binString, (ch, i) => ua[i] = ch.charCodeAt(0));
+
+  return ua;
+};
 exports.bytesToText = (bytes) => Buffer.from(bytes).toString('utf-8');
 exports.ensureBytes = (bytes) => {
   return bytes.constructor.name == 'Array' ? new Uint8Array(bytes) : bytes;
