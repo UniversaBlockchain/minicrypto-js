@@ -7,6 +7,13 @@ const { arrayToByteString } = utils;
 exports.wrapOptions = wrapOptions;
 exports.getMaxSalt = getMaxSalt;
 exports.normalizeOptions = normalizeOptions;
+exports.mapCall = (fn, context, ...args) => {
+  let res;
+
+  fn.apply(context, args.concat([result => res = result]));
+
+  return res;
+}
 
 function getMaxSalt(emBits, hLen) {
 	return parseInt((emBits + 7) / 8) - hLen - 2;

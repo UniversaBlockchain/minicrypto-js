@@ -48,28 +48,28 @@ class SignedRecord {
    * @param nonce   optional nonce, usually sent by remote party to avoid repeat ciphertext attack
    * @return
    */
-  static packWithKey(key, payload, nonce = null) {
+  static async packWithKey(key, payload, nonce = null) {
     const boss = new Boss();
-    const pub = key.publicKey.packed;
+    const pub = await key.publicKey.packed();
     const data = boss.dump([nonce, payload]);
+    const signature = await key.sign(data, defaultPSSConfig());
 
     return boss.dump([
       SignedRecord.RECORD_WITH_KEY,
       pub,
-      key.sign(data, defaultPSSConfig()),
+      signature,
       data
     ]);
   }
 
-  static unpack(packed) {
+  static async unpack(packed) {
     const boss = new Boss();
-
     const outer = boss.load(packed);
     const recordType = outer[0];
     if (recordType !== SignedRecord.RECORD_WITH_KEY)
       throw new SignedRecordFormatException(`not supported type ${recordType}`);
 
-    const key = PublicKey.unpack(outer[1]);
+    const key = await PublicKey.unpack(outer[1]);
     const signature = outer[2];
     const innerPacked = outer[3];
     const inner = boss.load(innerPacked);

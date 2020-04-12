@@ -16,22 +16,27 @@ describe('Extended signature', function() {
     Module.onRuntimeInitialized = () => done();
   });
 
-  it('should get key id', function() {
-    const key = new PrivateKey('BOSS', decode64(seedKeys[1]));
-    const id = keyId(key);
+  it('should get key id', async () => {
+    const key = await PrivateKey.unpack(decode64(seedKeys[1]));
+    const id = await keyId(key);
 
     expect(hex(id)).to.equal('074118648ed82a64b9a9ff6a9cb7bcd64cf5367e290e1c80c333a08107c1f82663');
   });
 
-  it('should sign and verify data', function() {
+  it.only('should sign and verify data', async () => {
     const data = hexToBytes(textToHex('Hello world'));
-    const key = new PrivateKey('BOSS', decode64(seedKeys[3]));
-    const id = keyId(key);
+    const key = await PrivateKey.unpack(decode64(seedKeys[3]));
+    const id = await keyId(key);
     const pubKey = key.publicKey;
-    const signature = key.signExtended(data);
+    console.log("test signature");
 
-    const es = pubKey.verifyExtended(signature, data);
+    const sign = await key.sign(data);
+    console.log("done sign");
+    const signature = await key.signExtended(data);
 
+    console.log("......");
+    const es = await pubKey.verifyExtended(signature, data);
+    console.log("................");
     expect(es).to.be.ok;
     expect(hex(es.key)).to.equal(hex(id));
     expect(hex(extractKeyId(signature))).to.equal(hex(keyId(pubKey)));

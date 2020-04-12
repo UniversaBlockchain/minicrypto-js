@@ -28,26 +28,16 @@ const {
 const { pki } = forge;
 const { rsa } = pki;
 
-const { wrapOptions, getMaxSalt, normalizeOptions } = helpers;
+const { wrapOptions, getMaxSalt, normalizeOptions, mapCall } = helpers;
 
 const transit = {
   KEY: {
     unpack: fromKey
   },
 
-  PEM: {
-    pack: toPEM,
-    unpack: fromPEM
-  },
-
   BOSS: {
     pack: toBOSS,
     unpack: fromBOSS
-  },
-
-  FORGE: {
-    pack: toForge,
-    unpack: fromForge
   },
 
   EXPONENTS: {
@@ -57,33 +47,132 @@ const transit = {
 };
 
 module.exports = class PublicKey extends AbstractKey {
-  constructor(encodingType, options) {
+  constructor(key) {
     super();
 
-    const key = this.key = transit[encodingType].unpack(options);
+    this.key = key;
   }
 
-  delete() {
-    this.key.delete();
-  }
+  delete() { this.key.delete(); }
 
   async verify(data, signature, options) {
     const self = this;
-    const hashType = SHA.StringTypes[options.pssHash || 'sha256'];
+    const hashType = SHA.wasmType(options.pssHash || 'sha1');
+    const mgf1Type = SHA.wasmType(options.mgf1Hash || 'sha1');
+    let saltLength = -1;
+    if (typeof options.saltLength === 'number') saltLength = options.saltLength;
+    if (options.salt) saltLength = options.salt.length;
+
 
     return new Promise(resolve => {
-      self.key.verify(data, signature, hashType, resolve);
+      self.key.verify(data, signature, hashType, mgf1Type, saltLength, resolve);
     });
   }
 
-  async encrypt(data) {
+  async verifyExtended(signature, data) {
+    const boss = new Boss();
+    const dataHash = new SHA('512');
+    console.log("run verify", signature);
+    const unpacked = boss.load(signature);
+    const { exts, sign } = unpacked;
+    const verified = await this.verify(exts, sign, {
+      pssHash: 'sha512'
+    });
+
+    console.log("done verify");
+
+    if (!verified) return null;
+
+    const targetSignature = boss.load(exts);
+    const { sha512, key, created_at } = targetSignature;
+
+    if (encode64(await dataHash.get(data)) === encode64(sha512))
+      return { key, created_at };
+
+    return null;
+  }
+
+  async encrypt(data, options = {}) {
+    const { oaepHash, seed } = options;
+    const self = this;
+    const hashType = SHA.wasmType(oaepHash || 'sha1');
+
+    return new Promise(resolve => {
+      const cb = res => resolve(new Uint8Array(res));
+
+      if (seed) self.key.encryptWithSeed(data, hashType, seed, cb);
+      else self.key.encrypt(data, hashType, cb);
+    });
+  }
+
+  async fingerprint() {
     const self = this;
 
     return new Promise(resolve => {
-      self.key.encrypt(data, (res) => {
-        resolve(new Uint8Array(res));
+      if (self._fingerprint) return resolve(self._fingerprint);
+
+      self.key.fingerprint(fp => {
+        self._fingerprint = fp;
+        resolve(fp);
       });
     });
+  }
+
+  async packed() {
+    const self = this;
+
+    if (this._packed) return this._packed;
+
+    this._packed = await this.pack();
+
+    return this._packed;
+  }
+
+  async pack() {
+    const self = this;
+
+    return new Promise(resolve => {
+      self.key.pack(packed => resolve(new Uint8Array(packed)));
+    });
+  }
+
+  encryptionMaxLength(options) {
+    const mdHashType = options.pssHash || options.oaepHash || 'sha1';
+    const md = new SHA(SHA.StringTypes[mdHashType]);
+    const keyLength = this.getBitStrength() / 8;
+    const maxLength = keyLength - 2 * md.getDigestSize() - 2;
+
+    return maxLength;
+  }
+
+  getN() { return this.key.get_n(); }
+  getE() { return this.key.get_e(); }
+  getBitStrength() { return this.key.getBitStrength(); }
+
+  get shortAddress58() { return this.key.getShortAddress58(); }
+  get shortAddress() {
+    return new Uint8Array(mapCall(this.key.getShortAddressBin, this.key));
+  }
+
+  get longAddress58() { return this.key.getLongAddress58(); }
+  get longAddress() {
+    return new Uint8Array(mapCall(this.key.getLongAddressBin, this.key));
+  }
+
+  static async unpack(options) {
+    return new PublicKey(await PublicKey.unpackBOSS(options));
+  }
+
+  static async unpackBOSS(options) {
+    const self = this;
+
+    return new Promise(resolve => {
+      Module.PublicKeyImpl.initFromPackedBinary(options, resolve);
+    });
+  }
+
+  static fromPrivate(key) {
+    return new PublicKey(new Module.PublicKeyImpl(key));
   }
 }
 
@@ -136,27 +225,27 @@ module.exports = class PublicKey extends AbstractKey {
 //     return this.key.verify(arrayToByteString(hash.get(message)), signature, pss);
 //   }
 
-//   verifyExtended(signature, data) {
-//     const boss = new Boss();
-//     const dataHash = new SHA('512');
-//     const unpacked = boss.load(signature);
-//     const { exts, sign } = unpacked;
+  // verifyExtended(signature, data) {
+  //   const boss = new Boss();
+  //   const dataHash = new SHA('512');
+  //   const unpacked = boss.load(signature);
+  //   const { exts, sign } = unpacked;
 
-//     const verified = this.verify(exts, sign, {
-//       pssHash: new SHA(512),
-//       mgf1Hash: new SHA(1)
-//     });
+  //   const verified = this.verify(exts, sign, {
+  //     pssHash: new SHA(512),
+  //     mgf1Hash: new SHA(1)
+  //   });
 
-//     if (!verified) return null;
+  //   if (!verified) return null;
 
-//     const targetSignature = boss.load(exts);
-//     const { sha512, key, created_at } = targetSignature;
+  //   const targetSignature = boss.load(exts);
+  //   const { sha512, key, created_at } = targetSignature;
 
-//     if (encode64(dataHash.get(data)) === encode64(sha512))
-//       return { key, created_at };
+  //   if (encode64(dataHash.get(data)) === encode64(sha512))
+  //     return { key, created_at };
 
-//     return null;
-//   }
+  //   return null;
+  // }
 
 //   /**
 //    * Encrypts data with OAEP
@@ -183,21 +272,21 @@ module.exports = class PublicKey extends AbstractKey {
 //   static get DEFAULT_MGF1_HASH() { return new SHA(1); }
 //   static get DEFAULT_OAEP_HASH() { return new SHA(1); }
 
-//   fingerprint() {
-//     if (this._fingerprint) return this._fingerprint;
+  // fingerprint() {
+  //   if (this._fingerprint) return this._fingerprint;
 
-//     const { n, e } = this.params;
-//     const sha256 = new SHA('256');
+  //   const { n, e } = this.params;
+  //   const sha256 = new SHA('256');
 
-//     sha256.put(hexToBytes(e.toString(16)));
-//     sha256.put(hexToBytes(n.toString(16)));
+  //   sha256.put(hexToBytes(e.toString(16)));
+  //   sha256.put(hexToBytes(n.toString(16)));
 
-//     const hashedExponents = sha256.get('hex');
+  //   const hashedExponents = sha256.get('hex');
 
-//     this._fingerprint = hexToBytes(FINGERPRINT_SHA512 + hashedExponents);
+  //   this._fingerprint = hexToBytes(FINGERPRINT_SHA512 + hashedExponents);
 
-//     return this._fingerprint;
-//   }
+  //   return this._fingerprint;
+  // }
 
 //   address(options = {}) {
 //     const shaType = options.long ? 384 : 256;

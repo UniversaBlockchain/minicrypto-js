@@ -7,6 +7,19 @@ const { base64, raw } = util.binary;
 
 const { bytesToHex } = util;
 
+var window = window || {};
+
+// nodejs polyfill
+if (!window.TextDecoder || !window.TextEncoder) {
+  const {
+    TextEncoder,
+    TextDecoder
+  } = require("fastestsmallesttextencoderdecoder");
+  // var window = window || {};
+  window.TextEncoder = TextEncoder;
+  window.TextDecoder = TextDecoder;
+}
+
 const hexToBytes = (data) => raw.decode(util.hexToBytes(data));
 
 function textToHex(text) {
@@ -44,8 +57,19 @@ exports.arrayToByteString = function(list, offset = 10000) {
 };
 
 exports.textToHex = textToHex;
-exports.textToBytes = (text) => hexToBytes(textToHex(text));
-exports.bytesToText = (bytes) => Buffer.from(bytes).toString('utf-8');
+
+
+
+exports.textToBytes = (text) => {
+  const te = new TextEncoder();
+
+  return new Uint8Array(te.encode(text));
+};
+exports.bytesToText = (bytes) => {
+  const td = new TextDecoder("utf-8");
+
+  return td.decode(bytes);
+};
 exports.ensureBytes = (bytes) => {
   return bytes.constructor.name == 'Array' ? new Uint8Array(bytes) : bytes;
 }

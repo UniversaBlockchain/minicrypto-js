@@ -47,13 +47,10 @@ exports.createPrivateKey = function createPrivateKey(bits, exponent, callback) {
 };
 
 exports.keysEqual = function keysEqual(key1, key2) {
-  const { n: n1, e: e1 } = key1.params;
-  const { n: n2, e: e2 } = key2.params;
-
-  return n1.equals(n2) && e1.equals(e2);
+  return key1.getN() === key2.getN() && key1.getE() === key2.getE();
 };
 
 exports.defaultPSSConfig = () => ({
-  pssHash: new SHA("3_384"),
-  mgf1Hash: new SHA("1")
+  pssHash: "sha3_384",
+  mgf1Hash: "sha1"
 });

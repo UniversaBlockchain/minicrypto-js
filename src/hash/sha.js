@@ -66,6 +66,8 @@ class SHA {
       Module.calcHashId(data, res => resolve(new Uint8Array(res)));
     });
   }
+
+  static wasmType(stringType) { return SHA.StringTypes[stringType.toLowerCase()]; }
 }
 
 SHA.StringTypes = StringTypes;

@@ -10,7 +10,7 @@ exports.extractKeyId = extractKeyId;
 exports.extractPublicKey = extractPublicKey;
 
 exports.sign = (key, data) => key.signExtended(data);
-exports.verify = (publicKey, signature, data) =>
+exports.verify = async (publicKey, signature, data) =>
 	publicKey.verifyExtended(signature, data);
 
 function extractKeyId(signature) {
@@ -22,17 +22,15 @@ function extractKeyId(signature) {
 	return targetSignature.key;
 }
 
-function extractPublicKey(signature) {
+async function extractPublicKey(signature) {
   const boss = new Boss();
   const unpacked = boss.unpack(signature);
   const { exts } = unpacked;
   const targetSignature = boss.unpack(exts);
 
-  return new PublicKey("BOSS", targetSignature.pub_key);
+  return PublicKey.unpack("BOSS", targetSignature.pub_key);
 }
 
-function keyId(key) {
-	const publicKey = key.publicKey || key;
-
-	return publicKey.fingerprint();
+async function keyId(key) {
+	return key.fingerprint();
 }

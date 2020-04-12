@@ -1,30 +1,28 @@
-const forge = require('../vendor/forge');
-const Hash = require('./hash');
-const bytes = require('../utils/bytes');
+var Module = Module || require('../vendor/wasm/wrapper');
 
-const { arrayToByteString } = bytes;
+const SHA = require('./SHA');
 
-module.exports = HMAC;
+class HMAC {
+  /**
+   * Returns instance of HMAC message digest function
+   *
+   * @param {Hash} hash - hash instance, for example SHA256
+   * @param {String} key - key to use with HMAC
+   */
+  constructor(hashStringType, key) {
+    this.hashType = SHA.wasmType[hashStringType];
+    this.key = key;
+  }
 
-/**
- * Returns instance of HMAC message digest function
- *
- * @param {Hash} hash - hash instance, for example SHA256
- * @param {String} key - key to use with HMAC
- */
-function HMAC(hash, key) {
-  this.hash = hash;
-  this.key = key;
+  async get(data) {
+    const self = this;
 
-  Hash.call(this, 'hmac');
+    return new Promise((resolve, reject) => {
+      Module.calcHmac(self.hashType, self.key, data, res => {
+        resolve(new Uint8Array(res));
+      });
+    });
+  }
 }
 
-HMAC.prototype = Object.create(Hash.prototype);
-
-HMAC.prototype._init = function() {
-  this.forgeMD = forge.hmac.create();
-
-  var convertedKey = typeof this.key == 'object' ? arrayToByteString(this.key) : this.key;
-
-  this.forgeMD.start(this.hash._getForgeMD(), convertedKey);
-};
+module.exports = HMAC;

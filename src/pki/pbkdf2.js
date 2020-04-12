@@ -1,8 +1,6 @@
-const forge = require('../vendor/forge');
+var Module = Module || require('../vendor/wasm/wrapper');
 
-const utils = require('../utils');
-
-const { byteStringToArray, arrayToByteString } = utils;
+const SHA = require('../hash/SHA');
 
 module.exports = derive;
 
@@ -17,27 +15,18 @@ module.exports = derive;
  * @param {Number} options.keyLength - the intended length, in bytes, of the
  *                                     derived key, (max: 2^32 - 1) * hash
  *                                     length of the PRF.
- * @param {Function} [callback(err, key)] - presence triggers asynchronous
- *                                          version, called once the operation
- *                                          completes.
  *
  * @return the derived key, as a binary-encoded array of bytes, for the
  *           synchronous version (if no callback is specified).
  */
-function derive(hash, options, callback) {
-	const { password, salt, iterations, keyLength, rounds } = options;
-  // FIXME: remove iterations
-  const rnds = iterations || rounds;
+async function derive(hashStringType, options) {
+  const self = this;
+  const hashType = SHA.StringTypes[hashStringType];
 
-	const forgeMD = hash._getForgeMD();
-  const convertedSalt = salt && typeof salt === 'object' ? arrayToByteString(salt) : salt;
+  return new Promise((resolve, reject) => {
+    const { password, salt, keyLength, rounds } = options;
+    const cb = (result) => resolve(new Uint8Array(result));
 
-  if (!callback)
-    return byteStringToArray(forge.pbkdf2(password, convertedSalt, rnds, keyLength, forgeMD));
-
-  forge.pbkdf2(password, convertedSalt, rnds, keyLength, forgeMD, (err, key) => {
-    if (err) return callback(err);
-
-    callback(null, byteStringToArray(key));
+    Module.pbkdf2(hashType, rounds || 5000, keyLength, password, salt, cb);
   });
 }
