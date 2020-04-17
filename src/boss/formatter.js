@@ -54,81 +54,120 @@ module.exports = class Formatter {
     if (isNone(value))
       return this.writeHeader(CREF, 0);
 
-    switch (value.constructor.name) {
-      case 'Number':
-        if (value === parseInt(value)) { // Integer
-          return this.writeHeader(value < 0 ? NINT : INT, Math.abs(value));
-        } else {
-          // All numbers in JavaScript are 64-bit floating point numbers.
-          this.writeHeader(EXTRA, TDOUBLE);
-          return this.writeDouble(value);
-        }
-      case 'String':
-        if (this.isCached(value))
-          return this.writeReference(value);
+    const self = this;
 
-        this.cacheObject(value);
-        const buffer = Buffer.from(value);
-
-        this.writeHeader(TEXT, buffer.byteLength);
-        return this.writeBinary(buffer.toString('binary'));
-      case 'Buffer':
-      case 'Uint8Array':
-
-        const buffered = Buffer.from(value.buffer);
-        const binary = buffered.toString('binary');
-
-        if (this.isCached(binary))
-          return this.writeReference(binary);
-
-        this.cacheObject(binary);
-        this.writeHeader(BIN, buffered.byteLength);
-
-        return this.writeBinary(binary);
-      case 'Boolean':
-        return this.writeHeader(EXTRA, value ? TTRUE : TFALSE);
-      case 'Date':
-        this.writeHeader(EXTRA, TTIME); // TODO: Should validate?
-        return this.writeSegment(parseInt(value.getTime() / 1000));
-      case 'Array':
-        if (this.isCached(value))
-          return this.writeReference(value);
-
-        this.writeHeader(LIST, value.length);
-        this.cacheObject(value);
-
-        for (const v of value) {
-          this.put(v);
-        }
-
-        return this;
-      case 'Object':
-
-        if (this.isCached(value))
-          return this.writeReference(value);
-
-
-
-        const keys = Object.keys(value).filter(key => {
-          if (key === "___id") return false;
-
-          const val = value[key];
-          return isNone(val) || val.constructor.name != "Function";
-        });
-
-        this.writeHeader(DICT, keys.length);
-        this.cacheObject(value);
-
-        for (const key of keys) {
-          this.put(key);
-          this.put(value[key]);
-        }
-
-        return this;
-      // TODO: Should implement TYPE_BIN section
-      default:
-        throw new Error("Unknown type " + value.constructor.name);
+    function writeNumber(value) {
+      if (value === parseInt(value)) { // Integer
+        return self.writeHeader(value < 0 ? NINT : INT, Math.abs(value));
+      } else {
+        // All numbers in JavaScript are 64-bit floating point numbers.
+        self.writeHeader(EXTRA, TDOUBLE);
+        return self.writeDouble(value);
+      }
     }
+
+    function writeString(value) {
+      if (self.isCached(value))
+        return self.writeReference(value);
+
+      self.cacheObject(value);
+      const buffer = Buffer.from(value);
+
+      self.writeHeader(TEXT, buffer.byteLength);
+      return self.writeBinary(buffer.toString('binary'));
+    }
+
+    function writeBinary(value) {
+      const buffered = Buffer.from(value.buffer);
+      const binary = buffered.toString('binary');
+
+      if (self.isCached(binary))
+        return self.writeReference(binary);
+
+      self.cacheObject(binary);
+      self.writeHeader(BIN, buffered.byteLength);
+
+      return self.writeBinary(binary);
+    }
+
+    function writeBoolean(value) {
+      return self.writeHeader(EXTRA, value ? TTRUE : TFALSE);
+    }
+
+    function writeArray(value) {
+      if (self.isCached(value))
+        return self.writeReference(value);
+
+      self.writeHeader(LIST, value.length);
+      self.cacheObject(value);
+
+      for (const v of value) {
+        self.put(v);
+      }
+
+      return self;
+    }
+
+    function writeDate(value) {
+      self.writeHeader(EXTRA, TTIME); // TODO: Should validate?
+      return self.writeSegment(parseInt(value.getTime() / 1000));
+    }
+
+    function writeObject(value) {
+      if (self.isCached(value))
+        return self.writeReference(value);
+
+      const keys = Object.keys(value).filter(key => {
+        if (key === "___id") return false;
+
+        const val = value[key];
+        return isNone(val) || val.constructor.name != "Function";
+      });
+
+      self.writeHeader(DICT, keys.length);
+      self.cacheObject(value);
+
+      for (const key of keys) {
+        self.put(key);
+        self.put(value[key]);
+      }
+
+      return self;
+    }
+
+    function classifyByConstructorName() {
+      const constructorName = value.constructor.name;
+
+      switch (constructorName) {
+        case 'Number': return writeNumber(value);
+        case 'String': return writeString(value);
+        case 'Buffer':
+        case 'Uint8Array': return writeBinary(value);
+        case 'Boolean': return writeBoolean(value);
+        case 'Date': return writeDate(value);
+        case 'Array': return writeArray(value);
+        case 'Object': return writeObject(value);
+        default: return classifyByInstance();
+      }
+    }
+
+    function classifyByInstance() {
+      if (value instanceof Number) return writeNumber(value);
+      if (value instanceof String) return writeString(value);
+      if (value instanceof Buffer || value instanceof Uint8Array)
+        return writeBinary(value);
+      if (value instanceof Boolean) return writeBoolean(value);
+      if (value instanceof Date) return writeDate(value);
+      if (value instanceof Array) return writeArray(value);
+      if (value instanceof Object) return writeObject(value);
+
+      const errMsg = "unknown type " + (constructorName || "without constructor name");
+
+      throw new Error("Boss dump error: " + errMsg);
+    }
+
+    if (value.constructor) return classifyByConstructorName();
+    else return classifyByInstance();
   }
 
   /**
