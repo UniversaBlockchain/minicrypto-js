@@ -135,7 +135,7 @@ mocha.setup = function(opts) {
       this[opt](opts[opt]);
     }
   }
-  // return this;
+  return this;
 };
 
 /**

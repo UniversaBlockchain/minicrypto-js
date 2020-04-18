@@ -33,6 +33,7 @@
   "dependencies": {
     "buffer": "^5.4.2",
     "fastestsmallesttextencoderdecoder": "^1.0.14",
-    "jsbn": "^1.1.0"
+    "jsbn": "^1.1.0",
+    "randombytes": "^2.1.0"
   }
 }

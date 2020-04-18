@@ -15,8 +15,7 @@ describe('Hash', function() {
   } = Universa;
 
   before((done) => {
-    if (Module.isReady) Module.isReady.then(done);
-    else Module.onRuntimeInitialized = done;
+    Module.isReady.then(done);
   });
 
   const { SHA, HMAC } = Universa;

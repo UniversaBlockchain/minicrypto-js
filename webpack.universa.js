@@ -18,9 +18,8 @@ module.exports = [
     },
     externals: [
       function(context, request, callback) {
-        console.log(/\/wasm\/wrapper/.test(request));
         if (/\/wasm\/wrapper/.test(request)){
-          return callback(null, 'commonjs ' + 'Module');
+          return callback(null, 'root ' + 'Module');
         }
         callback();
       }
