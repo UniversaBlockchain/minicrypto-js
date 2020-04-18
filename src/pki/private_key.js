@@ -2,7 +2,6 @@ var Module = Module || require('../vendor/wasm/wrapper');
 
 const Boss = require('../boss/protocol');
 const utils = require('../utils');
-const forge = require('../vendor/forge');
 const helpers = require('./helpers');
 const PublicKey = require('./public_key');
 const SHA = require('../hash/sha');
@@ -31,8 +30,6 @@ const { AESCTRTransformer } = cipher;
 
 const { ONE: one } = BigInteger;
 const { wrapOptions, getMaxSalt, normalizeOptions } = helpers;
-
-const { pki, rsa } = forge;
 
 // const transit = {
 //   BOSS: {
@@ -63,8 +60,8 @@ module.exports = class PrivateKey extends AbstractKey {
   getP() { return this.key.get_p(); }
   getQ() { return this.key.get_q(); }
   getBitStrength() { return this.publicKey.getBitStrength(); }
-  async fingerprint() {
-    return this.publicKey.fingerprint();
+  get fingerprint() {
+    return this.publicKey.fingerprint;
   }
   async sign(data, options = {}) {
     const self = this;
@@ -86,15 +83,10 @@ module.exports = class PrivateKey extends AbstractKey {
   async signExtended(data) {
     const self = this;
     const pub = this.publicKey;
-    // const boss = new Boss();
     const dataHash = new SHA('512');
-
-    console.log("run dump");
-    const fingerprint = await pub.fingerprint();
+    const fingerprint = pub.fingerprint;
     const sha512Digest = await dataHash.get(data);
     const publicPacked = await pub.packed();
-
-    console.log(fingerprint, encode64(fingerprint), encode64(sha512Digest), encode64(publicPacked));
     const boss = new Boss();
     const targetSignature = boss.dump({
       'key': fingerprint,
@@ -103,13 +95,11 @@ module.exports = class PrivateKey extends AbstractKey {
       'pub_key': publicPacked
     });
 
-    console.log("done dump", targetSignature.length);
-    console.log((boss.load(targetSignature)).key.length);
+
     const signature = await self.sign(targetSignature, {
-      // pssHash: 'sha512',
-      // mgf1Hash: 'sha1'
+      pssHash: 'sha512',
+      mgf1Hash: 'sha1'
     });
-    console.log(">>>>>>>");
 
     return boss.dump({
       'exts': targetSignature,

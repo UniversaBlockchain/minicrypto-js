@@ -13,7 +13,8 @@ describe('Extended signature', function() {
   const { keyId, extractKeyId, extractPublicKey } = ExtendedSignature;
 
   before((done) => {
-    Module.onRuntimeInitialized = () => done();
+    if (Module.isReady) Module.isReady.then(done);
+    else Module.onRuntimeInitialized = done;
   });
 
   it('should get key id', async () => {
@@ -23,35 +24,29 @@ describe('Extended signature', function() {
     expect(hex(id)).to.equal('074118648ed82a64b9a9ff6a9cb7bcd64cf5367e290e1c80c333a08107c1f82663');
   });
 
-  it.only('should sign and verify data', async () => {
+  it('should sign and verify data', async () => {
     const data = hexToBytes(textToHex('Hello world'));
     const key = await PrivateKey.unpack(decode64(seedKeys[3]));
-    const id = await keyId(key);
-    const pubKey = key.publicKey;
-    console.log("test signature");
-
-    const sign = await key.sign(data);
-    console.log("done sign");
-    const signature = await key.signExtended(data);
-
-    console.log("......");
-    const es = await pubKey.verifyExtended(signature, data);
-    console.log("................");
-    expect(es).to.be.ok;
-    expect(hex(es.key)).to.equal(hex(id));
-    expect(hex(extractKeyId(signature))).to.equal(hex(keyId(pubKey)));
-    expect(hex(keyId(key))).to.equal(hex(keyId(pubKey)));
-  });
-
-  it('should extract key from signature', function () {
-    const data = hexToBytes(textToHex('Hello world'));
-    const key = new PrivateKey('BOSS', decode64(seedKeys[3]));
     const id = keyId(key);
     const pubKey = key.publicKey;
-    const signature = key.signExtended(data);
+    const fp = pubKey.fingerprint;
+    const sign = await key.sign(data);
+    const signature = await key.signExtended(data);
+    const es = await pubKey.verifyExtended(signature, data);
 
-    const extractedKey = extractPublicKey(signature);
+    expect(es).to.be.ok;
+    expect(hex(es.key)).to.equal(hex(id));
+    expect(hex(extractKeyId(signature))).to.equal(hex(pubKey.fingerprint));
+  });
 
-    expect(hex(pubKey.fingerprint())).to.equal(hex(extractedKey.fingerprint()));
+  it('should extract key from signature', async () => {
+    const data = hexToBytes(textToHex('Hello world'));
+    const key = await PrivateKey.unpack(decode64(seedKeys[3]));
+    const id = keyId(key);
+    const pubKey = key.publicKey;
+    const signature = await key.signExtended(data);
+    const extractedKey = await extractPublicKey(signature);
+
+    expect(hex(pubKey.fingerprint)).to.equal(hex(extractedKey.fingerprint));
   });
 });

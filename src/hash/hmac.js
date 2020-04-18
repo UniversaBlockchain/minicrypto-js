@@ -10,7 +10,7 @@ class HMAC {
    * @param {String} key - key to use with HMAC
    */
   constructor(hashStringType, key) {
-    this.hashType = SHA.wasmType[hashStringType];
+    this.hashType = SHA.wasmType(hashStringType);
     this.key = key;
   }
 

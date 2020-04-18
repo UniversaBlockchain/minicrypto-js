@@ -1,11 +1,7 @@
 const { Buffer } = require('buffer');
-const forge = require('../vendor/forge');
+const jsbn = require('jsbn');
 
-const { util, jsbn } = forge;
 const { BigInteger } = jsbn;
-const { base64, raw } = util.binary;
-
-const { bytesToHex } = util;
 
 var window = window || {};
 
@@ -20,7 +16,8 @@ if (!window.TextDecoder || !window.TextEncoder) {
   window.TextDecoder = TextDecoder;
 }
 
-const hexToBytes = (data) => raw.decode(util.hexToBytes(data));
+const hexToBytes = (hexString) => Uint8Array.from(Buffer.from(hexString, 'hex'));
+const bytesToHex = (data) => Buffer.from(data).toString('hex');
 
 function textToHex(text) {
   var result = [];
@@ -33,29 +30,8 @@ function textToHex(text) {
 
 exports.bigIntToBin = num => hexToBytes(num.toString(16));
 exports.binToBigInt = bin => new BigInteger(bytesToHex(bin), 16);
-exports.byteStringToArray = raw.decode;
 exports.hexToBytes = hexToBytes;
 exports.bytesToHex = bytesToHex;
-
-exports.arrayToByteString = function(list, offset = 10000) {
-  const total = list.length;
-  var cursor = 0;
-
-  if (offset > total) return raw.encode(list);
-
-  var result = '';
-
-  for(cursor = 0; cursor < total; cursor += offset) {
-    var start = cursor;
-    var end = start + offset;
-    if (end > total) end = total;
-
-    result += raw.encode(list.subarray(start, end));
-  }
-
-  return result;
-};
-
 exports.textToHex = textToHex;
 
 
@@ -74,16 +50,47 @@ exports.ensureBytes = (bytes) => {
   return bytes.constructor.name == 'Array' ? new Uint8Array(bytes) : bytes;
 }
 
-exports.bufferToArray = function(buf) {
+exports.byteStringToBytes = function(str, output, offset) {
+  var out = output;
+  if(!out) {
+    out = new Uint8Array(str.length);
+  }
+  offset = offset || 0;
+  var j = offset;
+  for(var i = 0; i < str.length; ++i) {
+    out[j++] = str.charCodeAt(i);
+  }
+  return output ? (j - offset) : out;
+};
+
+exports.bytesToByteString = (bytes) => String.fromCharCode.apply(null, bytes);
+
+const bufferToArray = function(buf) {
   var ab = new ArrayBuffer(buf.length);
   var view = new Uint8Array(ab);
   for (var i = 0; i < buf.length; ++i) {
       view[i] = buf[i];
   }
   return view;
-}
-
-exports.randomByteString = forge.random.getBytesSync;
-exports.randomBytes = function(len) {
-  return raw.decode(forge.random.getBytesSync(len));
 };
+
+exports.bufferToArray = bufferToArray;
+
+const randomBytesBuffer = (
+  (typeof self !== 'undefined' && (self.crypto || self.msCrypto))
+    ? function() { // Browsers
+        var crypto = (self.crypto || self.msCrypto), QUOTA = 65536;
+        return function(n) {
+          var a = new Uint8Array(n);
+          for (var i = 0; i < n; i += QUOTA) {
+            crypto.getRandomValues(a.subarray(i, i + Math.min(n - i, QUOTA)));
+          }
+          return a;
+        };
+      }
+    : function() { // Node
+        return require("crypto").randomBytes;
+      }
+)();
+
+exports.randomBytes = (size) => bufferToArray(randomBytesBuffer(size));

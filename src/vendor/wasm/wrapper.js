@@ -1,6 +1,9 @@
 module.exports = function() {
-  console.log("run module importer");
-  var Module = Module || require('./main');
+  var Module = Module || require('./crypto');
+
+  Module.isReady = new Promise(resolve => {
+    Module.onRuntimeInitialized = resolve;
+  });
 
   return Module;
 }();

@@ -1,4 +1,3 @@
-const forge = require('../vendor/forge');
 const SHA = require('../hash/sha');
 const utils = require('../utils');
 

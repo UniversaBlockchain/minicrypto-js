@@ -27,21 +27,6 @@ describe('BOSS Protocol', function() {
     boss = new Boss();
   });
 
-  it.only('should dump extended signature', function() {
-    const fp = decode64("kJ1RAICdUQBvIHdvSwAAALf3g7rtgpfw25F0YhhP9PCO");
-    const shaDigest = decode64("t/eDuu2Cl/DbkXRiGE/08I5pwtXl95qUJgD5cl9Yzh8pwYE5v4CwbA//K900c4RS7PQMSIwip+PYDN9vnBwNRw==");
-    const pub = decode64("HggcAQABxAAC4vJD/uUC+tELh0fHN/5MxSOTUPhWTbZX+8AAVLq1ZCENPqNrAmMXjoNT3on3FXrCjnfOiIONeSPFpBmsE3cnKpDgzv0FVo1tfhLtC/YEARZA7Q6LpXlNxaZREecIxg9upjmh6q84AsbIVaGmSvoh8HcprzkUHIfik26qivnw6RXe+zqLfGx9myJ2101zcX1rdBrsc+TgAH+X2mPw3NU7oTXwbdKi+b4oG0c+faaET17llSElTrSFmALkYinQ4nHYUlAAxxVryPULpIz5KiAJdHc4/+B7OJM+vNxJP2dGS6lbQaQBk5fFGf/SjRQTUsbXlSizgi9VQatcaOOVEA0mE2f5YW99JqSK4vuCbR7Am8e/KA3shyj5iz5BfXjrSgfLnwaBcUYWqeT2V1ySfBfiYJ4+T4lzov4NlW0GImnsPSKR88VO4TmR/h62uvYXp1w+72qxTvXHc61iBwKELerFicAIc0rog9RyAZgxuSA0VHPawYomBG4knN9o46vkIpDc/9afEBz4Ad3x+/fH8J4H6KbZFDBYXRbwET4IxOWlvOoJ1b/Z9NrDLo+8ShV6GhwbXGUX4uHi03kIxjMauxxCGql1tHtbh51Ru4Vswc06Pzy/Cfj9pjvbkBQQo6g5/ggLMZ/5Yf64h9FBYO1Halbwydkkmmx0IwWuHIMQTjGQIsc=");
-
-    const targetSignature = boss.dump({
-      'key': fp,
-      'sha512': shaDigest,
-      'created_at': new Date(),
-      'pub_key': pub
-    });
-
-    console.log(targetSignature.length);
-  });
-
   it('should ignore functions', function() {
     const hash = { a: 1, b: 2, c: function() {} };
     const decoded = boss.load(boss.dump(hash));
@@ -87,6 +72,8 @@ describe('BOSS Protocol', function() {
   });
 
   it('should encode utf8 strings', function() {
+    // console.log(boss.dump('АБВГД'));
+
     expect(boss.load(boss.dump('АБВГД'))).to.equal('АБВГД');
   });
 
@@ -99,13 +86,13 @@ describe('BOSS Protocol', function() {
   });
 
   // FIXME: need to deprecate byte strings
-  it('should perform compatible encode', function() {
+  it.skip('should perform compatible encode', function() {
     for (const [a, b] of vectors)
       expect(arrayToByteString(boss.dump(b))).to.equal(a);
   });
 
   // FIXME: need to deprecate byte strings
-  it('should perform compatible decode', function() {
+  it.skip('should perform compatible decode', function() {
     for (const [a, b] of vectors)
       expect(hex(boss.load(byteStringToArray(a)))).to.equal(hex(b));
   });

@@ -1,6 +1,5 @@
 var Module = Module || require('../vendor/wasm/wrapper');
 
-const forge = require('../vendor/forge');
 const helpers = require('./helpers');
 const utils = require('../utils');
 const Boss = require('../boss/protocol');
@@ -24,9 +23,6 @@ const {
   arrayToByteString,
   crc32
 } = utils;
-
-const { pki } = forge;
-const { rsa } = pki;
 
 const { wrapOptions, getMaxSalt, normalizeOptions, mapCall } = helpers;
 
@@ -72,14 +68,11 @@ module.exports = class PublicKey extends AbstractKey {
   async verifyExtended(signature, data) {
     const boss = new Boss();
     const dataHash = new SHA('512');
-    console.log("run verify", signature);
     const unpacked = boss.load(signature);
     const { exts, sign } = unpacked;
     const verified = await this.verify(exts, sign, {
       pssHash: 'sha512'
     });
-
-    console.log("done verify");
 
     if (!verified) return null;
 
@@ -105,17 +98,13 @@ module.exports = class PublicKey extends AbstractKey {
     });
   }
 
-  async fingerprint() {
+  get fingerprint() {
+    if (this._fingerprint) return this._fingerprint;
+
     const self = this;
+    this.key.fingerprint(fp => self._fingerprint = new Uint8Array(fp));
 
-    return new Promise(resolve => {
-      if (self._fingerprint) return resolve(self._fingerprint);
-
-      self.key.fingerprint(fp => {
-        self._fingerprint = fp;
-        resolve(fp);
-      });
-    });
+    return this._fingerprint;
   }
 
   async packed() {

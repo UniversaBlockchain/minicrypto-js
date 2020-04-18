@@ -1,12 +1,10 @@
-const forge = require('../vendor/forge');
+const jsbn = require('jsbn');
 const bytes = require('./bytes');
 const base58 = require('./base58');
 const base64 = require('./base64');
 const idGenerators = require('./id_generators');
 const crc32 = require('../hash/crc32');
 const SHA = require('../hash/sha');
-
-const { jsbn } = forge;
 
 const { BigInteger } = jsbn;
 
@@ -40,6 +38,8 @@ exports.hexToBytes = bytes.hexToBytes;
 exports.bytesToHex = bytes.bytesToHex;
 exports.textToBytes = bytes.textToBytes;
 exports.bytesToText = bytes.bytesToText;
+exports.byteStringToBytes = bytes.byteStringToBytes;
+exports.bytesToByteString = bytes.bytesToByteString;
 exports.textToHex = bytes.textToHex;
 exports.randomBytes = bytes.randomBytes;
 

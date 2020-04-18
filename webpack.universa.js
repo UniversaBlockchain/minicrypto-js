@@ -15,21 +15,31 @@ module.exports = [
       minimize: true,
       minimizer: [new TerserPlugin({
         terserOptions: { mangle: { reserved: ["window"]}} })],
-    }
-  },
-  {
-    entry: ['./src/boss/protocol.js'],
-    output: {
-      globalObject: 'this',
-      filename: 'boss.min.js',
-      path: __dirname + '/dist',
-      library: 'Boss',
-      libraryTarget: 'umd'
     },
-    mode: 'production',
-    optimization: {
-      minimize: true,
-      minimizer: [new TerserPlugin()],
-    }
-  }
+    externals: [
+      function(context, request, callback) {
+        console.log(/\/wasm\/wrapper/.test(request));
+        if (/\/wasm\/wrapper/.test(request)){
+          return callback(null, 'commonjs ' + 'Module');
+        }
+        callback();
+      }
+    ]
+
+  },
+  // {
+  //   entry: ['./src/boss/protocol.js'],
+  //   output: {
+  //     globalObject: 'this',
+  //     filename: 'boss.min.js',
+  //     path: __dirname + '/dist',
+  //     library: 'Boss',
+  //     libraryTarget: 'umd'
+  //   },
+  //   mode: 'production',
+  //   optimization: {
+  //     minimize: true,
+  //     minimizer: [new TerserPlugin()],
+  //   }
+  // }
 ];

@@ -28,9 +28,9 @@ async function extractPublicKey(signature) {
   const { exts } = unpacked;
   const targetSignature = boss.unpack(exts);
 
-  return PublicKey.unpack("BOSS", targetSignature.pub_key);
+  return PublicKey.unpack(targetSignature.pub_key);
 }
 
-async function keyId(key) {
-	return key.fingerprint();
+function keyId(key) {
+	return key.fingerprint;
 }

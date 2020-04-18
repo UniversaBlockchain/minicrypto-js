@@ -1,16 +1,13 @@
 const { Buffer } = require('buffer');
 
 const buffer = require('./struct');
-
 const types = require('./types');
 const StringIO = require('./stringio');
 
-const forge = require('../vendor/forge');
-
-const { jsbn } = forge;
+const jsbn = require('jsbn');
 
 const { BigInteger } = jsbn;
-
+const { textToBytes, byteStringToBytes } = require('../utils');
 const { chr, isNone, indexOfObject } = require('./helpers');
 
 const {
@@ -339,6 +336,6 @@ module.exports = class Formatter {
   toArray() {
     const str = this.buffer.getValue();
 
-    return forge.util.binary.raw.decode(str);
+    return byteStringToBytes(str);
   }
 };

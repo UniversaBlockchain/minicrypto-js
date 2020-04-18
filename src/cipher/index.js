@@ -1,8 +1,6 @@
 const AES = require('./aes');
 const utils = require('../utils');
 
-const { arrayToBytes, bytesToArray, ensureBytes } = utils;
-
 exports.AES = require('./aes');
 
 var AESCTRTransformer,

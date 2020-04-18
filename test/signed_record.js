@@ -11,7 +11,8 @@ describe('Signed record', function() {
   const boss = new Boss();
 
   before((done) => {
-    Module.onRuntimeInitialized = () => done();
+    if (Module.isReady) Module.isReady.then(done);
+    else Module.onRuntimeInitialized = done;
   });
 
   it('should sign with key without nonce', async () => {

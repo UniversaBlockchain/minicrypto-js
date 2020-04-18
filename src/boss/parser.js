@@ -1,17 +1,16 @@
 const buffer = require('./struct');
 
+const { Buffer } = require('buffer');
+
 const types = require('./types');
 const StringIO = require('./stringio');
-// const forge = require('../vendor/forge');
-const forge = require('../vendor/forge');
+
+const jsbn = require('jsbn');
 
 const { ord } = require('./helpers');
 
-const { util, jsbn } = forge;
 const { BigInteger } = jsbn;
-
-const { decodeUtf8 } = util;
-const raw = util.binary.raw;
+const { bytesToText, byteStringToBytes, bytesToByteString } = require('../utils');
 
 const {
   INT,
@@ -41,7 +40,7 @@ const {
 module.exports = class Parser {
   constructor(protocol, source) {
     this.protocol = protocol;
-    this.buffer = new StringIO(raw.encode(source));
+    this.buffer = new StringIO(bytesToByteString(source));
 
     // Aliases
     this.read = this.get.bind(this);
@@ -90,12 +89,12 @@ module.exports = class Parser {
             throw new Error('Unknown type');
         }
       case TEXT:
-        const binaryText = decodeUtf8(this.readBinary(value));
+        const binaryText = bytesToText(byteStringToBytes(this.readBinary(value)));
 
         return this.cacheObject(binaryText);
       case BIN:
         const binary = this.readBinary(value);
-        const byteArray = raw.decode(binary);
+        const byteArray = byteStringToBytes(binary);
         const parsedValue = this.cacheObject(byteArray);
 
         return byteArray;

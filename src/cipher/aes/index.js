@@ -1,8 +1,6 @@
 const AES = require('./vendor');
 const utils = require('../../utils');
 
-const { raw, arrayToBytes } = utils;
-
 module.exports = AESCipher;
 
 /**

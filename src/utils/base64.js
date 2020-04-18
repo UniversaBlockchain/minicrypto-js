@@ -1,10 +1,8 @@
 const bytes = require('./bytes');
-const forge = require('../vendor/forge');
+const { Buffer } = require('buffer');
 
-const { util, jsbn } = forge;
-const { base64, raw } = util.binary;
-
-const encode64 = (byteArr) => base64.encode(bytes.ensureBytes(byteArr));
+// const encode64 = (byteArr) => base64.encode(bytes.ensureBytes(byteArr));
+const encode64 = (byteArr) => (Buffer.from(byteArr)).toString('base64');
 const decode64 = (base64Str) =>
   bytes.bufferToArray(Buffer.from(base64Str, 'base64'));
 
