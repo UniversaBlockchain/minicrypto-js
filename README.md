@@ -1,6 +1,6 @@
-## universa-js/universajs
+## universa-wasm
 
-Minimalistic Javascript library required to perform basic operations with Universa smart contracts and other objects.
+Minimalistic Javascript library required to perform basic operations with Universa smart contracts and other objects. WASM version
 
 Supports:
  * [SHA family](#sha)
@@ -17,13 +17,13 @@ Supports:
 For usage in an existing Node.js project, add it to your dependencies:
 
 ```
-$ npm install universa-minicrypto
+$ npm install universa-wasm
 ```
 
 or with yarn:
 
 ```
-$ yarn add universa-minicrypto
+$ yarn add universa-wasm
 ```
 
 
