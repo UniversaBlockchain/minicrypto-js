@@ -13,8 +13,7 @@ describe('Extended signature', function() {
   const { keyId, extractKeyId, extractPublicKey } = ExtendedSignature;
 
   before((done) => {
-    if (Module.isReady) Module.isReady.then(done);
-    else Module.onRuntimeInitialized = done;
+    Universa.isReady.then(done);
   });
 
   it('should get key id', async () => {

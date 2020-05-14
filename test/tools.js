@@ -20,8 +20,7 @@ describe('Tools', function() {
   } = Universa;
 
   before((done) => {
-    if (Module.isReady) Module.isReady.then(done);
-    else Module.onRuntimeInitialized = done;
+    Universa.isReady.then(done);
   });
 
   const { randomByteString } = Universa.bytes;

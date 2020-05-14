@@ -11,8 +11,7 @@ describe('Signed record', function() {
   const boss = new Boss();
 
   before((done) => {
-    if (Module.isReady) Module.isReady.then(done);
-    else Module.onRuntimeInitialized = done;
+    Universa.isReady.then(done);
   });
 
   it('should sign with key without nonce', async () => {

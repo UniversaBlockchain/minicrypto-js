@@ -6,7 +6,7 @@ var Module = Module || require('../src/vendor/wasm/wrapper');
 
 describe('PBKDF2', function() {
   before((done) => {
-    Module.isReady.then(done);
+    Universa.isReady.then(done);
   });
 
   const { pbkdf2 } = Universa;

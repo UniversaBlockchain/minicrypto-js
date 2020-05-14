@@ -1,6 +1,5 @@
 const fs = require('fs');
 const webpack = require('webpack');
-const forgeConfig = require('./webpack.forge');
 const universaConfig = require('./webpack.universa');
 
 function rewriteWASM() {
@@ -30,7 +29,7 @@ function build(config) {
 }
 
 build(universaConfig)
-  .then(rewriteWASM)
+  // .then(rewriteWASM)
   .then(
     () => console.log("Done without errors."),
     (err) => console.log(`Done with errors: ${err}`)

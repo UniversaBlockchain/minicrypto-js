@@ -13,7 +13,7 @@ if (!window.TextDecoder || !window.TextEncoder) {
     TextEncoder,
     TextDecoder
   } = require("fastestsmallesttextencoderdecoder");
-  // var window = window || {};
+
   window.TextEncoder = TextEncoder;
   window.TextDecoder = TextDecoder;
 }
@@ -36,15 +36,13 @@ exports.hexToBytes = hexToBytes;
 exports.bytesToHex = bytesToHex;
 exports.textToHex = textToHex;
 
-
-
 exports.textToBytes = (text) => {
-  const te = new TextEncoder();
+  const te = new window.TextEncoder();
 
   return new Uint8Array(te.encode(text));
 };
 exports.bytesToText = (bytes) => {
-  const td = new TextDecoder("utf-8");
+  const td = new window.TextDecoder("utf-8");
 
   return td.decode(bytes);
 };

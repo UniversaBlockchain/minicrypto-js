@@ -14,7 +14,7 @@ describe('RSA', function() {
   } = Universa;
 
   before((done) => {
-    Module.isReady.then(done);
+    Universa.isReady.then(done);
   });
 
   const {

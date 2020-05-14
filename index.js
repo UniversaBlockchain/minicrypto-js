@@ -4,7 +4,9 @@ const utils = require('./src/utils');
 const cipher = require('./src/cipher');
 const Boss = require('./src/boss/protocol');
 const universa = require('./src/universa');
+var Module = Module || require('./src/vendor/wasm/wrapper');
 
+exports.isReady = Module.isReady;
 exports.Boss = Boss;
 
 for (var key in universa) { exports[key] = universa[key]; }

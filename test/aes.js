@@ -19,8 +19,7 @@ describe('AES', function() {
   const encrypted = hexToBytes('8ea2b7ca516745bfeafc49904b496089');
 
   before((done) => {
-    if (Module.isReady) Module.isReady.then(done);
-    else Module.onRuntimeInitialized = done;
+    Universa.isReady.then(done);
   });
 
   describe('AES 256', function() {
