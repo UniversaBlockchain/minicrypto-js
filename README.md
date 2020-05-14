@@ -17,13 +17,13 @@ Supports:
 For usage in an existing Node.js project, add it to your dependencies:
 
 ```
-$ npm install universa-wasm
+$ npm install UniversaBlockchain/minicrypto-js#feature/wasm
 ```
 
 or with yarn:
 
 ```
-$ yarn add universa-wasm
+$ yarn add UniversaBlockchain/minicrypto-js#feature/wasm
 ```
 
 
