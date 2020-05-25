@@ -166,10 +166,18 @@ module.exports = class PublicKey extends AbstractKey {
     const shaType = options.long ? 384 : 256;
     const shaLength = shaType === 384 ? 48 : 32;
 
+    const keyMasks = {
+      1024: 0x01,
+      2048: 0x01,
+      4096: 0x02,
+      8192: 0x03
+    };
+
     const hash = new SHA('3_' + shaType);
     const typeMark = options.typeMark || 0;
     const bits = this.params.n.bitLength();
-    const keyMask = bits === 2048 ? 0x01 : 0x02;
+    const keyMask = keyMasks[bits];
+
     const firstByte = ((keyMask << 4) | typeMark) & 0xFF;
     const result = new Uint8Array(1 + 4 + shaLength);
     result.set([firstByte]);

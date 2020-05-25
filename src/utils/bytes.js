@@ -7,19 +7,6 @@ const { base64, raw } = util.binary;
 
 const { bytesToHex } = util;
 
-var window = window || {};
-
-// nodejs polyfill
-if (!window.TextDecoder || !window.TextEncoder) {
-  const {
-    TextEncoder,
-    TextDecoder
-  } = require("fastestsmallesttextencoderdecoder");
-  // var window = window || {};
-  window.TextEncoder = TextEncoder;
-  window.TextDecoder = TextDecoder;
-}
-
 const hexToBytes = (data) => raw.decode(util.hexToBytes(data));
 
 function textToHex(text) {
@@ -61,11 +48,21 @@ exports.textToHex = textToHex;
 
 
 exports.textToBytes = (text) => {
+  if (typeof TextEncoder !== 'function') {
+    const polyfill = require("fastestsmallesttextencoderdecoder");
+    TextEncoder = polyfill.TextEncoder;
+  }
+
   const te = new TextEncoder();
 
   return new Uint8Array(te.encode(text));
 };
 exports.bytesToText = (bytes) => {
+  if (typeof TextDecoder !== 'function') {
+    const polyfill = require("fastestsmallesttextencoderdecoder");
+    TextDecoder = polyfill.TextDecoder;
+  }
+
   const td = new TextDecoder("utf-8");
 
   return td.decode(bytes);
