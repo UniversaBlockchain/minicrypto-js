@@ -33,6 +33,6 @@
   "dependencies": {
     "buffer": "^5.4.2",
     "fastestsmallesttextencoderdecoder": "^1.0.14",
-    "node-forge": "^0.8.5"
+    "node-forge": "^0.10.0"
   }
 }
