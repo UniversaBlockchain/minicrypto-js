@@ -1,3 +1,12 @@
+# Important note
+
+> This project is no more supported, instead, we have created much improved version with similar interface: 
+[unicrypto npm package](https://www.npmjs.com/package/unicrypto), see also [unicrypto github page](https://github.com/UniversaBlockchain/unicrypto-js)
+
+We strongly encourage all users to migrate to it.
+
+Sorry for inconveniente.
+
 ## universa-js/universajs
 
 Minimalistic Javascript library required to perform basic operations with Universa smart contracts and other objects.
